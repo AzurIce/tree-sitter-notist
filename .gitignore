@@ -1,0 +1,8 @@
+target/
+*.o
+*.obj
+*.dll
+*.so
+*.dylib
+*.wasm
+build/

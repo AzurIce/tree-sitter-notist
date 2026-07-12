@@ -1,0 +1,191 @@
+/**
+ * @file Notist grammar for tree-sitter
+ * @license MIT OR Apache-2.0
+ */
+
+/// <reference types="tree-sitter-cli/dsl" />
+// @ts-check
+
+module.exports = grammar({
+  name: "notist",
+
+  extras: _ => [],
+
+  word: $ => $.identifier,
+
+  externals: $ => [
+    $.raw_open,
+    $.raw_content,
+    $.raw_close,
+    $.backtick_raw,
+  ],
+
+  rules: {
+    document: $ => repeat($._item),
+
+    _item: $ => choice(
+      $.wiki_reference,
+      $.transparent_scope,
+      $.raw_call,
+      $.content_call,
+      $.backtick_raw,
+      $.text,
+    ),
+
+    _body_item: $ => choice(
+      $.wiki_reference,
+      $.transparent_scope,
+      $.raw_call,
+      $.content_call,
+      $.backtick_raw,
+      $.text,
+    ),
+
+    text: _ => token(prec(-1, /[^#\[\]`]+|[#\[\]`]/)),
+
+    wiki_reference: $ => seq(
+      "[[",
+      field("target", $.wiki_target),
+      "]]",
+    ),
+
+    wiki_target: _ => token.immediate(/[^\]\n]+/),
+
+    transparent_scope: $ => seq(
+      "#[",
+      optional(field("body", $.content_body)),
+      "]",
+      optional(field("attributes", $.attributes)),
+    ),
+
+    content_call: $ => seq(
+      "#",
+      field("function", $.qualified_name),
+      optional(field("arguments", $.arguments)),
+      "[",
+      optional(field("body", $.content_body)),
+      "]",
+      optional(field("attributes", $.attributes)),
+    ),
+
+    raw_call: $ => seq(
+      "#",
+      field("function", $.qualified_name),
+      optional(field("arguments", $.arguments)),
+      field("open", $.raw_open),
+      optional(field("body", $.raw_content)),
+      field("close", $.raw_close),
+      optional(field("attributes", $.attributes)),
+    ),
+
+    content_body: $ => repeat1($._body_item),
+
+    qualified_name: $ => seq(
+      $.identifier,
+      repeat(seq("::", $.identifier)),
+    ),
+
+    identifier: _ => /[\p{L}\p{N}_-]+/,
+
+    arguments: $ => seq(
+      "(",
+      optional($._whitespace),
+      optional(seq(
+        $.argument,
+        repeat(seq(
+          optional($._whitespace),
+          ",",
+          optional($._whitespace),
+          $.argument,
+        )),
+      )),
+      optional($._whitespace),
+      ")",
+    ),
+
+    argument: $ => choice(
+      $.named_argument,
+      $.positional_argument,
+    ),
+
+    named_argument: $ => seq(
+      field("name", $.identifier),
+      optional($._whitespace),
+      "=",
+      optional($._whitespace),
+      field("value", $.expression),
+    ),
+
+    positional_argument: $ => field("value", $.expression),
+
+    expression: $ => choice(
+      $.none,
+      $.boolean,
+      $.float,
+      $.integer,
+      $.string,
+    ),
+
+    none: _ => "none",
+    boolean: _ => choice("true", "false"),
+    integer: _ => token(prec(2, /-?[0-9]+/)),
+    float: _ => token(prec(2, /-?(?:[0-9]+\.[0-9]*|[0-9]*\.[0-9]+)/)),
+
+    string: $ => seq(
+      '"',
+      optional($.string_content),
+      '"',
+    ),
+
+    string_content: $ => repeat1(choice(
+      token.immediate(/[^"\\]+/),
+      $.escape_sequence,
+    )),
+
+    escape_sequence: _ => token.immediate(/\\["\\nrt]/),
+
+    attributes: $ => seq(
+      "@",
+      field("first", $.first_attribute),
+      repeat(seq(",", field("item", $.attribute_item))),
+    ),
+
+    first_attribute: $ => choice(
+      $.id_attribute,
+      $.attribute_item,
+    ),
+
+    attribute_item: $ => choice(
+      $.tag_attribute,
+      $.class_attribute,
+      $.property_attribute,
+    ),
+
+    id_attribute: $ => field("name", $.identifier),
+    tag_attribute: $ => seq("#", field("name", $.identifier)),
+    class_attribute: $ => seq(".", field("name", $.identifier)),
+    property_attribute: $ => seq(
+      field("key", $.identifier),
+      "=",
+      field("value", $.attribute_value),
+    ),
+
+    attribute_value: $ => choice(
+      $.identifier,
+      $.attribute_string,
+    ),
+
+    attribute_string: $ => seq(
+      '"',
+      optional($.attribute_string_content),
+      '"',
+    ),
+
+    attribute_string_content: $ => repeat1(choice(
+      token.immediate(/[^"\\]+/),
+      token.immediate(/\\./),
+    )),
+
+    _whitespace: _ => /[ \t\r\n]+/,
+  },
+});

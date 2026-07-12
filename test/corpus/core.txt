@@ -1,0 +1,187 @@
+==================
+Wiki references
+==================
+
+Read [[self::intro]] and [[vault::guide#section]].
+
+---
+
+(document
+  (text)
+  (wiki_reference
+    (wiki_target))
+  (text)
+  (wiki_reference
+    (wiki_target))
+  (text))
+
+==================
+Scopes and content calls
+==================
+
+#[annotated [[self::target]]]@concept,#knowledge
+#heading(level=2)[Title]
+#quote[
+Paragraph one.
+
+Paragraph two.
+]
+
+---
+
+(document
+  (text)
+  (transparent_scope
+    (content_body
+      (text)
+      (wiki_reference
+        (wiki_target)))
+    (attributes
+      (first_attribute
+        (id_attribute
+          (identifier)))
+      (attribute_item
+        (tag_attribute
+          (identifier)))))
+  (text)
+  (content_call
+    (qualified_name
+      (identifier))
+    (arguments
+      (argument
+        (named_argument
+          (identifier)
+          (expression
+            (integer)))))
+    (content_body
+      (text)))
+  (text)
+  (content_call
+    (qualified_name
+      (identifier))
+    (content_body
+      (text)))
+  (text))
+
+==================
+Raw calls and delimiter levels
+==================
+
+#raw(lang="rust")![fn main() {}]!
+#raw!![body containing ]! and ordinary brackets []]!!@example,#code
+
+---
+
+(document
+  (text)
+  (raw_call
+    (qualified_name
+      (identifier))
+    (arguments
+      (argument
+        (named_argument
+          (identifier)
+          (expression
+            (string
+              (string_content))))))
+    (raw_open)
+    (raw_content)
+    (raw_close))
+  (text)
+  (raw_call
+    (qualified_name
+      (identifier))
+    (raw_open)
+    (raw_content)
+    (raw_close)
+    (attributes
+      (first_attribute
+        (id_attribute
+          (identifier)))
+      (attribute_item
+        (tag_attribute
+          (identifier)))))
+  (text))
+
+==================
+Arguments and attributes
+==================
+
+#example(1, enabled=true, ratio=-1.5, label="demo", missing=none)[body]@id,#tag,.class,key=value
+
+---
+
+(document
+  (text)
+  (content_call
+    (qualified_name
+      (identifier))
+    (arguments
+      (argument
+        (positional_argument
+          (expression
+            (integer))))
+      (argument
+        (named_argument
+          (identifier)
+          (expression
+            (boolean))))
+      (argument
+        (named_argument
+          (identifier)
+          (expression
+            (float))))
+      (argument
+        (named_argument
+          (identifier)
+          (expression
+            (string
+              (string_content)))))
+      (argument
+        (named_argument
+          (identifier)
+          (expression
+            (none)))))
+    (content_body
+      (text))
+    (attributes
+      (first_attribute
+        (id_attribute
+          (identifier)))
+      (attribute_item
+        (tag_attribute
+          (identifier)))
+      (attribute_item
+        (class_attribute
+          (identifier)))
+      (attribute_item
+        (property_attribute
+          (identifier)
+          (attribute_value
+            (identifier))))))
+  (text))
+
+==================
+Empty raw and legacy backticks
+==================
+
+#raw![]!
+`#[shielded]`
+```not
+#heading[shielded]
+```
+
+---
+
+(document
+  (text)
+  (raw_call
+    (qualified_name
+      (identifier))
+    (raw_open)
+    (raw_close))
+  (text)
+  (backtick_raw)
+  (text)
+  (backtick_raw)
+  (text))

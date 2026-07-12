@@ -1,0 +1,23 @@
+{
+  "grammars": [
+    {
+      "name": "notist",
+      "camelcase": "Notist",
+      "scope": "source.notist",
+      "file-types": ["not"],
+      "injection-regex": "^(not|notist)$"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT OR Apache-2.0",
+    "description": "Notist grammar for tree-sitter",
+    "authors": [{ "name": "Notist contributors" }],
+    "links": {
+      "repository": "https://github.com/notist-lang/tree-sitter-notist"
+    }
+  },
+  "bindings": {
+    "rust": true
+  }
+}
