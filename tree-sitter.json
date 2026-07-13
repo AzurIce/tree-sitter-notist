@@ -14,7 +14,7 @@
     "description": "Notist grammar for tree-sitter",
     "authors": [{ "name": "Notist contributors" }],
     "links": {
-      "repository": "https://github.com/notist-lang/tree-sitter-notist"
+      "repository": "https://github.com/AzurIce/tree-sitter-notist"
     }
   },
   "bindings": {

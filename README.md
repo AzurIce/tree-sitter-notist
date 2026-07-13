@@ -2,7 +2,7 @@
 
 Tree-sitter grammar for the Notist markup language.
 
-The grammar follows `docs/grammar.not` in the main Notist repository. It supports wiki references, transparent scopes, content calls, typed literal arguments, postfix attributes, legacy backtick shielding, and extensible raw call delimiters.
+The grammar follows [`docs/grammar.not`](https://github.com/AzurIce/Notist/blob/main/docs/grammar.not) in the main Notist repository. It supports wiki references, transparent scopes, content calls, typed literal arguments, postfix attributes, legacy backtick shielding, and extensible raw call delimiters.
 
 ```not
 #heading(level=2)[Content]
