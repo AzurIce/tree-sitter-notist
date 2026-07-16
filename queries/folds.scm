@@ -1,3 +1,5 @@
 (transparent_scope) @fold
-(content_call) @fold
-(raw_call) @fold
+(call) @fold
+(fenced_raw) @fold
+(escaped_multiline_string) @fold
+(raw_multiline_string) @fold

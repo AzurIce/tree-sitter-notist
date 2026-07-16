@@ -14,10 +14,18 @@ module.exports = grammar({
   word: $ => $.identifier,
 
   externals: $ => [
-    $.raw_open,
-    $.raw_content,
-    $.raw_close,
-    $.backtick_raw,
+    $.escaped_inline_open,
+    $.escaped_multiline_open,
+    $.raw_inline_open,
+    $.raw_multiline_open,
+    $.string_content,
+    $.escape_sequence,
+    $.string_close,
+    $.inline_raw,
+    $.fence_open,
+    $.fence_info,
+    $.fence_content,
+    $.fence_close,
   ],
 
   rules: {
@@ -26,18 +34,18 @@ module.exports = grammar({
     _item: $ => choice(
       $.wiki_reference,
       $.transparent_scope,
-      $.raw_call,
-      $.content_call,
-      $.backtick_raw,
+      $.call,
+      $.fenced_raw,
+      $.inline_raw,
       $.text,
     ),
 
     _body_item: $ => choice(
       $.wiki_reference,
       $.transparent_scope,
-      $.raw_call,
-      $.content_call,
-      $.backtick_raw,
+      $.call,
+      $.fenced_raw,
+      $.inline_raw,
       $.text,
     ),
 
@@ -58,24 +66,20 @@ module.exports = grammar({
       optional(field("attributes", $.attributes)),
     ),
 
-    content_call: $ => seq(
+    call: $ => seq(
       "#",
       field("function", $.qualified_name),
-      optional(field("arguments", $.arguments)),
-      "[",
-      optional(field("body", $.content_body)),
-      "]",
+      choice(
+        seq(field("arguments", $.arguments), optional($._trailing_content)),
+        $._trailing_content,
+      ),
       optional(field("attributes", $.attributes)),
     ),
 
-    raw_call: $ => seq(
-      "#",
-      field("function", $.qualified_name),
-      optional(field("arguments", $.arguments)),
-      field("open", $.raw_open),
-      optional(field("body", $.raw_content)),
-      field("close", $.raw_close),
-      optional(field("attributes", $.attributes)),
+    _trailing_content: $ => seq(
+      "[",
+      optional(field("body", $.content_body)),
+      "]",
     ),
 
     content_body: $ => repeat1($._body_item),
@@ -98,6 +102,7 @@ module.exports = grammar({
           optional($._whitespace),
           $.argument,
         )),
+        optional(seq(optional($._whitespace), ",")),
       )),
       optional($._whitespace),
       ")",
@@ -131,18 +136,44 @@ module.exports = grammar({
     integer: _ => token(prec(2, /-?[0-9]+/)),
     float: _ => token(prec(2, /-?(?:[0-9]+\.[0-9]*|[0-9]*\.[0-9]+)/)),
 
-    string: $ => seq(
-      '"',
-      optional($.string_content),
-      '"',
+    string: $ => choice(
+      $.escaped_inline_string,
+      $.escaped_multiline_string,
+      $.raw_inline_string,
+      $.raw_multiline_string,
     ),
 
-    string_content: $ => repeat1(choice(
-      token.immediate(/[^"\\]+/),
-      $.escape_sequence,
-    )),
+    escaped_inline_string: $ => seq(
+      $.escaped_inline_open,
+      repeat(choice($.string_content, $.escape_sequence)),
+      $.string_close,
+    ),
 
-    escape_sequence: _ => token.immediate(/\\["\\nrt]/),
+    escaped_multiline_string: $ => seq(
+      $.escaped_multiline_open,
+      repeat(choice($.string_content, $.escape_sequence)),
+      $.string_close,
+    ),
+
+    raw_inline_string: $ => seq(
+      $.raw_inline_open,
+      repeat($.string_content),
+      $.string_close,
+    ),
+
+    raw_multiline_string: $ => seq(
+      $.raw_multiline_open,
+      repeat($.string_content),
+      $.string_close,
+    ),
+
+    fenced_raw: $ => seq(
+      $.fence_open,
+      optional(field("language", $.fence_info)),
+      $._line_break,
+      optional(field("body", $.fence_content)),
+      field("close", $.fence_close),
+    ),
 
     attributes: $ => seq(
       "@",
@@ -186,6 +217,7 @@ module.exports = grammar({
       token.immediate(/\\./),
     )),
 
+    _line_break: _ => /\r?\n/,
     _whitespace: _ => /[ \t\r\n]+/,
   },
 });

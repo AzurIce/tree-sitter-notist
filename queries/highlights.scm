@@ -11,17 +11,9 @@
 "::" @punctuation.delimiter
 "@" @attribute
 
-(raw_open) @punctuation.bracket
-(raw_close) @punctuation.bracket
-(raw_content) @string.special
-(backtick_raw) @string.special
-
 (wiki_target) @link_uri
 
-(content_call
-  function: (qualified_name) @function.call)
-
-(raw_call
+(call
   function: (qualified_name) @function.call)
 
 (named_argument
@@ -33,6 +25,18 @@
 (float) @number
 (string) @string
 (escape_sequence) @string.escape
+
+[(escaped_inline_open)
+ (escaped_multiline_open)
+ (raw_inline_open)
+ (raw_multiline_open)
+ (string_close)] @punctuation.bracket
+
+(inline_raw) @string.special
+(fence_open) @punctuation.bracket
+(fence_info) @label
+(fence_content) @string.special
+(fence_close) @punctuation.bracket
 
 (id_attribute
   name: (identifier) @label)

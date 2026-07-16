@@ -2,13 +2,15 @@
 
 Tree-sitter grammar for the Notist markup language.
 
-The grammar follows [`docs/grammar.not`](https://github.com/AzurIce/Notist/blob/main/docs/grammar.not) in the main Notist repository. It supports wiki references, transparent scopes, content calls, typed literal arguments, postfix attributes, legacy backtick shielding, and extensible raw call delimiters.
+The grammar follows [`docs/grammar.not`](https://github.com/AzurIce/Notist/blob/main/docs/grammar.not) in the main Notist repository. It supports wiki references, transparent scopes, calls with trailing content, typed literal arguments, postfix attributes, escaped and hash-delimited raw strings, inline raw spans, and fenced raw blocks.
 
-```not
+````not
 #heading(level=2)[Content]
-#raw(lang="rust")![fn main() {}]!
-#raw!![body containing ]!]!!
+#raw(text=r#"fn main() {}"#, lang="rust")
+```rust
+fn main() {}
 ```
+````
 
 Generate and test the parser with:
 

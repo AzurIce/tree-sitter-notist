@@ -127,58 +127,7 @@
     "fields": {}
   },
   {
-    "type": "class_attribute",
-    "named": true,
-    "fields": {
-      "name": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "content_body",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "backtick_raw",
-          "named": true
-        },
-        {
-          "type": "content_call",
-          "named": true
-        },
-        {
-          "type": "raw_call",
-          "named": true
-        },
-        {
-          "type": "text",
-          "named": true
-        },
-        {
-          "type": "transparent_scope",
-          "named": true
-        },
-        {
-          "type": "wiki_reference",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "content_call",
+    "type": "call",
     "named": true,
     "fields": {
       "arguments": {
@@ -224,24 +173,39 @@
     }
   },
   {
-    "type": "document",
+    "type": "class_attribute",
     "named": true,
-    "root": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "content_body",
+    "named": true,
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
-          "type": "backtick_raw",
+          "type": "call",
           "named": true
         },
         {
-          "type": "content_call",
+          "type": "fenced_raw",
           "named": true
         },
         {
-          "type": "raw_call",
+          "type": "inline_raw",
           "named": true
         },
         {
@@ -254,6 +218,96 @@
         },
         {
           "type": "wiki_reference",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "document",
+    "named": true,
+    "root": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "call",
+          "named": true
+        },
+        {
+          "type": "fenced_raw",
+          "named": true
+        },
+        {
+          "type": "inline_raw",
+          "named": true
+        },
+        {
+          "type": "text",
+          "named": true
+        },
+        {
+          "type": "transparent_scope",
+          "named": true
+        },
+        {
+          "type": "wiki_reference",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "escaped_inline_string",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "escape_sequence",
+          "named": true
+        },
+        {
+          "type": "escaped_inline_open",
+          "named": true
+        },
+        {
+          "type": "string_close",
+          "named": true
+        },
+        {
+          "type": "string_content",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "escaped_multiline_string",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "escape_sequence",
+          "named": true
+        },
+        {
+          "type": "escaped_multiline_open",
+          "named": true
+        },
+        {
+          "type": "string_close",
+          "named": true
+        },
+        {
+          "type": "string_content",
           "named": true
         }
       ]
@@ -285,6 +339,52 @@
         },
         {
           "type": "string",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "fenced_raw",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "fence_content",
+            "named": true
+          }
+        ]
+      },
+      "close": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "fence_close",
+            "named": true
+          }
+        ]
+      },
+      "language": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "fence_info",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "fence_open",
           "named": true
         }
       ]
@@ -409,79 +509,21 @@
     }
   },
   {
-    "type": "raw_call",
-    "named": true,
-    "fields": {
-      "arguments": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "arguments",
-            "named": true
-          }
-        ]
-      },
-      "attributes": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "attributes",
-            "named": true
-          }
-        ]
-      },
-      "body": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "raw_content",
-            "named": true
-          }
-        ]
-      },
-      "close": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "raw_close",
-            "named": true
-          }
-        ]
-      },
-      "function": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "qualified_name",
-            "named": true
-          }
-        ]
-      },
-      "open": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "raw_open",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "string",
+    "type": "raw_inline_string",
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
-      "required": false,
+      "multiple": true,
+      "required": true,
       "types": [
+        {
+          "type": "raw_inline_open",
+          "named": true
+        },
+        {
+          "type": "string_close",
+          "named": true
+        },
         {
           "type": "string_content",
           "named": true
@@ -490,15 +532,50 @@
     }
   },
   {
-    "type": "string_content",
+    "type": "raw_multiline_string",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
-          "type": "escape_sequence",
+          "type": "raw_multiline_open",
+          "named": true
+        },
+        {
+          "type": "string_close",
+          "named": true
+        },
+        {
+          "type": "string_content",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "string",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "escaped_inline_string",
+          "named": true
+        },
+        {
+          "type": "escaped_multiline_string",
+          "named": true
+        },
+        {
+          "type": "raw_inline_string",
+          "named": true
+        },
+        {
+          "type": "raw_multiline_string",
           "named": true
         }
       ]
@@ -619,11 +696,15 @@
     "named": false
   },
   {
-    "type": "backtick_raw",
+    "type": "escape_sequence",
     "named": true
   },
   {
-    "type": "escape_sequence",
+    "type": "escaped_inline_open",
+    "named": true
+  },
+  {
+    "type": "escaped_multiline_open",
     "named": true
   },
   {
@@ -631,11 +712,31 @@
     "named": false
   },
   {
+    "type": "fence_close",
+    "named": true
+  },
+  {
+    "type": "fence_content",
+    "named": true
+  },
+  {
+    "type": "fence_info",
+    "named": true
+  },
+  {
+    "type": "fence_open",
+    "named": true
+  },
+  {
     "type": "float",
     "named": true
   },
   {
     "type": "identifier",
+    "named": true
+  },
+  {
+    "type": "inline_raw",
     "named": true
   },
   {
@@ -647,15 +748,19 @@
     "named": true
   },
   {
-    "type": "raw_close",
+    "type": "raw_inline_open",
     "named": true
   },
   {
-    "type": "raw_content",
+    "type": "raw_multiline_open",
     "named": true
   },
   {
-    "type": "raw_open",
+    "type": "string_close",
+    "named": true
+  },
+  {
+    "type": "string_content",
     "named": true
   },
   {

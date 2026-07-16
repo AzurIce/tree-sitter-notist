@@ -16,7 +16,7 @@ Read [[self::intro]] and [[vault::guide#section]].
   (text))
 
 ==================
-Scopes and content calls
+Scopes and calls
 ==================
 
 #[annotated [[self::target]]]@concept,#knowledge
@@ -44,7 +44,7 @@ Paragraph two.
         (tag_attribute
           (identifier)))))
   (text)
-  (content_call
+  (call
     (qualified_name
       (identifier))
     (arguments
@@ -56,7 +56,7 @@ Paragraph two.
     (content_body
       (text)))
   (text)
-  (content_call
+  (call
     (qualified_name
       (identifier))
     (content_body
@@ -64,56 +64,17 @@ Paragraph two.
   (text))
 
 ==================
-Raw calls and delimiter levels
+Arguments, strings, and trailing comma
 ==================
 
-#raw(lang="rust")![fn main() {}]!
-#raw!![body containing ]! and ordinary brackets []]!!@example,#code
+#example(1, enabled=true, ratio=-1.5, label="demo", missing=none,)[body]
+#raw(text=r#"fn main() {}"#, lang="rust")
 
 ---
 
 (document
   (text)
-  (raw_call
-    (qualified_name
-      (identifier))
-    (arguments
-      (argument
-        (named_argument
-          (identifier)
-          (expression
-            (string
-              (string_content))))))
-    (raw_open)
-    (raw_content)
-    (raw_close))
-  (text)
-  (raw_call
-    (qualified_name
-      (identifier))
-    (raw_open)
-    (raw_content)
-    (raw_close)
-    (attributes
-      (first_attribute
-        (id_attribute
-          (identifier)))
-      (attribute_item
-        (tag_attribute
-          (identifier)))))
-  (text))
-
-==================
-Arguments and attributes
-==================
-
-#example(1, enabled=true, ratio=-1.5, label="demo", missing=none)[body]@id,#tag,.class,key=value
-
----
-
-(document
-  (text)
-  (content_call
+  (call
     (qualified_name
       (identifier))
     (arguments
@@ -136,52 +97,168 @@ Arguments and attributes
           (identifier)
           (expression
             (string
-              (string_content)))))
+              (escaped_inline_string
+                (escaped_inline_open)
+                (string_content)
+                (string_close))))))
       (argument
         (named_argument
           (identifier)
           (expression
             (none)))))
     (content_body
-      (text))
-    (attributes
-      (first_attribute
-        (id_attribute
-          (identifier)))
-      (attribute_item
-        (tag_attribute
-          (identifier)))
-      (attribute_item
-        (class_attribute
-          (identifier)))
-      (attribute_item
-        (property_attribute
+      (text)))
+  (text)
+  (call
+    (qualified_name
+      (identifier))
+    (arguments
+      (argument
+        (named_argument
           (identifier)
-          (attribute_value
-            (identifier))))))
+          (expression
+            (string
+              (raw_inline_string
+                (raw_inline_open)
+                (string_content)
+                (string_close))))))
+      (argument
+        (named_argument
+          (identifier)
+          (expression
+            (string
+              (escaped_inline_string
+                (escaped_inline_open)
+                (string_content)
+                (string_close))))))))
   (text))
 
 ==================
-Empty raw and legacy backticks
+Multiline strings
 ==================
 
-#raw![]!
+#raw(text="""
+escaped \n text
+""")
+#raw(text=r##"""
+raw "# text
+"""##)
+
+---
+
+(document
+  (text)
+  (call
+    (qualified_name
+      (identifier))
+    (arguments
+      (argument
+        (named_argument
+          (identifier)
+          (expression
+            (string
+              (escaped_multiline_string
+                (escaped_multiline_open)
+                (string_content)
+                (escape_sequence)
+                (string_content)
+                (string_close))))))))
+  (text)
+  (call
+    (qualified_name
+      (identifier))
+    (arguments
+      (argument
+        (named_argument
+          (identifier)
+          (expression
+            (string
+              (raw_multiline_string
+                (raw_multiline_open)
+                (string_content)
+                (string_close))))))))
+  (text))
+
+==================
+Raw inline quote ambiguity
+==================
+
+#raw(text=r#"""#)
+#raw(text=r#"""text"""#)
+
+---
+
+(document
+  (text)
+  (call
+    (qualified_name
+      (identifier))
+    (arguments
+      (argument
+        (named_argument
+          (identifier)
+          (expression
+            (string
+              (raw_inline_string
+                (raw_inline_open)
+                (string_content)
+                (string_close))))))))
+  (text)
+  (call
+    (qualified_name
+      (identifier))
+    (arguments
+      (argument
+        (named_argument
+          (identifier)
+          (expression
+            (string
+              (raw_inline_string
+                (raw_inline_open)
+                (string_content)
+                (string_content)
+                (string_content)
+                (string_close))))))))
+  (text))
+
+==================
+Inline and fenced raw syntax
+==================
+
 `#[shielded]`
-```not
+``contains ` inside``
+```triple inline```
+```rust
 #heading[shielded]
+````
+```
+plain fence
+```
+```
 ```
 
 ---
 
 (document
   (text)
-  (raw_call
-    (qualified_name
-      (identifier))
-    (raw_open)
-    (raw_close))
+  (inline_raw)
   (text)
-  (backtick_raw)
+  (inline_raw)
   (text)
-  (backtick_raw)
+  (inline_raw)
+  (text)
+  (fenced_raw
+    (fence_open)
+    (fence_info)
+    (fence_content)
+    (fence_close))
+  (text)
+  (fenced_raw
+    (fence_open)
+    (fence_content)
+    (fence_close))
+  (text)
+  (fenced_raw
+    (fence_open)
+    (fence_close))
   (text))

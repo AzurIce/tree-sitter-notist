@@ -2,10 +2,10 @@
   "#["
   "]" @end) @indent
 
-(content_call
+(call
   "["
   "]" @end) @indent
 
-(raw_call
-  (raw_open)
-  (raw_close) @end) @indent
+(fenced_raw
+  (fence_open)
+  (fence_close) @end) @indent
