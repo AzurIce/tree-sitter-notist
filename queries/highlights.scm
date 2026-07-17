@@ -1,5 +1,5 @@
 "#" @punctuation.special
-"#[" @punctuation.bracket
+
 "[[" @punctuation.bracket
 "]]" @punctuation.bracket
 "[" @punctuation.bracket
@@ -13,7 +13,7 @@
 
 (wiki_target) @link_uri
 
-(call
+(call_expression
   function: (qualified_name) @function.call)
 
 (named_argument

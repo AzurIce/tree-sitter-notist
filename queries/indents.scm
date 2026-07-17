@@ -1,8 +1,4 @@
-(transparent_scope
-  "#["
-  "]" @end) @indent
-
-(call
+(content_block
   "["
   "]" @end) @indent
 

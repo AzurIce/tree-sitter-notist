@@ -33,17 +33,7 @@ module.exports = grammar({
 
     _item: $ => choice(
       $.wiki_reference,
-      $.transparent_scope,
-      $.call,
-      $.fenced_raw,
-      $.inline_raw,
-      $.text,
-    ),
-
-    _body_item: $ => choice(
-      $.wiki_reference,
-      $.transparent_scope,
-      $.call,
+      $.embedded_expression,
       $.fenced_raw,
       $.inline_raw,
       $.text,
@@ -59,76 +49,22 @@ module.exports = grammar({
 
     wiki_target: _ => token.immediate(/[^\]\n]+/),
 
-    transparent_scope: $ => seq(
-      "#[",
-      optional(field("body", $.content_body)),
-      "]",
-      optional(field("attributes", $.attributes)),
-    ),
-
-    call: $ => seq(
+    // EmbeddedExpression = "#" CodeExpression Attributes?
+    embedded_expression: $ => seq(
       "#",
-      field("function", $.qualified_name),
-      choice(
-        seq(field("arguments", $.arguments), optional($._trailing_content)),
-        $._trailing_content,
-      ),
+      field("expression", $._code_expression),
       optional(field("attributes", $.attributes)),
     ),
 
-    _trailing_content: $ => seq(
-      "[",
-      optional(field("body", $.content_body)),
-      "]",
-    ),
-
-    content_body: $ => repeat1($._body_item),
-
-    qualified_name: $ => seq(
-      $.identifier,
-      repeat(seq("::", $.identifier)),
-    ),
-
-    identifier: _ => /[\p{L}\p{N}_-]+/,
-
-    arguments: $ => seq(
-      "(",
-      optional($._whitespace),
-      optional(seq(
-        $.argument,
-        repeat(seq(
-          optional($._whitespace),
-          ",",
-          optional($._whitespace),
-          $.argument,
-        )),
-        optional(seq(optional($._whitespace), ",")),
-      )),
-      optional($._whitespace),
-      ")",
-    ),
-
-    argument: $ => choice(
-      $.named_argument,
-      $.positional_argument,
-    ),
-
-    named_argument: $ => seq(
-      field("name", $.identifier),
-      optional($._whitespace),
-      "=",
-      optional($._whitespace),
-      field("value", $.expression),
-    ),
-
-    positional_argument: $ => field("value", $.expression),
-
-    expression: $ => choice(
+    _code_expression: $ => choice(
       $.none,
       $.boolean,
       $.float,
       $.integer,
       $.string,
+      $.content_block,
+      $.call_expression,
+      $.parenthesized_expression,
     ),
 
     none: _ => "none",
@@ -166,6 +102,74 @@ module.exports = grammar({
       repeat($.string_content),
       $.string_close,
     ),
+
+    // ContentBlock = "[" Markup "]"
+    content_block: $ => seq(
+      "[",
+      optional(field("body", $.content_body)),
+      "]",
+    ),
+
+    content_body: $ => repeat1($._item),
+
+    // CallExpression = QualifiedName (Arguments ContentBlock* | ContentBlock+)
+    call_expression: $ => seq(
+      field("function", $.qualified_name),
+      choice(
+        seq(
+          field("arguments", $.arguments),
+          repeat(field("trailing", $.content_block)),
+        ),
+        repeat1(field("trailing", $.content_block)),
+      ),
+    ),
+
+    parenthesized_expression: $ => seq(
+      "(",
+      optional($._whitespace),
+      $._code_expression,
+      optional($._whitespace),
+      ")",
+    ),
+
+    qualified_name: $ => seq(
+      $.identifier,
+      repeat(seq("::", $.identifier)),
+    ),
+
+    identifier: _ => /[\p{L}\p{N}_-]+/,
+
+    arguments: $ => seq(
+      "(",
+      optional($._whitespace),
+      optional(seq(
+        $.argument,
+        repeat(seq(
+          optional($._whitespace),
+          ",",
+          optional($._whitespace),
+          $.argument,
+        )),
+        optional(seq(optional($._whitespace), ",")),
+      )),
+      optional($._whitespace),
+      ")",
+    ),
+
+    argument: $ => choice(
+      $.named_argument,
+      $.positional_argument,
+    ),
+
+    named_argument: $ => seq(
+      field("name", $.identifier),
+      optional($._whitespace),
+      "=",
+      optional($._whitespace),
+      field("value", $._code_expression),
+    ),
+
+    positional_argument: $ => field("value", $._code_expression),
 
     fenced_raw: $ => seq(
       $.fence_open,

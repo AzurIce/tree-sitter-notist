@@ -16,7 +16,7 @@ Read [[self::intro]] and [[vault::guide#section]].
   (text))
 
 ==================
-Scopes and calls
+Embedded expressions and calls
 ==================
 
 #[annotated [[self::target]]]@concept,#knowledge
@@ -31,11 +31,12 @@ Paragraph two.
 
 (document
   (text)
-  (transparent_scope
-    (content_body
-      (text)
-      (wiki_reference
-        (wiki_target)))
+  (embedded_expression
+    (content_block
+      (content_body
+        (text)
+        (wiki_reference
+          (wiki_target))))
     (attributes
       (first_attribute
         (id_attribute
@@ -44,23 +45,26 @@ Paragraph two.
         (tag_attribute
           (identifier)))))
   (text)
-  (call
-    (qualified_name
-      (identifier))
-    (arguments
-      (argument
-        (named_argument
-          (identifier)
-          (expression
-            (integer)))))
-    (content_body
-      (text)))
+  (embedded_expression
+    (call_expression
+      (qualified_name
+        (identifier))
+      (arguments
+        (argument
+          (named_argument
+            (identifier)
+            (integer))))
+      (content_block
+        (content_body
+          (text)))))
   (text)
-  (call
-    (qualified_name
-      (identifier))
-    (content_body
-      (text)))
+  (embedded_expression
+    (call_expression
+      (qualified_name
+        (identifier))
+      (content_block
+        (content_body
+          (text)))))
   (text))
 
 ==================
@@ -74,58 +78,54 @@ Arguments, strings, and trailing comma
 
 (document
   (text)
-  (call
-    (qualified_name
-      (identifier))
-    (arguments
-      (argument
-        (positional_argument
-          (expression
-            (integer))))
-      (argument
-        (named_argument
-          (identifier)
-          (expression
-            (boolean))))
-      (argument
-        (named_argument
-          (identifier)
-          (expression
-            (float))))
-      (argument
-        (named_argument
-          (identifier)
-          (expression
+  (embedded_expression
+    (call_expression
+      (qualified_name
+        (identifier))
+      (arguments
+        (argument
+          (positional_argument
+            (integer)))
+        (argument
+          (named_argument
+            (identifier)
+            (boolean)))
+        (argument
+          (named_argument
+            (identifier)
+            (float)))
+        (argument
+          (named_argument
+            (identifier)
             (string
               (escaped_inline_string
                 (escaped_inline_open)
                 (string_content)
-                (string_close))))))
-      (argument
-        (named_argument
-          (identifier)
-          (expression
-            (none)))))
-    (content_body
-      (text)))
+                (string_close)))))
+        (argument
+          (named_argument
+            (identifier)
+            (none))))
+      (content_block
+        (content_body
+          (text)))))
   (text)
-  (call
-    (qualified_name
-      (identifier))
-    (arguments
-      (argument
-        (named_argument
-          (identifier)
-          (expression
+  (embedded_expression
+    (call_expression
+      (qualified_name
+        (identifier))
+      (arguments
+        (argument
+          (named_argument
+            (identifier)
             (string
               (raw_inline_string
                 (raw_inline_open)
                 (string_content)
-                (string_close))))))
-      (argument
-        (named_argument
-          (identifier)
-          (expression
+                (string_close)))))
+        (argument
+          (named_argument
+            (identifier)
             (string
               (escaped_inline_string
                 (escaped_inline_open)
@@ -148,14 +148,14 @@ raw "# text
 
 (document
   (text)
-  (call
-    (qualified_name
-      (identifier))
-    (arguments
-      (argument
-        (named_argument
-          (identifier)
-          (expression
+  (embedded_expression
+    (call_expression
+      (qualified_name
+        (identifier))
+      (arguments
+        (argument
+          (named_argument
+            (identifier)
             (string
               (escaped_multiline_string
                 (escaped_multiline_open)
@@ -164,14 +164,14 @@ raw "# text
                 (string_content)
                 (string_close))))))))
   (text)
-  (call
-    (qualified_name
-      (identifier))
-    (arguments
-      (argument
-        (named_argument
-          (identifier)
-          (expression
+  (embedded_expression
+    (call_expression
+      (qualified_name
+        (identifier))
+      (arguments
+        (argument
+          (named_argument
+            (identifier)
             (string
               (raw_multiline_string
                 (raw_multiline_open)
@@ -190,28 +190,28 @@ Raw inline quote ambiguity
 
 (document
   (text)
-  (call
-    (qualified_name
-      (identifier))
-    (arguments
-      (argument
-        (named_argument
-          (identifier)
-          (expression
+  (embedded_expression
+    (call_expression
+      (qualified_name
+        (identifier))
+      (arguments
+        (argument
+          (named_argument
+            (identifier)
             (string
               (raw_inline_string
                 (raw_inline_open)
                 (string_content)
                 (string_close))))))))
   (text)
-  (call
-    (qualified_name
-      (identifier))
-    (arguments
-      (argument
-        (named_argument
-          (identifier)
-          (expression
+  (embedded_expression
+    (call_expression
+      (qualified_name
+        (identifier))
+      (arguments
+        (argument
+          (named_argument
+            (identifier)
             (string
               (raw_inline_string
                 (raw_inline_open)
@@ -261,4 +261,83 @@ plain fence
   (fenced_raw
     (fence_open)
     (fence_close))
+  (text))
+
+==================
+Nested code expressions in arguments
+==================
+
+#quote(body=[same])
+#heading(level=missing())[Title]
+#heading(level=(2))[T]
+
+---
+
+(document
+  (text)
+  (embedded_expression
+    (call_expression
+      (qualified_name
+        (identifier))
+      (arguments
+        (argument
+          (named_argument
+            (identifier)
+            (content_block
+              (content_body
+                (text))))))))
+  (text)
+  (embedded_expression
+    (call_expression
+      (qualified_name
+        (identifier))
+      (arguments
+        (argument
+          (named_argument
+            (identifier)
+            (call_expression
+              (qualified_name
+                (identifier))
+              (arguments)))))
+      (content_block
+        (content_body
+          (text)))))
+  (text)
+  (embedded_expression
+    (call_expression
+      (qualified_name
+        (identifier))
+      (arguments
+        (argument
+          (named_argument
+            (identifier)
+            (parenthesized_expression
+              (integer)))))
+      (content_block
+        (content_body
+          (text)))))
+  (text))
+
+==================
+Embedded literals in markup
+==================
+
+a#"text"#[content]#none z
+
+---
+
+(document
+  (text)
+  (embedded_expression
+    (string
+      (escaped_inline_string
+        (escaped_inline_open)
+        (string_content)
+        (string_close))))
+  (embedded_expression
+    (content_block
+      (content_body
+        (text))))
+  (embedded_expression
+    (none))
   (text))
