@@ -18,6 +18,9 @@ enum TokenType {
     FENCE_INFO,
     FENCE_CONTENT,
     FENCE_CLOSE,
+    LINE_COMMENT,
+    BLOCK_COMMENT,
+    TEXT_CHUNK,
 };
 
 typedef enum {
@@ -220,6 +223,101 @@ bool tree_sitter_notist_external_scanner_scan(
     const bool *valid_symbols
 ) {
     Scanner *scanner = payload;
+
+    if (scanner->mode == MODE_NONE && lexer->lookahead == '/' &&
+        (valid_symbols[LINE_COMMENT] || valid_symbols[BLOCK_COMMENT])) {
+        lexer->advance(lexer, false);
+        if (lexer->lookahead == '/' && valid_symbols[LINE_COMMENT]) {
+            lexer->advance(lexer, false);
+            while (!lexer->eof(lexer) && lexer->lookahead != '\r' && lexer->lookahead != '\n') {
+                lexer->advance(lexer, false);
+            }
+            lexer->mark_end(lexer);
+            lexer->result_symbol = LINE_COMMENT;
+            return true;
+        }
+        if (lexer->lookahead == '*' && valid_symbols[BLOCK_COMMENT]) {
+            lexer->advance(lexer, false);
+            uint32_t depth = 1;
+            while (!lexer->eof(lexer) && depth > 0) {
+                if (lexer->lookahead == '/') {
+                    lexer->advance(lexer, false);
+                    if (lexer->lookahead == '*') {
+                        lexer->advance(lexer, false);
+                        depth++;
+                    }
+                    continue;
+                }
+                if (lexer->lookahead == '*') {
+                    lexer->advance(lexer, false);
+                    if (lexer->lookahead == '/') {
+                        lexer->advance(lexer, false);
+                        depth--;
+                    }
+                    continue;
+                }
+                lexer->advance(lexer, false);
+            }
+            lexer->mark_end(lexer);
+            lexer->result_symbol = BLOCK_COMMENT;
+            return true;
+        }
+        return false;
+    }
+
+    if (scanner->mode == MODE_NONE && valid_symbols[TEXT_CHUNK]) {
+        bool has_content = false;
+        bool in_http_url = false;
+        char recent[8] = {0};
+        uint32_t recent_length = 0;
+        while (!lexer->eof(lexer)) {
+            if (lexer->lookahead == '#' || lexer->lookahead == '[' || lexer->lookahead == ']' ||
+                lexer->lookahead == '`' || lexer->lookahead == '@' || lexer->lookahead == ',') {
+                break;
+            }
+            if (lexer->lookahead == '/') {
+                lexer->mark_end(lexer);
+                lexer->advance(lexer, false);
+                bool starts_comment = lexer->lookahead == '/' || lexer->lookahead == '*';
+                bool starts_url = lexer->lookahead == '/' &&
+                                  (strcmp(recent, "http:") == 0 || strcmp(recent, "https:") == 0);
+                if (starts_comment && !in_http_url && !starts_url) {
+                    if (has_content) {
+                        lexer->result_symbol = TEXT_CHUNK;
+                        return true;
+                    }
+                    return false;
+                }
+                if (starts_url) {
+                    in_http_url = true;
+                }
+                has_content = true;
+                lexer->mark_end(lexer);
+                continue;
+            }
+
+            int32_t character = lexer->lookahead;
+            lexer->advance(lexer, false);
+            lexer->mark_end(lexer);
+            has_content = true;
+            if (character == ' ' || character == '\t' || character == '\r' || character == '\n') {
+                in_http_url = false;
+                recent_length = 0;
+                recent[0] = '\0';
+            } else if (character >= 0 && character <= 0x7f) {
+                if (recent_length == sizeof(recent) - 1) {
+                    memmove(recent, recent + 1, sizeof(recent) - 2);
+                    recent_length--;
+                }
+                recent[recent_length++] = (char)character;
+                recent[recent_length] = '\0';
+            }
+        }
+        if (has_content) {
+            lexer->result_symbol = TEXT_CHUNK;
+            return true;
+        }
+    }
 
     if (scanner->mode == MODE_NONE && lexer->lookahead == '`' &&
         (valid_symbols[FENCE_OPEN] || valid_symbols[INLINE_RAW])) {

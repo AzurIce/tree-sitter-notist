@@ -12,6 +12,8 @@
 "@" @attribute
 
 (wiki_target) @link_uri
+[(line_comment)
+ (block_comment)] @comment
 
 (call_expression
   function: (qualified_name) @function.call)

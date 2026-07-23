@@ -203,6 +203,10 @@
       "required": true,
       "types": [
         {
+          "type": "block_comment",
+          "named": true
+        },
+        {
           "type": "embedded_expression",
           "named": true
         },
@@ -212,6 +216,10 @@
         },
         {
           "type": "inline_raw",
+          "named": true
+        },
+        {
+          "type": "line_comment",
           "named": true
         },
         {
@@ -235,6 +243,10 @@
       "required": false,
       "types": [
         {
+          "type": "block_comment",
+          "named": true
+        },
+        {
           "type": "embedded_expression",
           "named": true
         },
@@ -244,6 +256,10 @@
         },
         {
           "type": "inline_raw",
+          "named": true
+        },
+        {
+          "type": "line_comment",
           "named": true
         },
         {
@@ -786,6 +802,10 @@
     "named": false
   },
   {
+    "type": "block_comment",
+    "named": true
+  },
+  {
     "type": "escape_sequence",
     "named": true
   },
@@ -831,6 +851,10 @@
   },
   {
     "type": "integer",
+    "named": true
+  },
+  {
+    "type": "line_comment",
     "named": true
   },
   {

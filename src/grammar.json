@@ -31,6 +31,23 @@
         },
         {
           "type": "SYMBOL",
+          "name": "line_comment"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "block_comment"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "text_chunk"
+          },
+          "named": true,
+          "value": "text"
+        },
+        {
+          "type": "SYMBOL",
           "name": "text"
         }
       ]
@@ -42,7 +59,7 @@
         "value": -1,
         "content": {
           "type": "PATTERN",
-          "value": "[^#\\[\\]`]+|[#\\[\\]`]"
+          "value": "[#\\[\\]`/@,]"
         }
       }
     },
@@ -961,6 +978,18 @@
     {
       "type": "SYMBOL",
       "name": "fence_close"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "line_comment"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "block_comment"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "text_chunk"
     }
   ],
   "inline": [],

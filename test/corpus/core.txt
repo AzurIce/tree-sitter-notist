@@ -16,6 +16,23 @@ Read [[self::intro]] and [[vault::guide#section]].
   (text))
 
 ==================
+Source comments and URLs
+==================
+
+Visible // hidden
+text /* outer /* nested */ hidden */ after
+https://example.test/path
+
+---
+
+(document
+  (text)
+  (line_comment)
+  (text)
+  (block_comment)
+  (text))
+
+==================
 Embedded expressions and calls
 ==================
 

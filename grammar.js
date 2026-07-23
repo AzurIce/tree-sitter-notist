@@ -26,6 +26,9 @@ module.exports = grammar({
     $.fence_info,
     $.fence_content,
     $.fence_close,
+    $.line_comment,
+    $.block_comment,
+    $.text_chunk,
   ],
 
   rules: {
@@ -36,10 +39,13 @@ module.exports = grammar({
       $.embedded_expression,
       $.fenced_raw,
       $.inline_raw,
+      $.line_comment,
+      $.block_comment,
+      alias($.text_chunk, $.text),
       $.text,
     ),
 
-    text: _ => token(prec(-1, /[^#\[\]`]+|[#\[\]`]/)),
+    text: _ => token(prec(-1, /[#\[\]`/@,]/)),
 
     wiki_reference: $ => seq(
       "[[",
