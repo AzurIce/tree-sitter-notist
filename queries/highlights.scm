@@ -11,6 +11,14 @@
 "::" @punctuation.delimiter
 "@" @attribute
 
+(heading
+  marker: (heading_marker) @punctuation.special
+  body: (line_text) @title.markup)
+
+[(list_item marker: (list_marker) @punctuation.list_marker.markup)
+ (enum_item marker: (enum_marker) @punctuation.list_marker.markup)
+ (task_item marker: (task_marker) @punctuation.list_marker.markup)]
+
 (wiki_target) @link_uri
 [(line_comment)
  (block_comment)] @comment

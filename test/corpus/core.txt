@@ -8,6 +8,7 @@ Read [[self::intro]] and [[vault::guide#section]].
 
 (document
   (text)
+  (text)
   (wiki_reference
     (wiki_target))
   (text)
@@ -27,9 +28,47 @@ https://example.test/path
 
 (document
   (text)
+  (text)
   (line_comment)
   (text)
+  (text)
   (block_comment)
+  (text)
+  (text))
+
+==================
+Surface headings and lists
+==================
+
+= Title
+  == Nested
+- item
+  + ordered
+- [x] done
+
+---
+
+(document
+  (text)
+  (heading
+    (heading_marker)
+    (line_text))
+  (text)
+  (heading
+    (heading_marker)
+    (line_text))
+  (text)
+  (list_item
+    (list_marker)
+    (line_text))
+  (text)
+  (enum_item
+    (enum_marker)
+    (line_text))
+  (text)
+  (task_item
+    (task_marker)
+    (line_text))
   (text))
 
 ==================
@@ -81,6 +120,9 @@ Paragraph two.
         (identifier))
       (content_block
         (content_body
+          (text)
+          (text)
+          (text)
           (text)))))
   (text))
 
@@ -344,6 +386,7 @@ a#"text"#[content]#none z
 ---
 
 (document
+  (text)
   (text)
   (embedded_expression
     (string

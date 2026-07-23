@@ -1,3 +1,6 @@
+((heading
+  body: (line_text) @name) @item)
+
 ((embedded_expression
   expression: (call_expression
     function: (qualified_name

@@ -21,6 +21,11 @@ enum TokenType {
     LINE_COMMENT,
     BLOCK_COMMENT,
     TEXT_CHUNK,
+    HEADING_MARKER,
+    LIST_MARKER,
+    ENUM_MARKER,
+    TASK_MARKER,
+    LINE_TEXT,
 };
 
 typedef enum {
@@ -30,6 +35,7 @@ typedef enum {
     MODE_RAW_INLINE,
     MODE_RAW_MULTILINE,
     MODE_FENCE,
+    MODE_LINE,
 } Mode;
 
 typedef struct {
@@ -223,6 +229,103 @@ bool tree_sitter_notist_external_scanner_scan(
     const bool *valid_symbols
 ) {
     Scanner *scanner = payload;
+    bool text_has_content = false;
+
+    if (scanner->mode == MODE_LINE && valid_symbols[LINE_TEXT]) {
+        bool has_content = false;
+        while (!lexer->eof(lexer) && lexer->lookahead != '\r' && lexer->lookahead != '\n') {
+            lexer->advance(lexer, false);
+            lexer->mark_end(lexer);
+            has_content = true;
+        }
+        scanner->mode = MODE_NONE;
+        if (has_content) {
+            lexer->result_symbol = LINE_TEXT;
+            return true;
+        }
+        return false;
+    }
+
+    if (scanner->mode == MODE_NONE && lexer->get_column(lexer) == 0 &&
+        (valid_symbols[HEADING_MARKER] || valid_symbols[LIST_MARKER] ||
+         valid_symbols[ENUM_MARKER] || valid_symbols[TASK_MARKER])) {
+        while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+            lexer->advance(lexer, false);
+            lexer->mark_end(lexer);
+            text_has_content = true;
+        }
+
+        if (lexer->lookahead == '=' && valid_symbols[HEADING_MARKER]) {
+            uint32_t level = 0;
+            while (lexer->lookahead == '=') {
+                lexer->advance(lexer, false);
+                lexer->mark_end(lexer);
+                level++;
+            }
+            text_has_content = true;
+            if (level >= 1 && level <= 6 && lexer->lookahead == ' ') {
+                lexer->advance(lexer, false);
+                lexer->mark_end(lexer);
+                scanner->mode = MODE_LINE;
+                lexer->result_symbol = HEADING_MARKER;
+                return true;
+            }
+            goto scan_text_chunk;
+        }
+
+        if (lexer->lookahead == '-' &&
+            (valid_symbols[LIST_MARKER] || valid_symbols[TASK_MARKER])) {
+            lexer->advance(lexer, false);
+            lexer->mark_end(lexer);
+            text_has_content = true;
+            if (lexer->lookahead == ' ') {
+                lexer->advance(lexer, false);
+                lexer->mark_end(lexer);
+                if (lexer->lookahead == '[' && valid_symbols[TASK_MARKER]) {
+                    lexer->advance(lexer, false);
+                    bool valid_state = lexer->lookahead == ' ' || lexer->lookahead == 'x' ||
+                                       lexer->lookahead == 'X';
+                    if (valid_state) {
+                        lexer->advance(lexer, false);
+                        if (lexer->lookahead == ']') {
+                            lexer->advance(lexer, false);
+                            if (lexer->lookahead == ' ') {
+                                lexer->advance(lexer, false);
+                                lexer->mark_end(lexer);
+                                scanner->mode = MODE_LINE;
+                                lexer->result_symbol = TASK_MARKER;
+                                return true;
+                            }
+                        }
+                    }
+                }
+                if (valid_symbols[LIST_MARKER]) {
+                    scanner->mode = MODE_LINE;
+                    lexer->result_symbol = LIST_MARKER;
+                    return true;
+                }
+            }
+            goto scan_text_chunk;
+        }
+
+        if (lexer->lookahead == '+' && valid_symbols[ENUM_MARKER]) {
+            lexer->advance(lexer, false);
+            lexer->mark_end(lexer);
+            text_has_content = true;
+            if (lexer->lookahead == ' ') {
+                lexer->advance(lexer, false);
+                lexer->mark_end(lexer);
+                scanner->mode = MODE_LINE;
+                lexer->result_symbol = ENUM_MARKER;
+                return true;
+            }
+            goto scan_text_chunk;
+        }
+
+        if (text_has_content) {
+            goto scan_text_chunk;
+        }
+    }
 
     if (scanner->mode == MODE_NONE && lexer->lookahead == '/' &&
         (valid_symbols[LINE_COMMENT] || valid_symbols[BLOCK_COMMENT])) {
@@ -265,8 +368,9 @@ bool tree_sitter_notist_external_scanner_scan(
         return false;
     }
 
+scan_text_chunk:
     if (scanner->mode == MODE_NONE && valid_symbols[TEXT_CHUNK]) {
-        bool has_content = false;
+        bool has_content = text_has_content;
         bool in_http_url = false;
         char recent[8] = {0};
         uint32_t recent_length = 0;
@@ -311,6 +415,10 @@ bool tree_sitter_notist_external_scanner_scan(
                 }
                 recent[recent_length++] = (char)character;
                 recent[recent_length] = '\0';
+            }
+            if (character == '\r' || character == '\n') {
+                lexer->result_symbol = TEXT_CHUNK;
+                return true;
             }
         }
         if (has_content) {

@@ -211,7 +211,15 @@
           "named": true
         },
         {
+          "type": "enum_item",
+          "named": true
+        },
+        {
           "type": "fenced_raw",
+          "named": true
+        },
+        {
+          "type": "heading",
           "named": true
         },
         {
@@ -220,6 +228,14 @@
         },
         {
           "type": "line_comment",
+          "named": true
+        },
+        {
+          "type": "list_item",
+          "named": true
+        },
+        {
+          "type": "task_item",
           "named": true
         },
         {
@@ -251,7 +267,15 @@
           "named": true
         },
         {
+          "type": "enum_item",
+          "named": true
+        },
+        {
           "type": "fenced_raw",
+          "named": true
+        },
+        {
+          "type": "heading",
           "named": true
         },
         {
@@ -260,6 +284,14 @@
         },
         {
           "type": "line_comment",
+          "named": true
+        },
+        {
+          "type": "list_item",
+          "named": true
+        },
+        {
+          "type": "task_item",
           "named": true
         },
         {
@@ -321,6 +353,32 @@
           },
           {
             "type": "string",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "enum_item",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "line_text",
+            "named": true
+          }
+        ]
+      },
+      "marker": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "enum_marker",
             "named": true
           }
         ]
@@ -447,6 +505,32 @@
     }
   },
   {
+    "type": "heading",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "line_text",
+            "named": true
+          }
+        ]
+      },
+      "marker": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "heading_marker",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "id_attribute",
     "named": true,
     "fields": {
@@ -456,6 +540,32 @@
         "types": [
           {
             "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "list_item",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "line_text",
+            "named": true
+          }
+        ]
+      },
+      "marker": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "list_marker",
             "named": true
           }
         ]
@@ -734,6 +844,32 @@
     }
   },
   {
+    "type": "task_item",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "line_text",
+            "named": true
+          }
+        ]
+      },
+      "marker": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "task_marker",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "wiki_reference",
     "named": true,
     "fields": {
@@ -806,6 +942,10 @@
     "named": true
   },
   {
+    "type": "enum_marker",
+    "named": true
+  },
+  {
     "type": "escape_sequence",
     "named": true
   },
@@ -842,6 +982,10 @@
     "named": true
   },
   {
+    "type": "heading_marker",
+    "named": true
+  },
+  {
     "type": "identifier",
     "named": true
   },
@@ -855,6 +999,14 @@
   },
   {
     "type": "line_comment",
+    "named": true
+  },
+  {
+    "type": "line_text",
+    "named": true
+  },
+  {
+    "type": "list_marker",
     "named": true
   },
   {
@@ -875,6 +1027,10 @@
   },
   {
     "type": "string_content",
+    "named": true
+  },
+  {
+    "type": "task_marker",
     "named": true
   },
   {

@@ -29,12 +29,21 @@ module.exports = grammar({
     $.line_comment,
     $.block_comment,
     $.text_chunk,
+    $.heading_marker,
+    $.list_marker,
+    $.enum_marker,
+    $.task_marker,
+    $.line_text,
   ],
 
   rules: {
     document: $ => repeat($._item),
 
     _item: $ => choice(
+      $.heading,
+      $.list_item,
+      $.enum_item,
+      $.task_item,
       $.wiki_reference,
       $.embedded_expression,
       $.fenced_raw,
@@ -46,6 +55,26 @@ module.exports = grammar({
     ),
 
     text: _ => token(prec(-1, /[#\[\]`/@,]/)),
+
+    heading: $ => seq(
+      field("marker", $.heading_marker),
+      field("body", $.line_text),
+    ),
+
+    list_item: $ => seq(
+      field("marker", $.list_marker),
+      field("body", $.line_text),
+    ),
+
+    enum_item: $ => seq(
+      field("marker", $.enum_marker),
+      field("body", $.line_text),
+    ),
+
+    task_item: $ => seq(
+      field("marker", $.task_marker),
+      field("body", $.line_text),
+    ),
 
     wiki_reference: $ => seq(
       "[[",

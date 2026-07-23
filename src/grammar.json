@@ -15,6 +15,22 @@
       "members": [
         {
           "type": "SYMBOL",
+          "name": "heading"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "list_item"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "enum_item"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "task_item"
+        },
+        {
+          "type": "SYMBOL",
           "name": "wiki_reference"
         },
         {
@@ -62,6 +78,90 @@
           "value": "[#\\[\\]`/@,]"
         }
       }
+    },
+    "heading": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "marker",
+          "content": {
+            "type": "SYMBOL",
+            "name": "heading_marker"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "body",
+          "content": {
+            "type": "SYMBOL",
+            "name": "line_text"
+          }
+        }
+      ]
+    },
+    "list_item": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "marker",
+          "content": {
+            "type": "SYMBOL",
+            "name": "list_marker"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "body",
+          "content": {
+            "type": "SYMBOL",
+            "name": "line_text"
+          }
+        }
+      ]
+    },
+    "enum_item": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "marker",
+          "content": {
+            "type": "SYMBOL",
+            "name": "enum_marker"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "body",
+          "content": {
+            "type": "SYMBOL",
+            "name": "line_text"
+          }
+        }
+      ]
+    },
+    "task_item": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "marker",
+          "content": {
+            "type": "SYMBOL",
+            "name": "task_marker"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "body",
+          "content": {
+            "type": "SYMBOL",
+            "name": "line_text"
+          }
+        }
+      ]
     },
     "wiki_reference": {
       "type": "SEQ",
@@ -990,6 +1090,26 @@
     {
       "type": "SYMBOL",
       "name": "text_chunk"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "heading_marker"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "list_marker"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "enum_marker"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "task_marker"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "line_text"
     }
   ],
   "inline": [],
