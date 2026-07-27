@@ -21,11 +21,20 @@ enum TokenType {
     LINE_COMMENT,
     BLOCK_COMMENT,
     TEXT_CHUNK,
+    STRONG_OPEN,
+    STRONG_CLOSE,
+    EMPHASIS_OPEN,
+    EMPHASIS_CLOSE,
+    UNDERLINE_OPEN,
+    UNDERLINE_CLOSE,
+    STRIKE_OPEN,
+    STRIKE_CLOSE,
+    MATH_OPEN,
+    MATH_CLOSE,
     HEADING_MARKER,
     LIST_MARKER,
     ENUM_MARKER,
     TASK_MARKER,
-    LINE_TEXT,
 };
 
 typedef enum {
@@ -35,14 +44,59 @@ typedef enum {
     MODE_RAW_INLINE,
     MODE_RAW_MULTILINE,
     MODE_FENCE,
-    MODE_LINE,
 } Mode;
 
 typedef struct {
     uint32_t delimiter_length;
     Mode mode;
     bool fence_info_allowed;
+    uint8_t inline_stack[16];
+    uint8_t inline_stack_length;
 } Scanner;
+
+enum InlineDelimiter {
+    INLINE_STRONG,
+    INLINE_EMPHASIS,
+    INLINE_UNDERLINE,
+    INLINE_STRIKE,
+    INLINE_MATH,
+};
+
+static bool scan_inline_delimiter(TSLexer *lexer, char delimiter, uint8_t length) {
+    for (uint8_t index = 0; index < length; index++) {
+        if (lexer->lookahead != delimiter) {
+            return false;
+        }
+        lexer->advance(lexer, false);
+    }
+    lexer->mark_end(lexer);
+    return true;
+}
+
+static bool has_inline_close(TSLexer *lexer, char delimiter, uint8_t length) {
+    bool has_content = false;
+    while (!lexer->eof(lexer) && lexer->lookahead != '\r' && lexer->lookahead != '\n') {
+        if (lexer->lookahead == '\\') {
+            lexer->advance(lexer, false);
+            if (!lexer->eof(lexer) && lexer->lookahead != '\r' && lexer->lookahead != '\n') {
+                lexer->advance(lexer, false);
+                has_content = true;
+            }
+            continue;
+        }
+        if (lexer->lookahead == delimiter) {
+            uint8_t found = 0;
+            while (found < length && lexer->lookahead == delimiter) {
+                lexer->advance(lexer, false);
+                found++;
+            }
+            return found == length && has_content;
+        }
+        lexer->advance(lexer, false);
+        has_content = true;
+    }
+    return false;
+}
 
 static bool scan_line_break(TSLexer *lexer) {
     if (lexer->lookahead == '\n') {
@@ -203,7 +257,10 @@ unsigned tree_sitter_notist_external_scanner_serialize(void *payload, char *buff
     buffer[0] = (char)scanner->mode;
     buffer[1] = scanner->fence_info_allowed ? 1 : 0;
     memcpy(buffer + 2, &scanner->delimiter_length, sizeof(scanner->delimiter_length));
-    return 2 + sizeof(scanner->delimiter_length);
+    unsigned offset = 2 + sizeof(scanner->delimiter_length);
+    buffer[offset++] = (char)scanner->inline_stack_length;
+    memcpy(buffer + offset, scanner->inline_stack, scanner->inline_stack_length);
+    return offset + scanner->inline_stack_length;
 }
 
 void tree_sitter_notist_external_scanner_deserialize(
@@ -215,11 +272,26 @@ void tree_sitter_notist_external_scanner_deserialize(
     scanner->mode = MODE_NONE;
     scanner->delimiter_length = 0;
     scanner->fence_info_allowed = false;
+    scanner->inline_stack_length = 0;
 
     if (length >= 2 + sizeof(scanner->delimiter_length)) {
         scanner->mode = (Mode)buffer[0];
         scanner->fence_info_allowed = buffer[1] != 0;
         memcpy(&scanner->delimiter_length, buffer + 2, sizeof(scanner->delimiter_length));
+        unsigned offset = 2 + sizeof(scanner->delimiter_length);
+        if (length > offset) {
+            scanner->inline_stack_length = (uint8_t)buffer[offset++];
+            if (scanner->inline_stack_length > sizeof(scanner->inline_stack) ||
+                length < offset + scanner->inline_stack_length) {
+                scanner->inline_stack_length = 0;
+            } else {
+                memcpy(
+                    scanner->inline_stack,
+                    buffer + offset,
+                    scanner->inline_stack_length
+                );
+            }
+        }
     }
 }
 
@@ -231,19 +303,106 @@ bool tree_sitter_notist_external_scanner_scan(
     Scanner *scanner = payload;
     bool text_has_content = false;
 
-    if (scanner->mode == MODE_LINE && valid_symbols[LINE_TEXT]) {
-        bool has_content = false;
-        while (!lexer->eof(lexer) && lexer->lookahead != '\r' && lexer->lookahead != '\n') {
+    if (scanner->mode == MODE_NONE && scanner->inline_stack_length > 0) {
+        uint8_t top = scanner->inline_stack[scanner->inline_stack_length - 1];
+        enum TokenType close_symbol;
+        char delimiter;
+        uint8_t length;
+        switch (top) {
+            case INLINE_STRONG:
+                close_symbol = STRONG_CLOSE;
+                delimiter = '*';
+                length = 1;
+                break;
+            case INLINE_EMPHASIS:
+                close_symbol = EMPHASIS_CLOSE;
+                delimiter = '_';
+                length = 1;
+                break;
+            case INLINE_UNDERLINE:
+                close_symbol = UNDERLINE_CLOSE;
+                delimiter = '_';
+                length = 2;
+                break;
+            case INLINE_STRIKE:
+                close_symbol = STRIKE_CLOSE;
+                delimiter = '~';
+                length = 2;
+                break;
+            default:
+                close_symbol = MATH_CLOSE;
+                delimiter = '$';
+                length = 1;
+                break;
+        }
+        if (valid_symbols[close_symbol] && lexer->lookahead == delimiter) {
+            if (scan_inline_delimiter(lexer, delimiter, length)) {
+                scanner->inline_stack_length--;
+                lexer->result_symbol = close_symbol;
+                return true;
+            }
+            return false;
+        }
+    }
+
+    if (scanner->mode == MODE_NONE && scanner->inline_stack_length < sizeof(scanner->inline_stack)) {
+        enum TokenType open_symbol;
+        uint8_t delimiter_kind;
+        char delimiter;
+        uint8_t length;
+        bool candidate = false;
+
+        if (lexer->lookahead == '*' && valid_symbols[STRONG_OPEN]) {
+            open_symbol = STRONG_OPEN;
+            delimiter_kind = INLINE_STRONG;
+            delimiter = '*';
+            length = 1;
+            candidate = true;
+        } else if (lexer->lookahead == '_' &&
+                   (valid_symbols[UNDERLINE_OPEN] || valid_symbols[EMPHASIS_OPEN])) {
             lexer->advance(lexer, false);
             lexer->mark_end(lexer);
-            has_content = true;
+            if (lexer->lookahead == '_' && valid_symbols[UNDERLINE_OPEN]) {
+                lexer->advance(lexer, false);
+                lexer->mark_end(lexer);
+                open_symbol = UNDERLINE_OPEN;
+                delimiter_kind = INLINE_UNDERLINE;
+                delimiter = '_';
+                length = 2;
+            } else if (valid_symbols[EMPHASIS_OPEN]) {
+                open_symbol = EMPHASIS_OPEN;
+                delimiter_kind = INLINE_EMPHASIS;
+                delimiter = '_';
+                length = 1;
+            } else {
+                return false;
+            }
+            candidate = true;
+        } else if (lexer->lookahead == '~' && valid_symbols[STRIKE_OPEN]) {
+            open_symbol = STRIKE_OPEN;
+            delimiter_kind = INLINE_STRIKE;
+            delimiter = '~';
+            length = 2;
+            candidate = true;
+        } else if (lexer->lookahead == '$' && valid_symbols[MATH_OPEN]) {
+            open_symbol = MATH_OPEN;
+            delimiter_kind = INLINE_MATH;
+            delimiter = '$';
+            length = 1;
+            candidate = true;
         }
-        scanner->mode = MODE_NONE;
-        if (has_content) {
-            lexer->result_symbol = LINE_TEXT;
+
+        if (candidate) {
+            if (delimiter != '_' && !scan_inline_delimiter(lexer, delimiter, length)) {
+                return false;
+            }
+            if (!has_inline_close(lexer, delimiter, length)) {
+                return false;
+            }
+            scanner->inline_stack[scanner->inline_stack_length++] = delimiter_kind;
+            lexer->result_symbol = open_symbol;
             return true;
         }
-        return false;
     }
 
     if (scanner->mode == MODE_NONE && lexer->get_column(lexer) == 0 &&
@@ -266,7 +425,6 @@ bool tree_sitter_notist_external_scanner_scan(
             if (level >= 1 && level <= 6 && lexer->lookahead == ' ') {
                 lexer->advance(lexer, false);
                 lexer->mark_end(lexer);
-                scanner->mode = MODE_LINE;
                 lexer->result_symbol = HEADING_MARKER;
                 return true;
             }
@@ -292,7 +450,6 @@ bool tree_sitter_notist_external_scanner_scan(
                             if (lexer->lookahead == ' ') {
                                 lexer->advance(lexer, false);
                                 lexer->mark_end(lexer);
-                                scanner->mode = MODE_LINE;
                                 lexer->result_symbol = TASK_MARKER;
                                 return true;
                             }
@@ -300,7 +457,6 @@ bool tree_sitter_notist_external_scanner_scan(
                     }
                 }
                 if (valid_symbols[LIST_MARKER]) {
-                    scanner->mode = MODE_LINE;
                     lexer->result_symbol = LIST_MARKER;
                     return true;
                 }
@@ -315,7 +471,6 @@ bool tree_sitter_notist_external_scanner_scan(
             if (lexer->lookahead == ' ') {
                 lexer->advance(lexer, false);
                 lexer->mark_end(lexer);
-                scanner->mode = MODE_LINE;
                 lexer->result_symbol = ENUM_MARKER;
                 return true;
             }
@@ -375,8 +530,13 @@ scan_text_chunk:
         char recent[8] = {0};
         uint32_t recent_length = 0;
         while (!lexer->eof(lexer)) {
+            if (lexer->lookahead == '\r' || lexer->lookahead == '\n') {
+                break;
+            }
             if (lexer->lookahead == '#' || lexer->lookahead == '[' || lexer->lookahead == ']' ||
-                lexer->lookahead == '`' || lexer->lookahead == '@' || lexer->lookahead == ',') {
+                lexer->lookahead == '`' || lexer->lookahead == '@' || lexer->lookahead == ',' ||
+                lexer->lookahead == '*' || lexer->lookahead == '_' || lexer->lookahead == '~' ||
+                lexer->lookahead == '$' || lexer->lookahead == '\\') {
                 break;
             }
             if (lexer->lookahead == '/') {
@@ -404,7 +564,7 @@ scan_text_chunk:
             lexer->advance(lexer, false);
             lexer->mark_end(lexer);
             has_content = true;
-            if (character == ' ' || character == '\t' || character == '\r' || character == '\n') {
+            if (character == ' ' || character == '\t') {
                 in_http_url = false;
                 recent_length = 0;
                 recent[0] = '\0';
@@ -415,10 +575,6 @@ scan_text_chunk:
                 }
                 recent[recent_length++] = (char)character;
                 recent[recent_length] = '\0';
-            }
-            if (character == '\r' || character == '\n') {
-                lexer->result_symbol = TEXT_CHUNK;
-                return true;
             }
         }
         if (has_content) {

@@ -29,15 +29,24 @@ module.exports = grammar({
     $.line_comment,
     $.block_comment,
     $.text_chunk,
+    $.strong_open,
+    $.strong_close,
+    $.emphasis_open,
+    $.emphasis_close,
+    $.underline_open,
+    $.underline_close,
+    $.strike_open,
+    $.strike_close,
+    $.math_open,
+    $.math_close,
     $.heading_marker,
     $.list_marker,
     $.enum_marker,
     $.task_marker,
-    $.line_text,
   ],
 
   rules: {
-    document: $ => repeat($._item),
+    document: $ => repeat(choice($._item, $._line_break)),
 
     _item: $ => choice(
       $.heading,
@@ -50,31 +59,144 @@ module.exports = grammar({
       $.inline_raw,
       $.line_comment,
       $.block_comment,
+      $.strong,
+      $.emphasis,
+      $.underline,
+      $.strike,
+      $.inline_math,
+      $.escaped_punctuation,
       alias($.text_chunk, $.text),
       $.text,
     ),
 
-    text: _ => token(prec(-1, /[#\[\]`/@,]/)),
+    text: _ => token(prec(-2, /[#\[\]`/@,*_~$\\]/)),
 
     heading: $ => seq(
       field("marker", $.heading_marker),
-      field("body", $.line_text),
+      field("body", $.inline_body),
     ),
 
     list_item: $ => seq(
       field("marker", $.list_marker),
-      field("body", $.line_text),
+      field("body", $.inline_body),
     ),
 
     enum_item: $ => seq(
       field("marker", $.enum_marker),
-      field("body", $.line_text),
+      field("body", $.inline_body),
     ),
 
     task_item: $ => seq(
       field("marker", $.task_marker),
-      field("body", $.line_text),
+      field("body", $.inline_body),
     ),
+
+    inline_body: $ => prec.right(repeat1($._inline)),
+
+    _inline: $ => choice(
+      $.wiki_reference,
+      $.embedded_expression,
+      $.inline_raw,
+      $.strong,
+      $.emphasis,
+      $.underline,
+      $.strike,
+      $.inline_math,
+      $.escaped_punctuation,
+      alias($.text_chunk, $.text),
+      $.text,
+    ),
+
+    strong: $ => seq(
+      field("open", alias($.strong_open, $.strong_marker)),
+      field("body", repeat1($._strong_item)),
+      field("close", alias($.strong_close, $.strong_marker)),
+    ),
+
+    _strong_item: $ => choice(
+      $.emphasis,
+      $.underline,
+      $.strike,
+      $._strong_atom,
+    ),
+
+    _strong_atom: $ => choice(
+      $.wiki_reference,
+      $.embedded_expression,
+      $.inline_raw,
+      $.inline_math,
+      $.escaped_punctuation,
+      alias($.text_chunk, $.text),
+      alias(token(prec(-2, /[#\[\]`/@,_~$\\]/)), $.text),
+    ),
+
+    emphasis: $ => seq(
+      field("open", alias($.emphasis_open, $.emphasis_marker)),
+      field("body", repeat1($._emphasis_item)),
+      field("close", alias($.emphasis_close, $.emphasis_marker)),
+    ),
+
+    _emphasis_item: $ => choice(
+      $.strong,
+      $.strike,
+      $._emphasis_atom,
+    ),
+
+    _emphasis_atom: $ => choice(
+      $.wiki_reference,
+      $.embedded_expression,
+      $.inline_raw,
+      $.inline_math,
+      $.escaped_punctuation,
+      alias($.text_chunk, $.text),
+      alias(token(prec(-2, /[#\[\]`/@,*~$\\]/)), $.text),
+    ),
+
+    underline: $ => seq(
+      field("open", alias($.underline_open, $.underline_marker)),
+      field("body", repeat1($._underline_item)),
+      field("close", alias($.underline_close, $.underline_marker)),
+    ),
+
+    _underline_item: $ => choice(
+      $.strong,
+      $.strike,
+      $._emphasis_atom,
+    ),
+
+    strike: $ => seq(
+      field("open", alias($.strike_open, $.strike_marker)),
+      field("body", repeat1($._strike_item)),
+      field("close", alias($.strike_close, $.strike_marker)),
+    ),
+
+    _strike_item: $ => choice(
+      $.strong,
+      $.emphasis,
+      $.underline,
+      $._strike_atom,
+    ),
+
+    _strike_atom: $ => choice(
+      $.wiki_reference,
+      $.embedded_expression,
+      $.inline_raw,
+      $.inline_math,
+      $.escaped_punctuation,
+      alias($.text_chunk, $.text),
+      alias(token(prec(-2, /[#\[\]`/@,*_$\\]/)), $.text),
+    ),
+
+    inline_math: $ => seq(
+      field("open", alias($.math_open, $.math_marker)),
+      field("body", repeat1(choice(
+        alias($.text_chunk, $.math_text),
+        alias(token(prec(-2, /[#\[\]`/@,*_~\\]/)), $.math_text),
+      ))),
+      field("close", alias($.math_close, $.math_marker)),
+    ),
+
+    escaped_punctuation: _ => token(/\\[\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e]/),
 
     wiki_reference: $ => seq(
       "[[",
@@ -145,7 +267,7 @@ module.exports = grammar({
       "]",
     ),
 
-    content_body: $ => repeat1($._item),
+    content_body: $ => repeat1(choice($._item, $._line_break)),
 
     // CallExpression = QualifiedName (Arguments ContentBlock* | ContentBlock+)
     call_expression: $ => seq(

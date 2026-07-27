@@ -13,13 +13,27 @@
 
 (heading
   marker: (heading_marker) @punctuation.special
-  body: (line_text) @title.markup)
+  body: (inline_body) @title.markup)
 
 [(list_item marker: (list_marker) @punctuation.list_marker.markup)
  (enum_item marker: (enum_marker) @punctuation.list_marker.markup)
  (task_item marker: (task_marker) @punctuation.list_marker.markup)]
 
 (wiki_target) @link_uri
+
+[(strong_marker)
+ (emphasis_marker)
+ (underline_marker)
+ (strike_marker)
+ (math_marker)] @punctuation.special
+
+(strong) @emphasis.strong
+(emphasis) @emphasis
+(underline) @emphasis
+(strike) @emphasis.strikethrough
+(inline_math) @string.special
+(escaped_punctuation) @string.escape
+
 [(line_comment)
  (block_comment)] @comment
 

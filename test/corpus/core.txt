@@ -8,7 +8,6 @@ Read [[self::intro]] and [[vault::guide#section]].
 
 (document
   (text)
-  (text)
   (wiki_reference
     (wiki_target))
   (text)
@@ -28,9 +27,7 @@ https://example.test/path
 
 (document
   (text)
-  (text)
   (line_comment)
-  (text)
   (text)
   (block_comment)
   (text)
@@ -49,27 +46,26 @@ Surface headings and lists
 ---
 
 (document
-  (text)
   (heading
     (heading_marker)
-    (line_text))
-  (text)
+    (inline_body
+      (text)))
   (heading
     (heading_marker)
-    (line_text))
-  (text)
+    (inline_body
+      (text)))
   (list_item
     (list_marker)
-    (line_text))
-  (text)
+    (inline_body
+      (text)))
   (enum_item
     (enum_marker)
-    (line_text))
-  (text)
+    (inline_body
+      (text)))
   (task_item
     (task_marker)
-    (line_text))
-  (text))
+    (inline_body
+      (text))))
 
 ==================
 Embedded expressions and calls
@@ -86,7 +82,6 @@ Paragraph two.
 ---
 
 (document
-  (text)
   (embedded_expression
     (content_block
       (content_body
@@ -100,7 +95,6 @@ Paragraph two.
       (attribute_item
         (tag_attribute
           (identifier)))))
-  (text)
   (embedded_expression
     (call_expression
       (qualified_name
@@ -113,7 +107,6 @@ Paragraph two.
       (content_block
         (content_body
           (text)))))
-  (text)
   (embedded_expression
     (call_expression
       (qualified_name
@@ -121,10 +114,7 @@ Paragraph two.
       (content_block
         (content_body
           (text)
-          (text)
-          (text)
-          (text)))))
-  (text))
+          (text))))))
 
 ==================
 Arguments, strings, and trailing comma
@@ -136,7 +126,6 @@ Arguments, strings, and trailing comma
 ---
 
 (document
-  (text)
   (embedded_expression
     (call_expression
       (qualified_name
@@ -168,7 +157,6 @@ Arguments, strings, and trailing comma
       (content_block
         (content_body
           (text)))))
-  (text)
   (embedded_expression
     (call_expression
       (qualified_name
@@ -189,8 +177,7 @@ Arguments, strings, and trailing comma
               (escaped_inline_string
                 (escaped_inline_open)
                 (string_content)
-                (string_close))))))))
-  (text))
+                (string_close)))))))))
 
 ==================
 Multiline strings
@@ -206,7 +193,6 @@ raw "# text
 ---
 
 (document
-  (text)
   (embedded_expression
     (call_expression
       (qualified_name
@@ -222,7 +208,6 @@ raw "# text
                 (escape_sequence)
                 (string_content)
                 (string_close))))))))
-  (text)
   (embedded_expression
     (call_expression
       (qualified_name
@@ -235,8 +220,7 @@ raw "# text
               (raw_multiline_string
                 (raw_multiline_open)
                 (string_content)
-                (string_close))))))))
-  (text))
+                (string_close)))))))))
 
 ==================
 Raw inline quote ambiguity
@@ -248,7 +232,6 @@ Raw inline quote ambiguity
 ---
 
 (document
-  (text)
   (embedded_expression
     (call_expression
       (qualified_name
@@ -262,7 +245,6 @@ Raw inline quote ambiguity
                 (raw_inline_open)
                 (string_content)
                 (string_close))))))))
-  (text)
   (embedded_expression
     (call_expression
       (qualified_name
@@ -277,8 +259,7 @@ Raw inline quote ambiguity
                 (string_content)
                 (string_content)
                 (string_content)
-                (string_close))))))))
-  (text))
+                (string_close)))))))))
 
 ==================
 Inline and fenced raw syntax
@@ -299,28 +280,21 @@ plain fence
 ---
 
 (document
-  (text)
   (inline_raw)
-  (text)
   (inline_raw)
-  (text)
   (inline_raw)
-  (text)
   (fenced_raw
     (fence_open)
     (fence_info)
     (fence_content)
     (fence_close))
-  (text)
   (fenced_raw
     (fence_open)
     (fence_content)
     (fence_close))
-  (text)
   (fenced_raw
     (fence_open)
-    (fence_close))
-  (text))
+    (fence_close)))
 
 ==================
 Nested code expressions in arguments
@@ -333,7 +307,6 @@ Nested code expressions in arguments
 ---
 
 (document
-  (text)
   (embedded_expression
     (call_expression
       (qualified_name
@@ -345,7 +318,6 @@ Nested code expressions in arguments
             (content_block
               (content_body
                 (text))))))))
-  (text)
   (embedded_expression
     (call_expression
       (qualified_name
@@ -361,7 +333,6 @@ Nested code expressions in arguments
       (content_block
         (content_body
           (text)))))
-  (text)
   (embedded_expression
     (call_expression
       (qualified_name
@@ -374,8 +345,7 @@ Nested code expressions in arguments
               (integer)))))
       (content_block
         (content_body
-          (text)))))
-  (text))
+          (text))))))
 
 ==================
 Embedded literals in markup
@@ -386,7 +356,6 @@ a#"text"#[content]#none z
 ---
 
 (document
-  (text)
   (text)
   (embedded_expression
     (string
@@ -401,3 +370,75 @@ a#"text"#[content]#none z
   (embedded_expression
     (none))
   (text))
+
+==================
+Inline markup in headings and lists
+==================
+
+= *Important _note_* and `code`
+**Markdown-style delimiters are not canonical**
+A * B and unmatched _ ~ $
+- Read [[self::guide]] with __care__
+  + ~~obsolete~~ and $x^2$
+- [ ] escape \*literally\*
+
+---
+
+(document
+  (heading
+    (heading_marker)
+    (inline_body
+      (strong
+        (strong_marker)
+        (text)
+        (emphasis
+          (emphasis_marker)
+          (text)
+          (emphasis_marker))
+        (strong_marker))
+      (text)
+      (inline_raw)))
+  (text)
+  (strong
+    (strong_marker)
+    (text)
+    (strong_marker))
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (list_item
+    (list_marker)
+    (inline_body
+      (text)
+      (wiki_reference
+        (wiki_target))
+      (text)
+      (underline
+        (underline_marker)
+        (text)
+        (underline_marker))))
+  (enum_item
+    (enum_marker)
+    (inline_body
+      (strike
+        (strike_marker)
+        (text)
+        (strike_marker))
+      (text)
+      (inline_math
+        (math_marker)
+        (math_text)
+        (math_marker))))
+  (task_item
+    (task_marker)
+    (inline_body
+      (text)
+      (escaped_punctuation)
+      (text)
+      (escaped_punctuation))))

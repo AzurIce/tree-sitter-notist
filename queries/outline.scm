@@ -1,5 +1,5 @@
 ((heading
-  body: (line_text) @name) @item)
+  body: (inline_body) @name) @item)
 
 ((embedded_expression
   expression: (call_expression

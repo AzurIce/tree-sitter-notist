@@ -200,7 +200,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "block_comment",
@@ -211,7 +211,15 @@
           "named": true
         },
         {
+          "type": "emphasis",
+          "named": true
+        },
+        {
           "type": "enum_item",
+          "named": true
+        },
+        {
+          "type": "escaped_punctuation",
           "named": true
         },
         {
@@ -220,6 +228,10 @@
         },
         {
           "type": "heading",
+          "named": true
+        },
+        {
+          "type": "inline_math",
           "named": true
         },
         {
@@ -235,11 +247,23 @@
           "named": true
         },
         {
+          "type": "strike",
+          "named": true
+        },
+        {
+          "type": "strong",
+          "named": true
+        },
+        {
           "type": "task_item",
           "named": true
         },
         {
           "type": "text",
+          "named": true
+        },
+        {
+          "type": "underline",
           "named": true
         },
         {
@@ -267,7 +291,15 @@
           "named": true
         },
         {
+          "type": "emphasis",
+          "named": true
+        },
+        {
           "type": "enum_item",
+          "named": true
+        },
+        {
+          "type": "escaped_punctuation",
           "named": true
         },
         {
@@ -276,6 +308,10 @@
         },
         {
           "type": "heading",
+          "named": true
+        },
+        {
+          "type": "inline_math",
           "named": true
         },
         {
@@ -291,11 +327,23 @@
           "named": true
         },
         {
+          "type": "strike",
+          "named": true
+        },
+        {
+          "type": "strong",
+          "named": true
+        },
+        {
           "type": "task_item",
           "named": true
         },
         {
           "type": "text",
+          "named": true
+        },
+        {
+          "type": "underline",
           "named": true
         },
         {
@@ -360,6 +408,70 @@
     }
   },
   {
+    "type": "emphasis",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "embedded_expression",
+            "named": true
+          },
+          {
+            "type": "escaped_punctuation",
+            "named": true
+          },
+          {
+            "type": "inline_math",
+            "named": true
+          },
+          {
+            "type": "inline_raw",
+            "named": true
+          },
+          {
+            "type": "strike",
+            "named": true
+          },
+          {
+            "type": "strong",
+            "named": true
+          },
+          {
+            "type": "text",
+            "named": true
+          },
+          {
+            "type": "wiki_reference",
+            "named": true
+          }
+        ]
+      },
+      "close": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "emphasis_marker",
+            "named": true
+          }
+        ]
+      },
+      "open": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "emphasis_marker",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "enum_item",
     "named": true,
     "fields": {
@@ -368,7 +480,7 @@
         "required": true,
         "types": [
           {
-            "type": "line_text",
+            "type": "inline_body",
             "named": true
           }
         ]
@@ -513,7 +625,7 @@
         "required": true,
         "types": [
           {
-            "type": "line_text",
+            "type": "inline_body",
             "named": true
           }
         ]
@@ -547,6 +659,93 @@
     }
   },
   {
+    "type": "inline_body",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "embedded_expression",
+          "named": true
+        },
+        {
+          "type": "emphasis",
+          "named": true
+        },
+        {
+          "type": "escaped_punctuation",
+          "named": true
+        },
+        {
+          "type": "inline_math",
+          "named": true
+        },
+        {
+          "type": "inline_raw",
+          "named": true
+        },
+        {
+          "type": "strike",
+          "named": true
+        },
+        {
+          "type": "strong",
+          "named": true
+        },
+        {
+          "type": "text",
+          "named": true
+        },
+        {
+          "type": "underline",
+          "named": true
+        },
+        {
+          "type": "wiki_reference",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "inline_math",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "math_text",
+            "named": true
+          }
+        ]
+      },
+      "close": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "math_marker",
+            "named": true
+          }
+        ]
+      },
+      "open": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "math_marker",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "list_item",
     "named": true,
     "fields": {
@@ -555,7 +754,7 @@
         "required": true,
         "types": [
           {
-            "type": "line_text",
+            "type": "inline_body",
             "named": true
           }
         ]
@@ -801,6 +1000,74 @@
     }
   },
   {
+    "type": "strike",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "embedded_expression",
+            "named": true
+          },
+          {
+            "type": "emphasis",
+            "named": true
+          },
+          {
+            "type": "escaped_punctuation",
+            "named": true
+          },
+          {
+            "type": "inline_math",
+            "named": true
+          },
+          {
+            "type": "inline_raw",
+            "named": true
+          },
+          {
+            "type": "strong",
+            "named": true
+          },
+          {
+            "type": "text",
+            "named": true
+          },
+          {
+            "type": "underline",
+            "named": true
+          },
+          {
+            "type": "wiki_reference",
+            "named": true
+          }
+        ]
+      },
+      "close": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "strike_marker",
+            "named": true
+          }
+        ]
+      },
+      "open": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "strike_marker",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "string",
     "named": true,
     "fields": {},
@@ -828,6 +1095,74 @@
     }
   },
   {
+    "type": "strong",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "embedded_expression",
+            "named": true
+          },
+          {
+            "type": "emphasis",
+            "named": true
+          },
+          {
+            "type": "escaped_punctuation",
+            "named": true
+          },
+          {
+            "type": "inline_math",
+            "named": true
+          },
+          {
+            "type": "inline_raw",
+            "named": true
+          },
+          {
+            "type": "strike",
+            "named": true
+          },
+          {
+            "type": "text",
+            "named": true
+          },
+          {
+            "type": "underline",
+            "named": true
+          },
+          {
+            "type": "wiki_reference",
+            "named": true
+          }
+        ]
+      },
+      "close": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "strong_marker",
+            "named": true
+          }
+        ]
+      },
+      "open": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "strong_marker",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "tag_attribute",
     "named": true,
     "fields": {
@@ -852,7 +1187,7 @@
         "required": true,
         "types": [
           {
-            "type": "line_text",
+            "type": "inline_body",
             "named": true
           }
         ]
@@ -863,6 +1198,70 @@
         "types": [
           {
             "type": "task_marker",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "underline",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "embedded_expression",
+            "named": true
+          },
+          {
+            "type": "escaped_punctuation",
+            "named": true
+          },
+          {
+            "type": "inline_math",
+            "named": true
+          },
+          {
+            "type": "inline_raw",
+            "named": true
+          },
+          {
+            "type": "strike",
+            "named": true
+          },
+          {
+            "type": "strong",
+            "named": true
+          },
+          {
+            "type": "text",
+            "named": true
+          },
+          {
+            "type": "wiki_reference",
+            "named": true
+          }
+        ]
+      },
+      "close": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "underline_marker",
+            "named": true
+          }
+        ]
+      },
+      "open": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "underline_marker",
             "named": true
           }
         ]
@@ -942,6 +1341,10 @@
     "named": true
   },
   {
+    "type": "emphasis_marker",
+    "named": true
+  },
+  {
     "type": "enum_marker",
     "named": true
   },
@@ -955,6 +1358,10 @@
   },
   {
     "type": "escaped_multiline_open",
+    "named": true
+  },
+  {
+    "type": "escaped_punctuation",
     "named": true
   },
   {
@@ -1002,11 +1409,15 @@
     "named": true
   },
   {
-    "type": "line_text",
+    "type": "list_marker",
     "named": true
   },
   {
-    "type": "list_marker",
+    "type": "math_marker",
+    "named": true
+  },
+  {
+    "type": "math_text",
     "named": true
   },
   {
@@ -1022,11 +1433,19 @@
     "named": true
   },
   {
+    "type": "strike_marker",
+    "named": true
+  },
+  {
     "type": "string_close",
     "named": true
   },
   {
     "type": "string_content",
+    "named": true
+  },
+  {
+    "type": "strong_marker",
     "named": true
   },
   {
@@ -1040,6 +1459,10 @@
   {
     "type": "true",
     "named": false
+  },
+  {
+    "type": "underline_marker",
+    "named": true
   },
   {
     "type": "wiki_target",
