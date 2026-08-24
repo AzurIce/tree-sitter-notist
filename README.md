@@ -4,9 +4,11 @@ Tree-sitter grammar for the Notist markup language.
 
 The grammar follows [`docs/grammar.not`](https://github.com/AzurIce/Notist/blob/main/docs/grammar.not) in the main Notist repository. It supports wiki references, transparent scopes, calls with trailing content, typed literal arguments, postfix attributes, nested source comments, escaped and hash-delimited raw strings, inline raw spans, and fenced raw blocks.
 
+On top of that it covers the code-mode expression grammar (operators, `if`/`else`, `let` with optional type annotations and function-definition sugar, lambdas, `import`, and `{...}` code blocks, including bare code blocks in markup), horizontal rules (`---`), pipe tables, and block-level (`@[...]`) / module-level (`@![...]`) attributes.
+
 ````not
-#heading(level=2)[Content]
-#raw(text=r#"fn main() {}"#, lang="rust")
+#heading(level: 2)[Content]
+#raw(text: r#"fn main() {}"#, lang: "rust")
 ```rust
 fn main() {}
 ```

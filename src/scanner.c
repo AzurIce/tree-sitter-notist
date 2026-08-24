@@ -35,6 +35,17 @@ enum TokenType {
     LIST_MARKER,
     ENUM_MARKER,
     TASK_MARKER,
+    RULE_MARKER,
+    PIPE,
+    TABLE_DELIMITER_ROW,
+    BLOCK_ATTRIBUTES_OPEN,
+    MODULE_ATTRIBUTES_OPEN,
+    OR_OPERATOR,
+    AND_OPERATOR,
+    COMPARISON_OPERATOR,
+    ADDITIVE_OPERATOR,
+    MULTIPLICATIVE_OPERATOR,
+    ELSE_KEYWORD,
 };
 
 typedef enum {
@@ -98,10 +109,26 @@ static bool has_inline_close(TSLexer *lexer, char delimiter, uint8_t length) {
     return false;
 }
 
+static bool scan_word(TSLexer *lexer, const char *word) {
+    for (const char *c = word; *c != '\0'; c++) {
+        if (lexer->lookahead != *c) {
+            return false;
+        }
+        lexer->advance(lexer, false);
+    }
+    return true;
+}
+
+// 近似判断标识符字符（Unicode 字母/数字/`-`/`_`）：非 ASCII 一律视为字母。
+static bool at_identifier_char(TSLexer *lexer) {
+    int32_t c = lexer->lookahead;
+    return c == '_' || c == '-' || (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') ||
+           (c >= 'A' && c <= 'Z') || c >= 0x80;
+}
+
 static bool scan_line_break(TSLexer *lexer) {
     if (lexer->lookahead == '\n') {
-        lexer->advance(lexer, false);
-        return true;
+        lexer->advance(lexer, false);        return true;
     }
     if (lexer->lookahead != '\r') {
         return false;
@@ -407,36 +434,59 @@ bool tree_sitter_notist_external_scanner_scan(
 
     if (scanner->mode == MODE_NONE && lexer->get_column(lexer) == 0 &&
         (valid_symbols[HEADING_MARKER] || valid_symbols[LIST_MARKER] ||
-         valid_symbols[ENUM_MARKER] || valid_symbols[TASK_MARKER])) {
+         valid_symbols[ENUM_MARKER] || valid_symbols[TASK_MARKER] ||
+         valid_symbols[RULE_MARKER] || valid_symbols[TABLE_DELIMITER_ROW])) {
         while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
             lexer->advance(lexer, false);
             lexer->mark_end(lexer);
             text_has_content = true;
         }
 
+        // Heading: 行首 `=` run，数量即 level 无上限；其后必须跟空白或行尾/EOF。
         if (lexer->lookahead == '=' && valid_symbols[HEADING_MARKER]) {
-            uint32_t level = 0;
             while (lexer->lookahead == '=') {
                 lexer->advance(lexer, false);
                 lexer->mark_end(lexer);
-                level++;
             }
             text_has_content = true;
-            if (level >= 1 && level <= 6 && lexer->lookahead == ' ') {
+            if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
                 lexer->advance(lexer, false);
                 lexer->mark_end(lexer);
+                lexer->result_symbol = HEADING_MARKER;
+                return true;
+            }
+            if (lexer->eof(lexer) || lexer->lookahead == '\r' || lexer->lookahead == '\n') {
                 lexer->result_symbol = HEADING_MARKER;
                 return true;
             }
             goto scan_text_chunk;
         }
 
+        // `-` run：3 个以上且其后只有空白到行尾是 rule，`- ` 是列表/任务，
+        // 其余落回普通文本。
         if (lexer->lookahead == '-' &&
-            (valid_symbols[LIST_MARKER] || valid_symbols[TASK_MARKER])) {
-            lexer->advance(lexer, false);
-            lexer->mark_end(lexer);
+            (valid_symbols[LIST_MARKER] || valid_symbols[TASK_MARKER] ||
+             valid_symbols[RULE_MARKER])) {
+            uint32_t dashes = 0;
+            while (lexer->lookahead == '-') {
+                lexer->advance(lexer, false);
+                lexer->mark_end(lexer);
+                dashes++;
+            }
             text_has_content = true;
-            if (lexer->lookahead == ' ') {
+            if (dashes >= 3 && valid_symbols[RULE_MARKER]) {
+                while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+                    lexer->advance(lexer, false);
+                }
+                if (lexer->eof(lexer) || lexer->lookahead == '\r' || lexer->lookahead == '\n') {
+                    lexer->mark_end(lexer);
+                    lexer->result_symbol = RULE_MARKER;
+                    return true;
+                }
+                goto scan_text_chunk;
+            }
+            if (dashes == 1 && lexer->lookahead == ' ' &&
+                (valid_symbols[LIST_MARKER] || valid_symbols[TASK_MARKER])) {
                 lexer->advance(lexer, false);
                 lexer->mark_end(lexer);
                 if (lexer->lookahead == '[' && valid_symbols[TASK_MARKER]) {
@@ -472,6 +522,52 @@ bool tree_sitter_notist_external_scanner_scan(
                 lexer->advance(lexer, false);
                 lexer->mark_end(lexer);
                 lexer->result_symbol = ENUM_MARKER;
+                return true;
+            }
+            goto scan_text_chunk;
+        }
+
+        // Table 分隔行：`|` 开头，cell 形如 `:?-+:?`，整行扫描为单个 token。
+        if (lexer->lookahead == '|' && valid_symbols[TABLE_DELIMITER_ROW]) {
+            lexer->advance(lexer, false);
+            bool valid_row = true;
+            for (;;) {
+                while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+                    lexer->advance(lexer, false);
+                }
+                if (lexer->lookahead == ':') {
+                    lexer->advance(lexer, false);
+                }
+                uint32_t dashes = 0;
+                while (lexer->lookahead == '-') {
+                    lexer->advance(lexer, false);
+                    dashes++;
+                }
+                if (dashes == 0) {
+                    valid_row = false;
+                    break;
+                }
+                if (lexer->lookahead == ':') {
+                    lexer->advance(lexer, false);
+                }
+                while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+                    lexer->advance(lexer, false);
+                }
+                if (lexer->lookahead != '|') {
+                    valid_row = false;
+                    break;
+                }
+                lexer->advance(lexer, false);
+                while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+                    lexer->advance(lexer, false);
+                }
+                if (lexer->eof(lexer) || lexer->lookahead == '\r' || lexer->lookahead == '\n') {
+                    break;
+                }
+            }
+            if (valid_row) {
+                lexer->mark_end(lexer);
+                lexer->result_symbol = TABLE_DELIMITER_ROW;
                 return true;
             }
             goto scan_text_chunk;
@@ -523,12 +619,89 @@ bool tree_sitter_notist_external_scanner_scan(
         return false;
     }
 
+    // `@[` 块级属性与 `@![` 模块属性的开口；`@` 后跟其他字符时是普通文本。
+    if (scanner->mode == MODE_NONE && lexer->lookahead == '@' &&
+        (valid_symbols[BLOCK_ATTRIBUTES_OPEN] || valid_symbols[MODULE_ATTRIBUTES_OPEN])) {
+        lexer->advance(lexer, false);
+        if (lexer->lookahead == '[' && valid_symbols[BLOCK_ATTRIBUTES_OPEN]) {
+            lexer->advance(lexer, false);
+            lexer->mark_end(lexer);
+            lexer->result_symbol = BLOCK_ATTRIBUTES_OPEN;
+            return true;
+        }
+        if (lexer->lookahead == '!' && valid_symbols[MODULE_ATTRIBUTES_OPEN]) {
+            lexer->advance(lexer, false);
+            if (lexer->lookahead == '[') {
+                lexer->advance(lexer, false);
+                lexer->mark_end(lexer);
+                lexer->result_symbol = MODULE_ATTRIBUTES_OPEN;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Code 二元运算符与 else 关键词：只在对应 token 合法的 parser 状态
+    //（二元延续 / if 的 else 延续位置）产生，前导水平空白被跳过。这样
+    // markup 文本栈的 text_chunk 不会抢先吞掉 ` *` 之类的延续，而纯文本中
+    // 的 `a + b` 因 token 不合法仍按普通文本解析。
+    if (scanner->mode == MODE_NONE &&
+        (valid_symbols[OR_OPERATOR] || valid_symbols[AND_OPERATOR] ||
+         valid_symbols[COMPARISON_OPERATOR] || valid_symbols[ADDITIVE_OPERATOR] ||
+         valid_symbols[MULTIPLICATIVE_OPERATOR] || valid_symbols[ELSE_KEYWORD])) {
+        while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+            lexer->advance(lexer, true);
+        }
+
+        enum TokenType result_symbol = OR_OPERATOR;
+        bool matched = false;
+        int32_t character = lexer->lookahead;
+
+        if (valid_symbols[COMPARISON_OPERATOR] &&
+            (character == '<' || character == '>' || character == '=' || character == '!')) {
+            lexer->advance(lexer, false);
+            if ((character == '<' || character == '>') && lexer->lookahead != '=') {
+                matched = true;
+            } else if (lexer->lookahead == '=') {
+                lexer->advance(lexer, false);
+                matched = true;
+            }
+            result_symbol = COMPARISON_OPERATOR;
+        } else if (valid_symbols[ADDITIVE_OPERATOR] &&
+                   (character == '+' || character == '-')) {
+            lexer->advance(lexer, false);
+            matched = true;
+            result_symbol = ADDITIVE_OPERATOR;
+        } else if (valid_symbols[MULTIPLICATIVE_OPERATOR] &&
+                   (character == '*' || character == '/')) {
+            lexer->advance(lexer, false);
+            matched = true;
+            result_symbol = MULTIPLICATIVE_OPERATOR;
+        } else if (valid_symbols[OR_OPERATOR] && character == 'o' &&
+                   scan_word(lexer, "or") && !at_identifier_char(lexer)) {
+            matched = true;
+            result_symbol = OR_OPERATOR;
+        } else if (valid_symbols[AND_OPERATOR] && character == 'a' &&
+                   scan_word(lexer, "and") && !at_identifier_char(lexer)) {
+            matched = true;
+            result_symbol = AND_OPERATOR;
+        } else if (valid_symbols[ELSE_KEYWORD] && character == 'e' &&
+                   scan_word(lexer, "else") && !at_identifier_char(lexer)) {
+            matched = true;
+            result_symbol = ELSE_KEYWORD;
+        }
+
+        if (!matched) {
+            return false;
+        }
+        lexer->mark_end(lexer);
+        lexer->result_symbol = result_symbol;
+        return true;
+    }
+
 scan_text_chunk:
     if (scanner->mode == MODE_NONE && valid_symbols[TEXT_CHUNK]) {
         bool has_content = text_has_content;
-        bool in_http_url = false;
-        char recent[8] = {0};
-        uint32_t recent_length = 0;
         while (!lexer->eof(lexer)) {
             if (lexer->lookahead == '\r' || lexer->lookahead == '\n') {
                 break;
@@ -536,51 +709,44 @@ scan_text_chunk:
             if (lexer->lookahead == '#' || lexer->lookahead == '[' || lexer->lookahead == ']' ||
                 lexer->lookahead == '`' || lexer->lookahead == '@' || lexer->lookahead == ',' ||
                 lexer->lookahead == '*' || lexer->lookahead == '_' || lexer->lookahead == '~' ||
-                lexer->lookahead == '$' || lexer->lookahead == '\\') {
+                lexer->lookahead == '$' || lexer->lookahead == '\\' ||
+                lexer->lookahead == '{' || lexer->lookahead == '}' || lexer->lookahead == '|' ||
+                lexer->lookahead == '(') {
                 break;
             }
-            if (lexer->lookahead == '/') {
+            // `//` 与 `/*` 只在 Code 上下文（注释 token 合法）截断文本；
+            // Markup 文本流中它们是普通字符。
+            if (lexer->lookahead == '/' &&
+                (valid_symbols[LINE_COMMENT] || valid_symbols[BLOCK_COMMENT])) {
                 lexer->mark_end(lexer);
                 lexer->advance(lexer, false);
-                bool starts_comment = lexer->lookahead == '/' || lexer->lookahead == '*';
-                bool starts_url = lexer->lookahead == '/' &&
-                                  (strcmp(recent, "http:") == 0 || strcmp(recent, "https:") == 0);
-                if (starts_comment && !in_http_url && !starts_url) {
+                if (lexer->lookahead == '/' || lexer->lookahead == '*') {
                     if (has_content) {
                         lexer->result_symbol = TEXT_CHUNK;
                         return true;
                     }
                     return false;
                 }
-                if (starts_url) {
-                    in_http_url = true;
-                }
                 has_content = true;
                 lexer->mark_end(lexer);
                 continue;
             }
 
-            int32_t character = lexer->lookahead;
             lexer->advance(lexer, false);
             lexer->mark_end(lexer);
             has_content = true;
-            if (character == ' ' || character == '\t') {
-                in_http_url = false;
-                recent_length = 0;
-                recent[0] = '\0';
-            } else if (character >= 0 && character <= 0x7f) {
-                if (recent_length == sizeof(recent) - 1) {
-                    memmove(recent, recent + 1, sizeof(recent) - 2);
-                    recent_length--;
-                }
-                recent[recent_length++] = (char)character;
-                recent[recent_length] = '\0';
-            }
         }
         if (has_content) {
             lexer->result_symbol = TEXT_CHUNK;
             return true;
         }
+    }
+
+    if (scanner->mode == MODE_NONE && lexer->lookahead == '|' && valid_symbols[PIPE]) {
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
+        lexer->result_symbol = PIPE;
+        return true;
     }
 
     if (scanner->mode == MODE_NONE && lexer->lookahead == '`' &&

@@ -4,6 +4,9 @@
 ("(" @open
   ")" @close)
 
+("{" @open
+  "}" @close)
+
 [(escaped_inline_open)
  (escaped_multiline_open)
  (raw_inline_open)

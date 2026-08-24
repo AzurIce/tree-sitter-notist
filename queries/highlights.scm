@@ -6,10 +6,52 @@
 "]" @punctuation.bracket
 "(" @punctuation.bracket
 ")" @punctuation.bracket
+"{" @punctuation.bracket
+"}" @punctuation.bracket
 "," @punctuation.delimiter
+";" @punctuation.delimiter
+":" @punctuation.delimiter
 "=" @operator
 "::" @punctuation.delimiter
 "@" @attribute
+"?" @operator
+"=>" @operator
+"->" @operator
+
+["let" "if" "else" "fn" "trailing"] @keyword
+["import" "as"] @keyword.import
+"not" @keyword.operator
+
+[(or_operator)
+ (and_operator)] @keyword.operator
+
+[(comparison_operator)
+ (additive_operator)
+ (multiplicative_operator)] @operator
+
+(rule_marker) @punctuation.special
+
+(table_delimiter_row) @punctuation.special
+(pipe) @punctuation.delimiter
+
+[(block_attributes_open)
+ (module_attributes_open)] @attribute
+
+(let_expression
+  parameters: (parameters)
+  name: (identifier) @function)
+
+(parameter
+  name: (identifier) @variable.parameter)
+
+(type_expression
+  (qualified_name) @type)
+
+(import_path
+  (identifier) @module)
+
+(import_item
+  alias: (identifier) @variable)
 
 (heading
   marker: (heading_marker) @punctuation.special

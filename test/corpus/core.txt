@@ -16,7 +16,7 @@ Read [[self::intro]] and [[vault::guide#section]].
   (text))
 
 ==================
-Source comments and URLs
+Comment markers are plain text in markup
 ==================
 
 Visible // hidden
@@ -27,11 +27,51 @@ https://example.test/path
 
 (document
   (text)
-  (line_comment)
   (text)
-  (block_comment)
+  (strong
+    (strong_marker)
+    (text)
+    (strong_marker))
+  (text)
+  (strong
+    (strong_marker)
+    (text)
+    (strong_marker))
   (text)
   (text))
+
+==================
+Comments in code contexts
+==================
+
+#(1 + /* outer /* nested */ still */ 2)
+#f(a, // note
+   b)
+
+---
+
+(document
+  (embedded_expression
+    (parenthesized_expression
+      (binary_expression
+        (integer)
+        (additive_operator)
+        (block_comment)
+        (integer))))
+  (embedded_expression
+    (call_expression
+      (qualified_name
+        (identifier))
+      (arguments
+        (argument
+          (positional_argument
+            (qualified_name
+              (identifier))))
+        (line_comment)
+        (argument
+          (positional_argument
+            (qualified_name
+              (identifier))))))))
 
 ==================
 Surface headings and lists
@@ -68,11 +108,30 @@ Surface headings and lists
       (text))))
 
 ==================
+Heading levels and empty headings
+==================
+
+======= Deep
+=
+=not a heading
+
+---
+
+(document
+  (heading
+    (heading_marker)
+    (inline_body
+      (text)))
+  (heading
+    (heading_marker))
+  (text))
+
+==================
 Embedded expressions and calls
 ==================
 
 #[annotated [[self::target]]]@concept,#knowledge
-#heading(level=2)[Title]
+#heading(level: 2)[Title]
 #quote[
 Paragraph one.
 
@@ -120,8 +179,8 @@ Paragraph two.
 Arguments, strings, and trailing comma
 ==================
 
-#example(1, enabled=true, ratio=-1.5, label="demo", missing=none,)[body]
-#raw(text=r#"fn main() {}"#, lang="rust")
+#example(1, enabled: true, ratio: -1.5, label: "demo", missing: none,)[body]
+#raw(text: r#"fn main() {}"#, lang: "rust")
 
 ---
 
@@ -141,7 +200,8 @@ Arguments, strings, and trailing comma
         (argument
           (named_argument
             (identifier)
-            (float)))
+            (unary_expression
+              (float))))
         (argument
           (named_argument
             (identifier)
@@ -183,10 +243,10 @@ Arguments, strings, and trailing comma
 Multiline strings
 ==================
 
-#raw(text="""
+#raw(text: """
 escaped \n text
 """)
-#raw(text=r##"""
+#raw(text: r##"""
 raw "# text
 """##)
 
@@ -226,8 +286,8 @@ raw "# text
 Raw inline quote ambiguity
 ==================
 
-#raw(text=r#"""#)
-#raw(text=r#"""text"""#)
+#raw(text: r#"""#)
+#raw(text: r#"""text"""#)
 
 ---
 
@@ -300,9 +360,9 @@ plain fence
 Nested code expressions in arguments
 ==================
 
-#quote(body=[same])
-#heading(level=missing())[Title]
-#heading(level=(2))[T]
+#quote(body: [same])
+#heading(level: missing())[Title]
+#heading(level: (2))[T]
 
 ---
 
@@ -442,3 +502,368 @@ A * B and unmatched _ ~ $
       (escaped_punctuation)
       (text)
       (escaped_punctuation))))
+
+==================
+Operators and precedence
+==================
+
+#(1 + 2 * 3)
+#(not a == b)
+#(a and not b)
+#(a or b and c)
+#(-a * b)
+#1 + 2
+
+---
+
+(document
+  (embedded_expression
+    (parenthesized_expression
+      (binary_expression
+        (integer)
+        (additive_operator)
+        (binary_expression
+          (integer)
+          (multiplicative_operator)
+          (integer)))))
+  (embedded_expression
+    (parenthesized_expression
+      (unary_expression
+        (binary_expression
+          (qualified_name
+            (identifier))
+          (comparison_operator)
+          (qualified_name
+            (identifier))))))
+  (embedded_expression
+    (parenthesized_expression
+      (binary_expression
+        (qualified_name
+          (identifier))
+        (and_operator)
+        (unary_expression
+          (qualified_name
+            (identifier))))))
+  (embedded_expression
+    (parenthesized_expression
+      (binary_expression
+        (qualified_name
+          (identifier))
+        (or_operator)
+        (binary_expression
+          (qualified_name
+            (identifier))
+          (and_operator)
+          (qualified_name
+            (identifier))))))
+  (embedded_expression
+    (parenthesized_expression
+      (binary_expression
+        (unary_expression
+          (qualified_name
+            (identifier)))
+        (multiplicative_operator)
+        (qualified_name
+          (identifier)))))
+  (embedded_expression
+    (integer))
+  (text))
+
+==================
+If expressions
+==================
+
+#if ok { 1 } else { 2 }
+#if ok [yes] else [no]
+#if a [x]
+#if a { 1 } else if b { 2 } else { 3 }
+
+---
+
+(document
+  (embedded_expression
+    (if_expression
+      (qualified_name
+        (identifier))
+      (code_block
+        (integer))
+      (code_block
+        (integer))))
+  (embedded_expression
+    (if_expression
+      (qualified_name
+        (identifier))
+      (content_block
+        (content_body
+          (text)))
+      (content_block
+        (content_body
+          (text)))))
+  (embedded_expression
+    (if_expression
+      (qualified_name
+        (identifier))
+      (content_block
+        (content_body
+          (text)))))
+  (embedded_expression
+    (if_expression
+      (qualified_name
+        (identifier))
+      (code_block
+        (integer))
+      (if_expression
+        (qualified_name
+          (identifier))
+        (code_block
+          (integer))
+        (code_block
+          (integer))))))
+
+==================
+Let, lambda, and import
+==================
+
+#let x = 1
+#let y: Int = 2
+#let double(x: Int) -> Int = x * 2
+#let add = (a: Int, b: Int) => a + b
+#import self::theme::{warning, accent as highlight}
+- item
+
+---
+
+(document
+  (embedded_expression
+    (let_expression
+      (identifier)
+      (integer)))
+  (embedded_expression
+    (let_expression
+      (identifier)
+      (type_expression
+        (qualified_name
+          (identifier)))
+      (integer)))
+  (embedded_expression
+    (let_expression
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type_expression
+            (qualified_name
+              (identifier)))))
+      (type_expression
+        (qualified_name
+          (identifier)))
+      (binary_expression
+        (qualified_name
+          (identifier))
+        (multiplicative_operator)
+        (integer))))
+  (embedded_expression
+    (let_expression
+      (identifier)
+      (lambda
+        (parameters
+          (parameter
+            (identifier)
+            (type_expression
+              (qualified_name
+                (identifier))))
+          (parameter
+            (identifier)
+            (type_expression
+              (qualified_name
+                (identifier)))))
+        (binary_expression
+          (qualified_name
+            (identifier))
+          (additive_operator)
+          (qualified_name
+            (identifier))))))
+  (embedded_expression
+    (import_expression
+      (import_path
+        (identifier)
+        (identifier))
+      (import_item
+        (identifier))
+      (import_item
+        (identifier)
+        (identifier))))
+  (list_item
+    (list_marker)
+    (inline_body
+      (text))))
+
+==================
+Code blocks
+==================
+
+#{ let x = 1; x + 1 }
+{ 1 + 1 }
+#{
+  let a = 1
+  a
+}
+
+---
+
+(document
+  (embedded_expression
+    (code_block
+      (let_expression
+        (identifier)
+        (integer))
+      (binary_expression
+        (qualified_name
+          (identifier))
+        (additive_operator)
+        (integer))))
+  (code_block
+    (binary_expression
+      (integer)
+      (additive_operator)
+      (integer)))
+  (embedded_expression
+    (code_block
+      (let_expression
+        (identifier)
+        (integer))
+      (qualified_name
+        (identifier)))))
+
+==================
+Rules
+==================
+
+---
+--
+- - -
+text ---
+
+---
+
+(document
+  (rule
+    (rule_marker))
+  (text)
+  (list_item
+    (list_marker)
+    (inline_body
+      (text)))
+  (text))
+
+==================
+Tables
+==================
+
+| Name  | Value |
+| :---- | ----: |
+| one   | 1     |
+| a \| b | *c* |
+
+just | text
+
+---
+
+(document
+  (table
+    (table_row
+      (pipe)
+      (table_cell
+        (text))
+      (pipe)
+      (table_cell
+        (text))
+      (pipe))
+    (table_delimiter_row)
+    (table_row
+      (pipe)
+      (table_cell
+        (text))
+      (pipe)
+      (table_cell
+        (text))
+      (pipe))
+    (table_row
+      (pipe)
+      (table_cell
+        (text)
+        (escaped_punctuation)
+        (text))
+      (pipe)
+      (table_cell
+        (text)
+        (strong
+          (strong_marker)
+          (text)
+          (strong_marker))
+        (text))
+      (pipe)))
+  (text)
+  (text)
+  (text))
+
+==================
+Block and module attributes
+==================
+
+@![#design, #wip, status = "draft"]
+
+@[wip]
+= 标题
+
+@[install, level = 2, ok = true]
+#warning[...]
+
+---
+
+(document
+  (module_attributes
+    (module_attributes_open)
+    (attribute_item
+      (tag_attribute
+        (identifier)))
+    (attribute_item
+      (tag_attribute
+        (identifier)))
+    (attribute_item
+      (property_attribute
+        (identifier)
+        (attribute_value
+          (attribute_string
+            (attribute_string_content))))))
+  (block_attributes
+    (block_attributes_open)
+    (first_attribute
+      (id_attribute
+        (identifier))))
+  (heading
+    (heading_marker)
+    (inline_body
+      (text)))
+  (block_attributes
+    (block_attributes_open)
+    (first_attribute
+      (id_attribute
+        (identifier)))
+    (attribute_item
+      (property_attribute
+        (identifier)
+        (attribute_value
+          (integer))))
+    (attribute_item
+      (property_attribute
+        (identifier)
+        (attribute_value
+          (boolean)))))
+  (embedded_expression
+    (call_expression
+      (qualified_name
+        (identifier))
+      (content_block
+        (content_body
+          (text))))))
