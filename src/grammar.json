@@ -80,10 +80,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "wiki_reference"
-        },
-        {
-          "type": "SYMBOL",
           "name": "embedded_expression"
         },
         {
@@ -395,10 +391,6 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "wiki_reference"
-        },
-        {
-          "type": "SYMBOL",
           "name": "embedded_expression"
         },
         {
@@ -638,10 +630,6 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "wiki_reference"
-        },
-        {
-          "type": "SYMBOL",
           "name": "embedded_expression"
         },
         {
@@ -768,10 +756,6 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "wiki_reference"
-        },
-        {
-          "type": "SYMBOL",
           "name": "embedded_expression"
         },
         {
@@ -884,10 +868,6 @@
     "_emphasis_atom": {
       "type": "CHOICE",
       "members": [
-        {
-          "type": "SYMBOL",
-          "name": "wiki_reference"
-        },
         {
           "type": "SYMBOL",
           "name": "embedded_expression"
@@ -1067,10 +1047,6 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "wiki_reference"
-        },
-        {
-          "type": "SYMBOL",
           "name": "embedded_expression"
         },
         {
@@ -1196,32 +1172,32 @@
         "value": "\\\\[\\x21-\\x2f\\x3a-\\x40\\x5b-\\x60\\x7b-\\x7e]"
       }
     },
-    "wiki_reference": {
+    "target_literal": {
       "type": "SEQ",
       "members": [
         {
           "type": "STRING",
-          "value": "[["
+          "value": "<"
         },
         {
           "type": "FIELD",
           "name": "target",
           "content": {
             "type": "SYMBOL",
-            "name": "wiki_target"
+            "name": "target_content"
           }
         },
         {
           "type": "STRING",
-          "value": "]]"
+          "value": ">"
         }
       ]
     },
-    "wiki_target": {
+    "target_content": {
       "type": "IMMEDIATE_TOKEN",
       "content": {
         "type": "PATTERN",
-        "value": "[^\\]\\n]+"
+        "value": "[^>\\n]+"
       }
     },
     "embedded_expression": {
@@ -1315,6 +1291,10 @@
         {
           "type": "SYMBOL",
           "name": "import_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "target_literal"
         }
       ]
     },
@@ -1384,6 +1364,10 @@
         {
           "type": "SYMBOL",
           "name": "import_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "target_literal"
         }
       ]
     },
@@ -2304,8 +2288,12 @@
           "name": "path",
           "content": {
             "type": "SYMBOL",
-            "name": "import_path"
+            "name": "target_literal"
           }
+        },
+        {
+          "type": "STRING",
+          "value": "::"
         },
         {
           "type": "STRING",
@@ -2389,22 +2377,6 @@
         }
       ]
     },
-    "import_path": {
-      "type": "REPEAT1",
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "identifier"
-          },
-          {
-            "type": "STRING",
-            "value": "::"
-          }
-        ]
-      }
-    },
     "import_item": {
       "type": "SEQ",
       "members": [
@@ -2459,6 +2431,47 @@
     },
     "type_expression": {
       "type": "PREC_RIGHT",
+      "value": 1,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "type_member"
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "union_operator"
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_code_trivia"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "type_member"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "type_member": {
+      "type": "PREC_RIGHT",
       "value": 0,
       "content": {
         "type": "SEQ",
@@ -2489,6 +2502,17 @@
             ]
           }
         ]
+      }
+    },
+    "union_operator": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 2,
+        "content": {
+          "type": "PATTERN",
+          "value": "[ \\t]*\\|"
+        }
       }
     },
     "function_type": {

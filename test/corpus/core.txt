@@ -2,17 +2,19 @@
 Wiki references
 ==================
 
-Read [[self::intro]] and [[vault::guide#section]].
+Read #<self::intro> and #<vault::guide/section>.
 
 ---
 
 (document
   (text)
-  (wiki_reference
-    (wiki_target))
+  (embedded_expression
+    (target_literal
+      (target_content)))
   (text)
-  (wiki_reference
-    (wiki_target))
+  (embedded_expression
+    (target_literal
+      (target_content)))
   (text))
 
 ==================
@@ -130,7 +132,7 @@ Heading levels and empty headings
 Embedded expressions and calls
 ==================
 
-#[annotated [[self::target]]]@concept,#knowledge
+#[annotated #<self::target>]@concept,#knowledge
 #heading(level: 2)[Title]
 #quote[
 Paragraph one.
@@ -145,8 +147,9 @@ Paragraph two.
     (content_block
       (content_body
         (text)
-        (wiki_reference
-          (wiki_target))))
+        (embedded_expression
+          (target_literal
+            (target_content)))))
     (attributes
       (first_attribute
         (id_attribute
@@ -438,7 +441,7 @@ Inline markup in headings and lists
 = *Important _note_* and `code`
 **Markdown-style delimiters are not canonical**
 A * B and unmatched _ ~ $
-- Read [[self::guide]] with __care__
+- Read #<self::guide> with __care__
   + ~~obsolete~~ and $x^2$
 - [ ] escape \*literally\*
 
@@ -476,8 +479,9 @@ A * B and unmatched _ ~ $
     (list_marker)
     (inline_body
       (text)
-      (wiki_reference
-        (wiki_target))
+      (embedded_expression
+        (target_literal
+          (target_content)))
       (text)
       (underline
         (underline_marker)
@@ -628,7 +632,7 @@ Let, lambda, and import
 #let y: Int = 2
 #let double(x: Int) -> Int = x * 2
 #let add = (a: Int, b: Int) => a + b
-#import self::theme::{warning, accent as highlight}
+#import <self::theme>::{warning, accent as highlight}
 - item
 
 ---
@@ -642,8 +646,9 @@ Let, lambda, and import
     (let_expression
       (identifier)
       (type_expression
-        (qualified_name
-          (identifier)))
+        (type_member
+          (qualified_name
+            (identifier))))
       (integer)))
   (embedded_expression
     (let_expression
@@ -652,11 +657,13 @@ Let, lambda, and import
         (parameter
           (identifier)
           (type_expression
-            (qualified_name
-              (identifier)))))
+            (type_member
+              (qualified_name
+                (identifier))))))
       (type_expression
-        (qualified_name
-          (identifier)))
+        (type_member
+          (qualified_name
+            (identifier))))
       (binary_expression
         (qualified_name
           (identifier))
@@ -670,13 +677,15 @@ Let, lambda, and import
           (parameter
             (identifier)
             (type_expression
-              (qualified_name
-                (identifier))))
+              (type_member
+                (qualified_name
+                  (identifier)))))
           (parameter
             (identifier)
             (type_expression
-              (qualified_name
-                (identifier)))))
+              (type_member
+                (qualified_name
+                  (identifier))))))
         (binary_expression
           (qualified_name
             (identifier))
@@ -685,9 +694,8 @@ Let, lambda, and import
             (identifier))))))
   (embedded_expression
     (import_expression
-      (import_path
-        (identifier)
-        (identifier))
+      (target_literal
+        (target_content))
       (import_item
         (identifier))
       (import_item
@@ -867,3 +875,49 @@ Block and module attributes
       (content_block
         (content_body
           (text))))))
+
+==================
+Union types and target literals
+==================
+
+#let a: Target | String = <vault::wiki link/install>
+#let b: fn(x: Int) -> Int | None = none
+
+---
+
+(document
+  (embedded_expression
+    (let_expression
+      (identifier)
+      (type_expression
+        (type_member
+          (qualified_name
+            (identifier)))
+        (union_operator)
+        (type_member
+          (qualified_name
+            (identifier))))
+      (target_literal
+        (target_content))))
+  (embedded_expression
+    (let_expression
+      (identifier)
+      (type_expression
+        (type_member
+          (function_type
+            (parameters
+              (parameter
+                (identifier)
+                (type_expression
+                  (type_member
+                    (qualified_name
+                      (identifier))))))
+            (type_expression
+              (type_member
+                (qualified_name
+                  (identifier)))
+              (union_operator)
+              (type_member
+                (qualified_name
+                  (identifier)))))))
+      (none))))

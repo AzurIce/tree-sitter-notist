@@ -675,6 +675,12 @@ bool tree_sitter_notist_external_scanner_scan(
         } else if (valid_symbols[MULTIPLICATIVE_OPERATOR] &&
                    (character == '*' || character == '/')) {
             lexer->advance(lexer, false);
+            // `//` 与 `/*` 是注释（或 markup 文本），除号不能抢先，
+            // 否则 `#let x = 1  // c` 会被解析成 `1 / / c`。
+            if (character == '/' &&
+                (lexer->lookahead == '/' || lexer->lookahead == '*')) {
+                return false;
+            }
             matched = true;
             result_symbol = MULTIPLICATIVE_OPERATOR;
         } else if (valid_symbols[OR_OPERATOR] && character == 'o' &&

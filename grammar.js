@@ -97,7 +97,6 @@ module.exports = grammar({
       $.table,
       $.block_attributes,
       $.code_block,
-      $.wiki_reference,
       $.embedded_expression,
       $.fenced_raw,
       $.inline_raw,
@@ -161,7 +160,6 @@ module.exports = grammar({
     table_cell: $ => prec.dynamic(1, prec.right(repeat1($._table_inline))),
 
     _table_inline: $ => choice(
-      $.wiki_reference,
       $.embedded_expression,
       $.code_block,
       $.inline_raw,
@@ -206,7 +204,6 @@ module.exports = grammar({
     inline_body: $ => prec.right(repeat1($._inline)),
 
     _inline: $ => choice(
-      $.wiki_reference,
       $.embedded_expression,
       $.code_block,
       $.inline_raw,
@@ -235,7 +232,6 @@ module.exports = grammar({
     ),
 
     _strong_atom: $ => choice(
-      $.wiki_reference,
       $.embedded_expression,
       $.inline_raw,
       $.inline_math,
@@ -258,7 +254,6 @@ module.exports = grammar({
     ),
 
     _emphasis_atom: $ => choice(
-      $.wiki_reference,
       $.embedded_expression,
       $.inline_raw,
       $.inline_math,
@@ -294,7 +289,6 @@ module.exports = grammar({
     ),
 
     _strike_atom: $ => choice(
-      $.wiki_reference,
       $.embedded_expression,
       $.inline_raw,
       $.inline_math,
@@ -315,13 +309,15 @@ module.exports = grammar({
 
     escaped_punctuation: _ => token(/\\[\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e]/),
 
-    wiki_reference: $ => seq(
-      "[[",
-      field("target", $.wiki_target),
-      "]]",
+    // Target literal `<path[/label]>` — the `<` `>` pair delimits the body;
+    // backslash escapes are accepted by the body token.
+    target_literal: $ => seq(
+      "<",
+      field("target", $.target_content),
+      ">",
     ),
 
-    wiki_target: _ => token.immediate(/[^\]\n]+/),
+    target_content: _ => token.immediate(/[^>\n]+/),
 
     // EmbeddedExpression = "#" EmbeddedCode Attributes?
     // The top-level expression after "#" stops at whitespace: binary/unary
@@ -347,6 +343,7 @@ module.exports = grammar({
       $.lambda,
       $.let_expression,
       $.import_expression,
+      $.target_literal,
     ),
 
     _code_expression: $ => choice(
@@ -366,6 +363,7 @@ module.exports = grammar({
       $.lambda,
       $.let_expression,
       $.import_expression,
+      $.target_literal,
     ),
 
     none: _ => "none",
@@ -552,11 +550,12 @@ module.exports = grammar({
       ),
     ),
 
-    // import path::{name, name as alias} — 显式选择器，无 wildcard。
+    // import <path>::{name, name as alias} — 显式选择器，无 wildcard。
     import_expression: $ => seq(
       "import",
       repeat1($._code_trivia),
-      field("path", $.import_path),
+      field("path", $.target_literal),
+      "::",
       "{",
       repeat($._code_trivia),
       $.import_item,
@@ -571,8 +570,6 @@ module.exports = grammar({
       "}",
     ),
 
-    import_path: $ => repeat1(seq($.identifier, "::")),
-
     import_item: $ => seq(
       field("name", $.identifier),
       optional(seq(
@@ -583,15 +580,26 @@ module.exports = grammar({
       )),
     ),
 
-    // Type = QualifiedName "?"? | "fn" Parameters "->" Type "?"?
+    // Type = TypeMember ("|" TypeMember)*
     // 紧邻的 `?` 绑定最内层类型。
-    type_expression: $ => prec.right(seq(
+    type_expression: $ => prec.right(1, seq(
+      $.type_member,
+      repeat(seq(
+        $.union_operator,
+        optional($._code_trivia),
+        $.type_member,
+      )),
+    )),
+
+    type_member: $ => prec.right(seq(
       choice(
         $.qualified_name,
         $.function_type,
       ),
       optional("?"),
     )),
+
+    union_operator: _ => token(prec(2, /[ \t]*\|/)),
 
     function_type: $ => seq(
       "fn",
