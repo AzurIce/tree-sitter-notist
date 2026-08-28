@@ -18,6 +18,18 @@ pub const HIGHLIGHTS_QUERY: &str = include_str!("../../queries/highlights.scm");
 /// The default language injection query.
 pub const INJECTIONS_QUERY: &str = include_str!("../../queries/injections.scm");
 
+/// The default code folding query.
+pub const FOLDS_QUERY: &str = include_str!("../../queries/folds.scm");
+
+/// The default indentation query.
+pub const INDENTS_QUERY: &str = include_str!("../../queries/indents.scm");
+
+/// The default outline query.
+pub const OUTLINE_QUERY: &str = include_str!("../../queries/outline.scm");
+
+/// The default bracket pairing query.
+pub const BRACKETS_QUERY: &str = include_str!("../../queries/brackets.scm");
+
 #[cfg(test)]
 mod tests {
     use tree_sitter::Query;
@@ -35,5 +47,9 @@ mod tests {
         let language = super::LANGUAGE.into();
         Query::new(&language, super::HIGHLIGHTS_QUERY).expect("highlight query should compile");
         Query::new(&language, super::INJECTIONS_QUERY).expect("injection query should compile");
+        Query::new(&language, super::FOLDS_QUERY).expect("fold query should compile");
+        Query::new(&language, super::INDENTS_QUERY).expect("indent query should compile");
+        Query::new(&language, super::OUTLINE_QUERY).expect("outline query should compile");
+        Query::new(&language, super::BRACKETS_QUERY).expect("bracket query should compile");
     }
 }

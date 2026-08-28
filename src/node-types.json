@@ -558,10 +558,6 @@
           "named": true
         },
         {
-          "type": "inline_math",
-          "named": true
-        },
-        {
           "type": "inline_raw",
           "named": true
         },
@@ -639,10 +635,6 @@
         },
         {
           "type": "heading",
-          "named": true
-        },
-        {
-          "type": "inline_math",
           "named": true
         },
         {
@@ -784,10 +776,6 @@
           },
           {
             "type": "escaped_punctuation",
-            "named": true
-          },
-          {
-            "type": "inline_math",
             "named": true
           },
           {
@@ -1282,10 +1270,6 @@
           "named": true
         },
         {
-          "type": "inline_math",
-          "named": true
-        },
-        {
           "type": "inline_raw",
           "named": true
         },
@@ -1306,42 +1290,6 @@
           "named": true
         }
       ]
-    }
-  },
-  {
-    "type": "inline_math",
-    "named": true,
-    "fields": {
-      "body": {
-        "multiple": true,
-        "required": true,
-        "types": [
-          {
-            "type": "math_text",
-            "named": true
-          }
-        ]
-      },
-      "close": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "math_marker",
-            "named": true
-          }
-        ]
-      },
-      "open": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "math_marker",
-            "named": true
-          }
-        ]
-      }
     }
   },
   {
@@ -2244,10 +2192,6 @@
             "named": true
           },
           {
-            "type": "inline_math",
-            "named": true
-          },
-          {
             "type": "inline_raw",
             "named": true
           },
@@ -2332,10 +2276,6 @@
           },
           {
             "type": "escaped_punctuation",
-            "named": true
-          },
-          {
-            "type": "inline_math",
             "named": true
           },
           {
@@ -2439,10 +2379,6 @@
           "named": true
         },
         {
-          "type": "inline_math",
-          "named": true
-        },
-        {
           "type": "inline_raw",
           "named": true
         },
@@ -2521,6 +2457,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "target_open",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -2706,10 +2652,6 @@
             "named": true
           },
           {
-            "type": "inline_math",
-            "named": true
-          },
-          {
             "type": "inline_raw",
             "named": true
           },
@@ -2791,10 +2733,6 @@
   },
   {
     "type": ";",
-    "named": false
-  },
-  {
-    "type": "<",
     "named": false
   },
   {
@@ -2942,14 +2880,6 @@
     "named": true
   },
   {
-    "type": "math_marker",
-    "named": true
-  },
-  {
-    "type": "math_text",
-    "named": true
-  },
-  {
     "type": "module_attributes_open",
     "named": true
   },
@@ -3007,6 +2937,10 @@
   },
   {
     "type": "target_content",
+    "named": true
+  },
+  {
+    "type": "target_open",
     "named": true
   },
   {

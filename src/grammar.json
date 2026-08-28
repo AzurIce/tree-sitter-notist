@@ -108,10 +108,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "inline_math"
-        },
-        {
-          "type": "SYMBOL",
           "name": "escaped_punctuation"
         },
         {
@@ -145,7 +141,7 @@
         "value": -2,
         "content": {
           "type": "PATTERN",
-          "value": "[#\\[\\]`/@,*_~$\\\\{}(]"
+          "value": "[#\\[\\]`/@,*_~\\\\{}(]"
         }
       }
     },
@@ -419,10 +415,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "inline_math"
-        },
-        {
-          "type": "SYMBOL",
           "name": "escaped_punctuation"
         },
         {
@@ -658,10 +650,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "inline_math"
-        },
-        {
-          "type": "SYMBOL",
           "name": "escaped_punctuation"
         },
         {
@@ -764,10 +752,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "inline_math"
-        },
-        {
-          "type": "SYMBOL",
           "name": "escaped_punctuation"
         },
         {
@@ -797,7 +781,7 @@
               "value": -2,
               "content": {
                 "type": "PATTERN",
-                "value": "[#\\[\\]`/@,_~$\\\\{}(]"
+                "value": "[#\\[\\]`/@,_~\\\\{}(]"
               }
             }
           },
@@ -878,10 +862,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "inline_math"
-        },
-        {
-          "type": "SYMBOL",
           "name": "escaped_punctuation"
         },
         {
@@ -911,7 +891,7 @@
               "value": -2,
               "content": {
                 "type": "PATTERN",
-                "value": "[#\\[\\]`/@,*~$\\\\{}(]"
+                "value": "[#\\[\\]`/@,*~\\\\{}(]"
               }
             }
           },
@@ -1055,10 +1035,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "inline_math"
-        },
-        {
-          "type": "SYMBOL",
           "name": "escaped_punctuation"
         },
         {
@@ -1088,80 +1064,12 @@
               "value": -2,
               "content": {
                 "type": "PATTERN",
-                "value": "[#\\[\\]`/@,*_$\\\\{}(]"
+                "value": "[#\\[\\]`/@,*_\\\\{}(]"
               }
             }
           },
           "named": true,
           "value": "text"
-        }
-      ]
-    },
-    "inline_math": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "FIELD",
-          "name": "open",
-          "content": {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "math_open"
-            },
-            "named": true,
-            "value": "math_marker"
-          }
-        },
-        {
-          "type": "FIELD",
-          "name": "body",
-          "content": {
-            "type": "REPEAT1",
-            "content": {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "ALIAS",
-                  "content": {
-                    "type": "SYMBOL",
-                    "name": "text_chunk"
-                  },
-                  "named": true,
-                  "value": "math_text"
-                },
-                {
-                  "type": "ALIAS",
-                  "content": {
-                    "type": "TOKEN",
-                    "content": {
-                      "type": "PREC",
-                      "value": -2,
-                      "content": {
-                        "type": "PATTERN",
-                        "value": "[#\\[\\]`/@,*_~\\\\{}(|]"
-                      }
-                    }
-                  },
-                  "named": true,
-                  "value": "math_text"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "type": "FIELD",
-          "name": "close",
-          "content": {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "math_close"
-            },
-            "named": true,
-            "value": "math_marker"
-          }
         }
       ]
     },
@@ -1176,8 +1084,8 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "<"
+          "type": "SYMBOL",
+          "name": "target_open"
         },
         {
           "type": "FIELD",
@@ -1197,7 +1105,7 @@
       "type": "IMMEDIATE_TOKEN",
       "content": {
         "type": "PATTERN",
-        "value": "[^>\\n]+"
+        "value": "(\\\\[<>\\\\]|[^>\\\\\\x00-\\x1f\\x7f])+"
       }
     },
     "embedded_expression": {
@@ -3413,11 +3321,7 @@
     },
     {
       "type": "SYMBOL",
-      "name": "math_open"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "math_close"
+      "name": "target_open"
     },
     {
       "type": "SYMBOL",

@@ -10,10 +10,12 @@ Read #<self::intro> and #<vault::guide/section>.
   (text)
   (embedded_expression
     (target_literal
+      (target_open)
       (target_content)))
   (text)
   (embedded_expression
     (target_literal
+      (target_open)
       (target_content)))
   (text))
 
@@ -149,6 +151,7 @@ Paragraph two.
         (text)
         (embedded_expression
           (target_literal
+            (target_open)
             (target_content)))))
     (attributes
       (first_attribute
@@ -474,13 +477,13 @@ A * B and unmatched _ ~ $
   (text)
   (text)
   (text)
-  (text)
   (list_item
     (list_marker)
     (inline_body
       (text)
       (embedded_expression
         (target_literal
+          (target_open)
           (target_content)))
       (text)
       (underline
@@ -494,11 +497,7 @@ A * B and unmatched _ ~ $
         (strike_marker)
         (text)
         (strike_marker))
-      (text)
-      (inline_math
-        (math_marker)
-        (math_text)
-        (math_marker))))
+      (text)))
   (task_item
     (task_marker)
     (inline_body
@@ -695,6 +694,7 @@ Let, lambda, and import
   (embedded_expression
     (import_expression
       (target_literal
+        (target_open)
         (target_content))
       (import_item
         (identifier))
@@ -898,6 +898,7 @@ Union types and target literals
           (qualified_name
             (identifier))))
       (target_literal
+        (target_open)
         (target_content))))
   (embedded_expression
     (let_expression
@@ -921,3 +922,67 @@ Union types and target literals
                 (qualified_name
                   (identifier)))))))
       (none))))
+
+==================
+Unclosed target literal is a local error
+==================
+
+Read #<self::intro
+and then more.
+
+---
+
+(document
+  (text)
+  (ERROR)
+  (text))
+
+==================
+Empty target literal
+==================
+
+Read #<>.
+
+---
+
+(document
+  (text)
+  (ERROR)
+  (text))
+
+==================
+Target literal escapes
+==================
+
+#<vault::a\>b\\c\<d> after
+
+---
+
+(document
+  (embedded_expression
+    (target_literal
+      (target_open)
+      (target_content)))
+  (text))
+
+==================
+Bare angle brackets stay text
+==================
+
+a < b and c > d
+
+---
+
+(document
+  (text))
+
+==================
+Dollar sign is plain text
+==================
+
+cost $5 and $x here
+
+---
+
+(document
+  (text))

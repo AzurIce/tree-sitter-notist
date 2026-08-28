@@ -37,8 +37,7 @@ module.exports = grammar({
     $.underline_close,
     $.strike_open,
     $.strike_close,
-    $.math_open,
-    $.math_close,
+    $.target_open,
     $.heading_marker,
     $.list_marker,
     $.enum_marker,
@@ -104,14 +103,13 @@ module.exports = grammar({
       $.emphasis,
       $.underline,
       $.strike,
-      $.inline_math,
       $.escaped_punctuation,
       alias($.pipe, $.text),
       alias($.text_chunk, $.text),
       $.text,
     ),
 
-    text: _ => token(prec(-2, /[#\[\]`/@,*_~$\\{}(]/)),
+    text: _ => token(prec(-2, /[#\[\]`/@,*_~\\{}(]/)),
 
     heading: $ => prec.right(seq(
       field("marker", $.heading_marker),
@@ -167,7 +165,6 @@ module.exports = grammar({
       $.emphasis,
       $.underline,
       $.strike,
-      $.inline_math,
       $.escaped_punctuation,
       alias($.text_chunk, $.text),
       $.text,
@@ -211,7 +208,6 @@ module.exports = grammar({
       $.emphasis,
       $.underline,
       $.strike,
-      $.inline_math,
       $.escaped_punctuation,
       alias($.pipe, $.text),
       alias($.text_chunk, $.text),
@@ -234,11 +230,10 @@ module.exports = grammar({
     _strong_atom: $ => choice(
       $.embedded_expression,
       $.inline_raw,
-      $.inline_math,
       $.escaped_punctuation,
       alias($.pipe, $.text),
       alias($.text_chunk, $.text),
-      alias(token(prec(-2, /[#\[\]`/@,_~$\\{}(]/)), $.text),
+      alias(token(prec(-2, /[#\[\]`/@,_~\\{}(]/)), $.text),
     ),
 
     emphasis: $ => seq(
@@ -256,11 +251,10 @@ module.exports = grammar({
     _emphasis_atom: $ => choice(
       $.embedded_expression,
       $.inline_raw,
-      $.inline_math,
       $.escaped_punctuation,
       alias($.pipe, $.text),
       alias($.text_chunk, $.text),
-      alias(token(prec(-2, /[#\[\]`/@,*~$\\{}(]/)), $.text),
+      alias(token(prec(-2, /[#\[\]`/@,*~\\{}(]/)), $.text),
     ),
 
     underline: $ => seq(
@@ -291,33 +285,26 @@ module.exports = grammar({
     _strike_atom: $ => choice(
       $.embedded_expression,
       $.inline_raw,
-      $.inline_math,
       $.escaped_punctuation,
       alias($.pipe, $.text),
       alias($.text_chunk, $.text),
-      alias(token(prec(-2, /[#\[\]`/@,*_$\\{}(]/)), $.text),
-    ),
-
-    inline_math: $ => seq(
-      field("open", alias($.math_open, $.math_marker)),
-      field("body", repeat1(choice(
-        alias($.text_chunk, $.math_text),
-        alias(token(prec(-2, /[#\[\]`/@,*_~\\{}(|]/)), $.math_text),
-      ))),
-      field("close", alias($.math_close, $.math_marker)),
+      alias(token(prec(-2, /[#\[\]`/@,*_\\{}(]/)), $.text),
     ),
 
     escaped_punctuation: _ => token(/\\[\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e]/),
 
-    // Target literal `<path[/label]>` — the `<` `>` pair delimits the body;
-    // backslash escapes are accepted by the body token.
+    // Target literal `<path[/label]>` — the `<` `>` pair delimits the body.
+    // `target_open` is external so the scanner only fires it when the same
+    // line actually holds a closing `>`; otherwise `<` degrades to text like
+    // every other paired inline delimiter. `\<` `\>` `\\` escape the
+    // delimiters and the backslash; no line breaks inside.
     target_literal: $ => seq(
-      "<",
+      $.target_open,
       field("target", $.target_content),
       ">",
     ),
 
-    target_content: _ => token.immediate(/[^>\n]+/),
+    target_content: _ => token.immediate(/(\\[<>\\]|[^>\\\x00-\x1f\x7f])+/),
 
     // EmbeddedExpression = "#" EmbeddedCode Attributes?
     // The top-level expression after "#" stops at whitespace: binary/unary

@@ -21,3 +21,11 @@ tree-sitter generate --js-runtime native
 tree-sitter test
 cargo test
 ```
+
+Build the web-tree-sitter wasm artifact (what the Obsidian plugin ships in
+`assets/notist.wasm`; record the commit and date in the plugin's
+`assets/UPSTREAM.txt`):
+
+```sh
+tree-sitter build --wasm  # produces tree-sitter-notist.wasm
+```

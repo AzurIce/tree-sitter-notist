@@ -29,8 +29,7 @@ enum TokenType {
     UNDERLINE_CLOSE,
     STRIKE_OPEN,
     STRIKE_CLOSE,
-    MATH_OPEN,
-    MATH_CLOSE,
+    TARGET_OPEN,
     HEADING_MARKER,
     LIST_MARKER,
     ENUM_MARKER,
@@ -70,7 +69,6 @@ enum InlineDelimiter {
     INLINE_EMPHASIS,
     INLINE_UNDERLINE,
     INLINE_STRIKE,
-    INLINE_MATH,
 };
 
 static bool scan_inline_delimiter(TSLexer *lexer, char delimiter, uint8_t length) {
@@ -102,6 +100,35 @@ static bool has_inline_close(TSLexer *lexer, char delimiter, uint8_t length) {
                 found++;
             }
             return found == length && has_content;
+        }
+        lexer->advance(lexer, false);
+        has_content = true;
+    }
+    return false;
+}
+
+/// From just after a `<` already consumed and marked: is there a same-line
+/// `>` reachable through at least one body character? Backslash escapes the
+/// next character (`\<`, `\>`, `\\`); control characters terminate the
+/// scan, mirroring the authoritative parser. Pure lookahead: advances the
+/// lexer but the caller's `mark_end` decides the token end.
+static bool has_target_close(TSLexer *lexer) {
+    bool has_content = false;
+    while (!lexer->eof(lexer)) {
+        if (lexer->lookahead < 0x20) {
+            return false;
+        }
+        if (lexer->lookahead == '\\') {
+            lexer->advance(lexer, false);
+            if (lexer->eof(lexer) || lexer->lookahead < 0x20) {
+                return false;
+            }
+            lexer->advance(lexer, false);
+            has_content = true;
+            continue;
+        }
+        if (lexer->lookahead == '>') {
+            return has_content;
         }
         lexer->advance(lexer, false);
         has_content = true;
@@ -356,12 +383,7 @@ bool tree_sitter_notist_external_scanner_scan(
                 delimiter = '~';
                 length = 2;
                 break;
-            default:
-                close_symbol = MATH_CLOSE;
-                delimiter = '$';
-                length = 1;
-                break;
-        }
+            }
         if (valid_symbols[close_symbol] && lexer->lookahead == delimiter) {
             if (scan_inline_delimiter(lexer, delimiter, length)) {
                 scanner->inline_stack_length--;
@@ -411,12 +433,6 @@ bool tree_sitter_notist_external_scanner_scan(
             delimiter = '~';
             length = 2;
             candidate = true;
-        } else if (lexer->lookahead == '$' && valid_symbols[MATH_OPEN]) {
-            open_symbol = MATH_OPEN;
-            delimiter_kind = INLINE_MATH;
-            delimiter = '$';
-            length = 1;
-            candidate = true;
         }
 
         if (candidate) {
@@ -430,6 +446,21 @@ bool tree_sitter_notist_external_scanner_scan(
             lexer->result_symbol = open_symbol;
             return true;
         }
+    }
+
+    // Target literal open: fire only when the same line holds an unescaped
+    // `>` after at least one body character, so an unterminated `<` degrades
+    // to plain text like every other paired inline delimiter. `<` is never a
+    // comparison operator in a state that also expects a target.
+    if (scanner->mode == MODE_NONE && lexer->lookahead == '<' &&
+        valid_symbols[TARGET_OPEN]) {
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
+        if (has_target_close(lexer)) {
+            lexer->result_symbol = TARGET_OPEN;
+            return true;
+        }
+        return false;
     }
 
     if (scanner->mode == MODE_NONE && lexer->get_column(lexer) == 0 &&
@@ -715,7 +746,7 @@ scan_text_chunk:
             if (lexer->lookahead == '#' || lexer->lookahead == '[' || lexer->lookahead == ']' ||
                 lexer->lookahead == '`' || lexer->lookahead == '@' || lexer->lookahead == ',' ||
                 lexer->lookahead == '*' || lexer->lookahead == '_' || lexer->lookahead == '~' ||
-                lexer->lookahead == '$' || lexer->lookahead == '\\' ||
+                lexer->lookahead == '\\' ||
                 lexer->lookahead == '{' || lexer->lookahead == '}' || lexer->lookahead == '|' ||
                 lexer->lookahead == '(') {
                 break;
