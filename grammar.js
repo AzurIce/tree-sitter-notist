@@ -710,22 +710,12 @@ module.exports = grammar({
     ),
 
     // key = value 的 value 只许 String / Int / Bool 字面量。
+    // String 与 Code 字符串字面量共用同一套规则（四种形态，2026-08-29 裁决）。
     attribute_value: $ => choice(
       $.boolean,
       $.integer,
-      $.attribute_string,
+      $.string,
     ),
-
-    attribute_string: $ => seq(
-      '"',
-      optional($.attribute_string_content),
-      '"',
-    ),
-
-    attribute_string_content: $ => repeat1(choice(
-      token.immediate(/[^"\\]+/),
-      token.immediate(/\\./),
-    )),
 
     _line_break: _ => /\r?\n/,
     _whitespace: _ => /[ \t\r\n]+/,

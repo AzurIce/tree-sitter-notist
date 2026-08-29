@@ -65,26 +65,6 @@
     }
   },
   {
-    "type": "attribute_string",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "attribute_string_content",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "attribute_string_content",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "attribute_value",
     "named": true,
     "fields": {},
@@ -93,15 +73,15 @@
       "required": true,
       "types": [
         {
-          "type": "attribute_string",
-          "named": true
-        },
-        {
           "type": "boolean",
           "named": true
         },
         {
           "type": "integer",
+          "named": true
+        },
+        {
+          "type": "string",
           "named": true
         }
       ]
@@ -2690,10 +2670,6 @@
         ]
       }
     }
-  },
-  {
-    "type": "\"",
-    "named": false
   },
   {
     "type": "#",

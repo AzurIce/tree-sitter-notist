@@ -842,8 +842,11 @@ Block and module attributes
       (property_attribute
         (identifier)
         (attribute_value
-          (attribute_string
-            (attribute_string_content))))))
+          (string
+            (escaped_inline_string
+              (escaped_inline_open)
+              (string_content)
+              (string_close)))))))
   (block_attributes
     (block_attributes_open)
     (first_attribute
@@ -875,6 +878,60 @@ Block and module attributes
       (content_block
         (content_body
           (text))))))
+
+==================
+Attribute multiline string shares Code grammar
+==================
+
+@![desc="""
+line1
+line2
+"""]
+
+= 标题
+
+---
+
+(document
+  (module_attributes
+    (module_attributes_open)
+    (attribute_item
+      (property_attribute
+        (identifier)
+        (attribute_value
+          (string
+            (escaped_multiline_string
+              (escaped_multiline_open)
+              (string_content)
+              (string_close)))))))
+  (heading
+    (heading_marker)
+    (inline_body
+      (text))))
+
+==================
+Attribute inline string rejects line break
+==================
+
+@![desc="first
+second"]
+
+---
+
+(document
+  (module_attributes
+    (module_attributes_open)
+    (attribute_item
+      (property_attribute
+        (identifier)
+        (attribute_value
+          (string
+            (escaped_inline_string
+              (escaped_inline_open)
+              (string_content)
+              (ERROR)
+              (string_content)
+              (string_close))))))))
 
 ==================
 Union types and target literals
