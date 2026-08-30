@@ -880,6 +880,45 @@ Block and module attributes
           (text))))))
 
 ==================
+Stacked module attributes
+==================
+
+@![implementation = "partial"]
+@![agents = "cli"]
+
+= 标题
+
+---
+
+(document
+  (module_attributes
+    (module_attributes_open)
+    (attribute_item
+      (property_attribute
+        (identifier)
+        (attribute_value
+          (string
+            (escaped_inline_string
+              (escaped_inline_open)
+              (string_content)
+              (string_close)))))))
+  (module_attributes
+    (module_attributes_open)
+    (attribute_item
+      (property_attribute
+        (identifier)
+        (attribute_value
+          (string
+            (escaped_inline_string
+              (escaped_inline_open)
+              (string_content)
+              (string_close)))))))
+  (heading
+    (heading_marker)
+    (inline_body
+      (text))))
+
+==================
 Attribute multiline string shares Code grammar
 ==================
 

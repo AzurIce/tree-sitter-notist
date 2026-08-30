@@ -83,8 +83,11 @@ module.exports = grammar({
   rules: {
     document: $ => seq(
       repeat($._line_break),
-      optional($.module_attributes),
-      repeat(choice($._item, $._line_break)),
+      // D0006: leading `@![...]` may stack — an earlier module annotation is
+      // metadata, not content, so the next one still precedes the first item.
+      // Placement violations (mid-document `@![...]`) are the analyzer's
+      // diagnostic, not a grammar error.
+      repeat(choice($.module_attributes, $._item, $._line_break)),
     ),
 
     _item: $ => choice(
