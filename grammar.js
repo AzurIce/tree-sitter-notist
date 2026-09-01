@@ -45,8 +45,6 @@ module.exports = grammar({
     $.rule_marker,
     $.pipe,
     $.table_delimiter_row,
-    $.block_attributes_open,
-    $.module_attributes_open,
     $.or_operator,
     $.and_operator,
     $.comparison_operator,
@@ -63,13 +61,16 @@ module.exports = grammar({
     // table_row 的 dynamic precedence。
     [$.table],
     [$.table_row],
-    // `@[name = value]` — 标识符后随空白时 id 与 property 的分叉。
-    [$.id_attribute, $.property_attribute],
     // `if c [a] else ...` — 空白后是 else 则继续，否则 if 结束。
     [$.if_expression],
     // `(x: Int) => ...` versus `(expression)`.
     [$.parameter, $.qualified_name],
     [$.parameters],
+    // `()` — Unit 字面量与空参数表（lambda / let 的 `name()`）同形，
+    // 由后随 token（`=>` / `->`）判别。
+    [$.unit_literal, $.parameters],
+    // Array / Dict 字面量与 parameters 同构：trivia 重的重复体交给 GLR。
+    [$.array_literal],
     // `name: Type = default` — 空白后是 `=` 则带默认值，否则形参结束。
     [$.parameter],
     [$.arguments],
@@ -83,11 +84,9 @@ module.exports = grammar({
   rules: {
     document: $ => seq(
       repeat($._line_break),
-      // D0006: leading `@![...]` may stack — an earlier module annotation is
-      // metadata, not content, so the next one still precedes the first item.
-      // Placement violations (mid-document `@![...]`) are the analyzer's
-      // diagnostic, not a grammar error.
-      repeat(choice($.module_attributes, $._item, $._line_break)),
+      // 2026-08-31: 前导 `@!expr` 模块标注可堆叠——模块标注是元数据而非
+      // 内容，后续标注仍先于第一个 Item。位置违规由 analyzer 诊断。
+      repeat(choice($.module_annotation, $._item, $._line_break)),
     ),
 
     _item: $ => choice(
@@ -97,7 +96,7 @@ module.exports = grammar({
       $.task_item,
       $.rule,
       $.table,
-      $.block_attributes,
+      $.annotation,
       $.code_block,
       $.embedded_expression,
       $.fenced_raw,
@@ -172,34 +171,6 @@ module.exports = grammar({
       alias($.text_chunk, $.text),
       $.text,
     ),
-
-    block_attributes: $ => seq(
-      $.block_attributes_open,
-      optional($._whitespace),
-      $.first_attribute,
-      repeat(seq(
-        optional($._whitespace),
-        ",",
-        optional($._whitespace),
-        field("item", $.attribute_item),
-      )),
-      optional($._whitespace),
-      "]",
-    ),
-
-    module_attributes: $ => prec.dynamic(1, seq(
-      $.module_attributes_open,
-      optional($._whitespace),
-      $.attribute_item,
-      repeat(seq(
-        optional($._whitespace),
-        ",",
-        optional($._whitespace),
-        field("item", $.attribute_item),
-      )),
-      optional($._whitespace),
-      "]",
-    )),
 
     inline_body: $ => prec.right(repeat1($._inline)),
 
@@ -309,17 +280,16 @@ module.exports = grammar({
 
     target_content: _ => token.immediate(/(\\[<>\\]|[^>\\\x00-\x1f\x7f])+/),
 
-    // EmbeddedExpression = "#" EmbeddedCode Attributes?
+    // EmbeddedExpression = "#" EmbeddedCode
     // The top-level expression after "#" stops at whitespace: binary/unary
     // operations need parentheses (`#(1 + 2)`), while `#1 + 2` embeds `1`.
     embedded_expression: $ => seq(
       "#",
       field("expression", $._embedded_expression),
-      optional(field("attributes", $.attributes)),
     ),
 
     _embedded_expression: $ => choice(
-      $.none,
+      $.unit_literal,
       $.boolean,
       $.float,
       $.integer,
@@ -337,7 +307,7 @@ module.exports = grammar({
     ),
 
     _code_expression: $ => choice(
-      $.none,
+      $.unit_literal,
       $.boolean,
       $.float,
       $.integer,
@@ -356,7 +326,9 @@ module.exports = grammar({
       $.target_literal,
     ),
 
-    none: _ => "none",
+    // `()` 是 Unit 的字面量与唯一值（2026-08-31 裁决，替代 none 关键字）。
+    // 与 Array `(,)`、Dict `(:)` 由括号后首字符判别。
+    unit_literal: $ => seq("(", repeat($._code_trivia), ")"),
     boolean: _ => choice("true", "false"),
     integer: _ => token(prec(2, /[0-9]+/)),
     float: _ => token(prec(2, /[0-9]+\.[0-9]+/)),
@@ -433,6 +405,9 @@ module.exports = grammar({
       repeat($._code_trivia),
       ")",
     ),
+
+    // `..expr`：集合字面量内的展开——Dict 拼接 Dict，Array 拼接 Array。
+    spread: $ => seq("..", $._code_expression),
 
     // not a == b 是 not (a == b)，-a * b 是 (-a) * b。
     unary_expression: $ => choice(
@@ -684,41 +659,78 @@ module.exports = grammar({
       field("close", $.fence_close),
     ),
 
-    attributes: $ => seq(
-      "@",
-      field("first", $.first_attribute),
-      repeat(seq(",", field("item", $.attribute_item))),
+    // 标注（2026-08-31 统一数据模型）：`@expr` 绑定其后紧邻的 Item，
+    // `@!expr` 在文件开头绑定模块根。载荷是求值为 Dict 的单个表达式：
+    // 标识符速记、调用，或 Dict 字面量。无 postfix、无裸键糖、无 fallback。
+    annotation: $ => seq("@", field("payload", $._annotation_payload)),
+
+    module_annotation: $ => seq("@!", field("payload", $._annotation_payload)),
+
+    _annotation_payload: $ => choice(
+      $.qualified_name,
+      $.call_expression,
+      $.dict_literal,
     ),
 
-    first_attribute: $ => choice(
-      $.id_attribute,
-      $.attribute_item,
+    // `(,)` 空 Array；单元素尾逗号必需：`(a,)`。条目在重复体内必选，
+    // 尾逗号由独立 optional 子句承接（与 arguments 同构，避免 GLR 误判）。
+    array_literal: $ => seq(
+      "(",
+      repeat($._code_trivia),
+      choice(
+        ",",
+        seq(
+          choice(
+            field("element", $._code_expression),
+            field("spread", $.spread),
+          ),
+          repeat(seq(
+            repeat($._code_trivia),
+            ",",
+            repeat($._code_trivia),
+            choice(
+              field("element", $._code_expression),
+              field("spread", $.spread),
+            ),
+          )),
+          optional(seq(repeat($._code_trivia), ",")),
+        ),
+      ),
+      ")",
     ),
 
-    attribute_item: $ => choice(
-      $.tag_attribute,
-      $.class_attribute,
-      $.property_attribute,
+    // `(:)` 空 Dict；条目为 `key: value` 或 `..expr` 展开，尾逗号合法。
+    dict_literal: $ => seq(
+      "(",
+      repeat($._code_trivia),
+      choice(
+        ":",
+        seq(
+          field("entry", $._dict_entry),
+          repeat(seq(
+            repeat($._code_trivia),
+            ",",
+            repeat($._code_trivia),
+            field("entry", $._dict_entry),
+          )),
+          optional(seq(repeat($._code_trivia), ",")),
+        ),
+      ),
+      ")",
     ),
 
-    id_attribute: $ => field("name", $.identifier),
-    tag_attribute: $ => seq("#", field("name", $.identifier)),
-    class_attribute: $ => seq(".", field("name", $.identifier)),
-    property_attribute: $ => seq(
-      field("key", $.identifier),
-      optional($._whitespace),
-      "=",
-      optional($._whitespace),
-      field("value", $.attribute_value),
+    _dict_entry: $ => choice(
+      seq(
+        field("key", choice($.identifier, $.string, $.integer, $.boolean)),
+        repeat($._code_trivia),
+        ":",
+        repeat($._code_trivia),
+        field("value", $._code_expression),
+      ),
+      $.dict_spread,
     ),
 
-    // key = value 的 value 只许 String / Int / Bool 字面量。
-    // String 与 Code 字符串字面量共用同一套规则（四种形态，2026-08-29 裁决）。
-    attribute_value: $ => choice(
-      $.boolean,
-      $.integer,
-      $.string,
-    ),
+    dict_spread: $ => seq("..", field("value", $._code_expression)),
 
     _line_break: _ => /\r?\n/,
     _whitespace: _ => /[ \t\r\n]+/,

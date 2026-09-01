@@ -134,7 +134,7 @@ Heading levels and empty headings
 Embedded expressions and calls
 ==================
 
-#[annotated #<self::target>]@concept,#knowledge
+#[annotated #<self::target>]
 #heading(level: 2)[Title]
 #quote[
 Paragraph one.
@@ -152,14 +152,7 @@ Paragraph two.
         (embedded_expression
           (target_literal
             (target_open)
-            (target_content)))))
-    (attributes
-      (first_attribute
-        (id_attribute
-          (identifier)))
-      (attribute_item
-        (tag_attribute
-          (identifier)))))
+            (target_content))))))
   (embedded_expression
     (call_expression
       (qualified_name
@@ -185,7 +178,7 @@ Paragraph two.
 Arguments, strings, and trailing comma
 ==================
 
-#example(1, enabled: true, ratio: -1.5, label: "demo", missing: none,)[body]
+#example(1, enabled: true, ratio: -1.5, label: "demo", missing: (),)[body]
 #raw(text: r#"fn main() {}"#, lang: "rust")
 
 ---
@@ -219,7 +212,7 @@ Arguments, strings, and trailing comma
         (argument
           (named_argument
             (identifier)
-            (none))))
+            (unit_literal))))
       (content_block
         (content_body
           (text)))))
@@ -417,7 +410,7 @@ Nested code expressions in arguments
 Embedded literals in markup
 ==================
 
-a#"text"#[content]#none z
+a#"text"#[content]#() z
 
 ---
 
@@ -434,7 +427,7 @@ a#"text"#[content]#none z
       (content_body
         (text))))
   (embedded_expression
-    (none))
+    (unit_literal))
   (text))
 
 ==================
@@ -819,58 +812,49 @@ just | text
 Block and module attributes
 ==================
 
-@![#design, #wip, status = "draft"]
+@!(design: true, wip: true, status: "draft")
 
-@[wip]
+@(wip: true)
 = 标题
 
-@[install, level = 2, ok = true]
+@(id: "install", level: 2, ok: true)
 #warning[...]
 
 ---
 
 (document
-  (module_attributes
-    (module_attributes_open)
-    (attribute_item
-      (tag_attribute
-        (identifier)))
-    (attribute_item
-      (tag_attribute
-        (identifier)))
-    (attribute_item
-      (property_attribute
-        (identifier)
-        (attribute_value
-          (string
-            (escaped_inline_string
-              (escaped_inline_open)
-              (string_content)
-              (string_close)))))))
-  (block_attributes
-    (block_attributes_open)
-    (first_attribute
-      (id_attribute
-        (identifier))))
+  (module_annotation
+    (dict_literal
+      (identifier)
+      (boolean)
+      (identifier)
+      (boolean)
+      (identifier)
+      (string
+        (escaped_inline_string
+          (escaped_inline_open)
+          (string_content)
+          (string_close)))))
+  (annotation
+    (dict_literal
+      (identifier)
+      (boolean)))
   (heading
     (heading_marker)
     (inline_body
       (text)))
-  (block_attributes
-    (block_attributes_open)
-    (first_attribute
-      (id_attribute
-        (identifier)))
-    (attribute_item
-      (property_attribute
-        (identifier)
-        (attribute_value
-          (integer))))
-    (attribute_item
-      (property_attribute
-        (identifier)
-        (attribute_value
-          (boolean)))))
+  (annotation
+    (dict_literal
+      (identifier)
+      (string
+        (escaped_inline_string
+          (escaped_inline_open)
+          (string_content)
+          (string_close)))
+      (identifier)
+      (integer)
+      (identifier)
+      (boolean)))
   (embedded_expression
     (call_expression
       (qualified_name
@@ -883,36 +867,30 @@ Block and module attributes
 Stacked module attributes
 ==================
 
-@![implementation = "partial"]
-@![agents = "cli"]
+@!(implementation: "partial")
+@!(agents: "cli")
 
 = 标题
 
 ---
 
 (document
-  (module_attributes
-    (module_attributes_open)
-    (attribute_item
-      (property_attribute
-        (identifier)
-        (attribute_value
-          (string
-            (escaped_inline_string
-              (escaped_inline_open)
-              (string_content)
-              (string_close)))))))
-  (module_attributes
-    (module_attributes_open)
-    (attribute_item
-      (property_attribute
-        (identifier)
-        (attribute_value
-          (string
-            (escaped_inline_string
-              (escaped_inline_open)
-              (string_content)
-              (string_close)))))))
+  (module_annotation
+    (dict_literal
+      (identifier)
+      (string
+        (escaped_inline_string
+          (escaped_inline_open)
+          (string_content)
+          (string_close)))))
+  (module_annotation
+    (dict_literal
+      (identifier)
+      (string
+        (escaped_inline_string
+          (escaped_inline_open)
+          (string_content)
+          (string_close)))))
   (heading
     (heading_marker)
     (inline_body
@@ -922,27 +900,24 @@ Stacked module attributes
 Attribute multiline string shares Code grammar
 ==================
 
-@![desc="""
+@!(desc: """
 line1
 line2
-"""]
+""")
 
 = 标题
 
 ---
 
 (document
-  (module_attributes
-    (module_attributes_open)
-    (attribute_item
-      (property_attribute
-        (identifier)
-        (attribute_value
-          (string
-            (escaped_multiline_string
-              (escaped_multiline_open)
-              (string_content)
-              (string_close)))))))
+  (module_annotation
+    (dict_literal
+      (identifier)
+      (string
+        (escaped_multiline_string
+          (escaped_multiline_open)
+          (string_content)
+          (string_close)))))
   (heading
     (heading_marker)
     (inline_body
@@ -952,32 +927,29 @@ line2
 Attribute inline string rejects line break
 ==================
 
-@![desc="first
-second"]
+@!(desc: "first
+second")
 
 ---
 
 (document
-  (module_attributes
-    (module_attributes_open)
-    (attribute_item
-      (property_attribute
-        (identifier)
-        (attribute_value
-          (string
-            (escaped_inline_string
-              (escaped_inline_open)
-              (string_content)
-              (ERROR)
-              (string_content)
-              (string_close))))))))
+  (module_annotation
+    (dict_literal
+      (identifier)
+      (string
+        (escaped_inline_string
+          (escaped_inline_open)
+          (string_content)
+          (ERROR)
+          (string_content)
+          (string_close))))))
 
 ==================
 Union types and target literals
 ==================
 
 #let a: Target | String = <vault::wiki link/install>
-#let b: fn(x: Int) -> Int | None = none
+#let b: fn(x: Int) -> Int | Unit = ()
 
 ---
 
@@ -1017,7 +989,7 @@ Union types and target literals
               (type_member
                 (qualified_name
                   (identifier)))))))
-      (none))))
+      (unit_literal))))
 
 ==================
 Unclosed target literal is a local error
@@ -1030,7 +1002,12 @@ and then more.
 
 (document
   (text)
-  (ERROR)
+  (embedded_expression
+    (ERROR
+      (UNEXPECTED '<'))
+    (qualified_name
+      (identifier)))
+  (text)
   (text))
 
 ==================
@@ -1043,8 +1020,10 @@ Read #<>.
 
 (document
   (text)
-  (ERROR)
-  (text))
+  (ERROR
+    (UNEXPECTED '<')
+    (comparison_operator)
+    (UNEXPECTED '\n')))
 
 ==================
 Target literal escapes

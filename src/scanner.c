@@ -37,8 +37,6 @@ enum TokenType {
     RULE_MARKER,
     PIPE,
     TABLE_DELIMITER_ROW,
-    BLOCK_ATTRIBUTES_OPEN,
-    MODULE_ATTRIBUTES_OPEN,
     OR_OPERATOR,
     AND_OPERATOR,
     COMPARISON_OPERATOR,
@@ -646,28 +644,6 @@ bool tree_sitter_notist_external_scanner_scan(
             lexer->mark_end(lexer);
             lexer->result_symbol = BLOCK_COMMENT;
             return true;
-        }
-        return false;
-    }
-
-    // `@[` 块级属性与 `@![` 模块属性的开口；`@` 后跟其他字符时是普通文本。
-    if (scanner->mode == MODE_NONE && lexer->lookahead == '@' &&
-        (valid_symbols[BLOCK_ATTRIBUTES_OPEN] || valid_symbols[MODULE_ATTRIBUTES_OPEN])) {
-        lexer->advance(lexer, false);
-        if (lexer->lookahead == '[' && valid_symbols[BLOCK_ATTRIBUTES_OPEN]) {
-            lexer->advance(lexer, false);
-            lexer->mark_end(lexer);
-            lexer->result_symbol = BLOCK_ATTRIBUTES_OPEN;
-            return true;
-        }
-        if (lexer->lookahead == '!' && valid_symbols[MODULE_ATTRIBUTES_OPEN]) {
-            lexer->advance(lexer, false);
-            if (lexer->lookahead == '[') {
-                lexer->advance(lexer, false);
-                lexer->mark_end(lexer);
-                lexer->result_symbol = MODULE_ATTRIBUTES_OPEN;
-                return true;
-            }
         }
         return false;
     }
