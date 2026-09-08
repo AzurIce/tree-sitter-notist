@@ -80,6 +80,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "math_block"
+        },
+        {
+          "type": "SYMBOL",
           "name": "inline_raw"
         },
         {
@@ -97,6 +101,10 @@
         {
           "type": "SYMBOL",
           "name": "strike"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "inline_math"
         },
         {
           "type": "SYMBOL",
@@ -133,7 +141,7 @@
         "value": -2,
         "content": {
           "type": "PATTERN",
-          "value": "[#\\[\\]`/@,*_~\\\\{}(]"
+          "value": "[#\\[\\]`/@,*_~$\\\\{}(]"
         }
       }
     },
@@ -391,6 +399,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "inline_math"
+        },
+        {
+          "type": "SYMBOL",
           "name": "strong"
         },
         {
@@ -449,6 +461,10 @@
         {
           "type": "SYMBOL",
           "name": "inline_raw"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "inline_math"
         },
         {
           "type": "SYMBOL",
@@ -570,6 +586,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "inline_math"
+        },
+        {
+          "type": "SYMBOL",
           "name": "escaped_punctuation"
         },
         {
@@ -599,7 +619,7 @@
               "value": -2,
               "content": {
                 "type": "PATTERN",
-                "value": "[#\\[\\]`/@,_~\\\\{}(]"
+                "value": "[#\\[\\]`/@,_~$\\\\{}(]"
               }
             }
           },
@@ -680,6 +700,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "inline_math"
+        },
+        {
+          "type": "SYMBOL",
           "name": "escaped_punctuation"
         },
         {
@@ -709,7 +733,7 @@
               "value": -2,
               "content": {
                 "type": "PATTERN",
-                "value": "[#\\[\\]`/@,*~\\\\{}(]"
+                "value": "[#\\[\\]`/@,*~$\\\\{}(]"
               }
             }
           },
@@ -853,6 +877,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "inline_math"
+        },
+        {
+          "type": "SYMBOL",
           "name": "escaped_punctuation"
         },
         {
@@ -882,12 +910,49 @@
               "value": -2,
               "content": {
                 "type": "PATTERN",
-                "value": "[#\\[\\]`/@,*_\\\\{}(]"
+                "value": "[#\\[\\]`/@,*_$\\\\{}(]"
               }
             }
           },
           "named": true,
           "value": "text"
+        }
+      ]
+    },
+    "inline_math": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "open",
+          "content": {
+            "type": "SYMBOL",
+            "name": "math_open"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "body",
+              "content": {
+                "type": "SYMBOL",
+                "name": "math_content"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "FIELD",
+          "name": "close",
+          "content": {
+            "type": "SYMBOL",
+            "name": "math_close"
+          }
         }
       ]
     },
@@ -2765,6 +2830,47 @@
         }
       ]
     },
+    "math_block": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "open",
+          "content": {
+            "type": "SYMBOL",
+            "name": "math_block_open"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_line_break"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "body",
+              "content": {
+                "type": "SYMBOL",
+                "name": "math_block_content"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "FIELD",
+          "name": "close",
+          "content": {
+            "type": "SYMBOL",
+            "name": "math_block_close"
+          }
+        }
+      ]
+    },
     "annotation": {
       "type": "SEQ",
       "members": [
@@ -3289,6 +3395,30 @@
     {
       "type": "SYMBOL",
       "name": "strike_close"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "math_open"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "math_content"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "math_close"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "math_block_open"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "math_block_content"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "math_block_close"
     },
     {
       "type": "SYMBOL",

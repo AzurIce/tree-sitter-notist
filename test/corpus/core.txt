@@ -470,6 +470,7 @@ A * B and unmatched _ ~ $
   (text)
   (text)
   (text)
+  (text)
   (list_item
     (list_marker)
     (inline_body
@@ -490,7 +491,11 @@ A * B and unmatched _ ~ $
         (strike_marker)
         (text)
         (strike_marker))
-      (text)))
+      (text)
+      (inline_math
+        (math_open)
+        (math_content)
+        (math_close))))
   (task_item
     (task_marker)
     (inline_body
@@ -1060,4 +1065,219 @@ cost $5 and $x here
 ---
 
 (document
+  (text)
+  (text)
+  (text)
+  (text)
   (text))
+==================
+Inline math
+==================
+
+Euler said $e^{i\pi} + 1 = 0$ loudly
+
+---
+
+(document
+  (text)
+  (inline_math
+    (math_open)
+    (math_content)
+    (math_close))
+  (text))
+
+==================
+Backslash-dollar does not close inline math
+==================
+
+raw $a \$ b$ kept
+cost \$5 is escaped
+
+---
+
+(document
+  (text)
+  (inline_math
+    (math_open)
+    (math_content)
+    (math_close))
+  (text)
+  (text)
+  (escaped_punctuation)
+  (text))
+
+==================
+Inline math delimiters require non-whitespace neighbors
+==================
+
+$ x$ stays text and so does $y $
+
+---
+
+(document
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text))
+
+==================
+Unterminated inline math degrades to text
+==================
+
+$x + y
+next line
+
+---
+
+(document
+  (text)
+  (text)
+  (text))
+
+==================
+First valid close wins
+==================
+
+cost $5 and $x$ here
+
+---
+
+(document
+  (text)
+  (inline_math
+    (math_open)
+    (math_content)
+    (math_close))
+  (text))
+
+==================
+Math block spans lines
+==================
+
+$$
+x^2 + y^2 = z^2
+$$
+
+---
+
+(document
+  (math_block
+    (math_block_open)
+    (math_block_content)
+    (math_block_close)))
+
+==================
+Math block lines may be indented
+==================
+
+  $$
+  raw *content*
+  $$
+
+---
+
+(document
+  (math_block
+    (math_block_open)
+    (math_block_content)
+    (math_block_close)))
+
+==================
+Empty math block
+==================
+
+$$
+$$
+
+---
+
+(document
+  (math_block
+    (math_block_open)
+    (math_block_close)))
+
+==================
+Unclosed math block eats to EOF
+==================
+
+$$
+x = 1
+
+---
+
+(document
+  (ERROR
+    (math_block_open)
+    (identifier)
+    (integer)))
+
+==================
+Bare dollar-dollar line required for math block
+==================
+
+text $$ inline
+$$ not a block
+still text
+
+---
+
+(document
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text))
+
+==================
+Math content stays raw
+==================
+
+$a * b _ c # d$
+
+$$
+* not emphasis _ not under # not header
+$$
+
+---
+
+(document
+  (inline_math
+    (math_open)
+    (math_content)
+    (math_close))
+  (math_block
+    (math_block_open)
+    (math_block_content)
+    (math_block_close)))
+
+==================
+Inline math in headings and lists
+==================
+
+= Euler $e^x$ rule
+- run $a+b$ times
+
+---
+
+(document
+  (heading
+    (heading_marker)
+    (inline_body
+      (text)
+      (inline_math
+        (math_open)
+        (math_content)
+        (math_close))
+      (text)))
+  (list_item
+    (list_marker)
+    (inline_body
+      (text)
+      (inline_math
+        (math_open)
+        (math_content)
+        (math_close))
+      (text))))

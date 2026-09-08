@@ -37,6 +37,12 @@ module.exports = grammar({
     $.underline_close,
     $.strike_open,
     $.strike_close,
+    $.math_open,
+    $.math_content,
+    $.math_close,
+    $.math_block_open,
+    $.math_block_content,
+    $.math_block_close,
     $.target_open,
     $.heading_marker,
     $.list_marker,
@@ -100,18 +106,20 @@ module.exports = grammar({
       $.code_block,
       $.embedded_expression,
       $.fenced_raw,
+      $.math_block,
       $.inline_raw,
       $.strong,
       $.emphasis,
       $.underline,
       $.strike,
+      $.inline_math,
       $.escaped_punctuation,
       alias($.pipe, $.text),
       alias($.text_chunk, $.text),
       $.text,
     ),
 
-    text: _ => token(prec(-2, /[#\[\]`/@,*_~\\{}(]/)),
+    text: _ => token(prec(-2, /[#\[\]`/@,*_~$\\{}(]/)),
 
     heading: $ => prec.right(seq(
       field("marker", $.heading_marker),
@@ -163,6 +171,7 @@ module.exports = grammar({
       $.embedded_expression,
       $.code_block,
       $.inline_raw,
+      $.inline_math,
       $.strong,
       $.emphasis,
       $.underline,
@@ -178,6 +187,7 @@ module.exports = grammar({
       $.embedded_expression,
       $.code_block,
       $.inline_raw,
+      $.inline_math,
       $.strong,
       $.emphasis,
       $.underline,
@@ -204,10 +214,11 @@ module.exports = grammar({
     _strong_atom: $ => choice(
       $.embedded_expression,
       $.inline_raw,
+      $.inline_math,
       $.escaped_punctuation,
       alias($.pipe, $.text),
       alias($.text_chunk, $.text),
-      alias(token(prec(-2, /[#\[\]`/@,_~\\{}(]/)), $.text),
+      alias(token(prec(-2, /[#\[\]`/@,_~$\\{}(]/)), $.text),
     ),
 
     emphasis: $ => seq(
@@ -225,10 +236,11 @@ module.exports = grammar({
     _emphasis_atom: $ => choice(
       $.embedded_expression,
       $.inline_raw,
+      $.inline_math,
       $.escaped_punctuation,
       alias($.pipe, $.text),
       alias($.text_chunk, $.text),
-      alias(token(prec(-2, /[#\[\]`/@,*~\\{}(]/)), $.text),
+      alias(token(prec(-2, /[#\[\]`/@,*~$\\{}(]/)), $.text),
     ),
 
     underline: $ => seq(
@@ -259,10 +271,21 @@ module.exports = grammar({
     _strike_atom: $ => choice(
       $.embedded_expression,
       $.inline_raw,
+      $.inline_math,
       $.escaped_punctuation,
       alias($.pipe, $.text),
       alias($.text_chunk, $.text),
-      alias(token(prec(-2, /[#\[\]`/@,*_\\{}(]/)), $.text),
+      alias(token(prec(-2, /[#\[\]`/@,*_$\\{}(]/)), $.text),
+    ),
+
+    // 行内数学 `$...$`：`$` 后必须紧跟非空白、非 `$` 才算开符；闭符 `$`
+    // 前必须是非空白；内容是 raw text（不解释 markup，`\$` 不闭、原样
+    // 保留）。开符 `math_open` 是外部 token：扫描器只在同一行内验证到
+    // 合法闭符时才产出，否则 `$` 降级为普通文本，不跨行。
+    inline_math: $ => seq(
+      field("open", $.math_open),
+      optional(field("body", $.math_content)),
+      field("close", $.math_close),
     ),
 
     escaped_punctuation: _ => token(/\\[\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e]/),
@@ -657,6 +680,17 @@ module.exports = grammar({
       $._line_break,
       optional(field("body", $.fence_content)),
       field("close", $.fence_close),
+    ),
+
+    // 块级数学：开行与闭行都是"仅含 `$$` 的行"（行首可有空白）；内容为
+    // 多行 raw text。开行由扫描器验证（行首空白 + `$$` + 其余仅空白）才
+    // 产出 math_block_open；未闭合时错误节点吃到 EOF。开行后的换行与
+    // fenced_raw 同款用显式 _line_break 承接，内容行才都从行首起扫。
+    math_block: $ => seq(
+      field("open", $.math_block_open),
+      $._line_break,
+      optional(field("body", $.math_block_content)),
+      field("close", $.math_block_close),
     ),
 
     // 标注（2026-08-31 统一数据模型）：`@expr` 绑定其后紧邻的 Item，

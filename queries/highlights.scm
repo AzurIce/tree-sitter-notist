@@ -101,6 +101,16 @@
 (fence_content) @string.special
 (fence_close) @punctuation.bracket
 
+(inline_math
+  body: (math_content) @string.special)
+[(math_open)
+ (math_close)] @punctuation.special
+
+(math_block
+  body: (math_block_content) @string.special)
+[(math_block_open)
+ (math_block_close)] @punctuation.bracket
+
 (annotation
   payload: (qualified_name) @label)
 

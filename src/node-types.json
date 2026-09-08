@@ -444,11 +444,19 @@
           "named": true
         },
         {
+          "type": "inline_math",
+          "named": true
+        },
+        {
           "type": "inline_raw",
           "named": true
         },
         {
           "type": "list_item",
+          "named": true
+        },
+        {
+          "type": "math_block",
           "named": true
         },
         {
@@ -814,11 +822,19 @@
           "named": true
         },
         {
+          "type": "inline_math",
+          "named": true
+        },
+        {
           "type": "inline_raw",
           "named": true
         },
         {
           "type": "list_item",
+          "named": true
+        },
+        {
+          "type": "math_block",
           "named": true
         },
         {
@@ -942,6 +958,10 @@
           },
           {
             "type": "escaped_punctuation",
+            "named": true
+          },
+          {
+            "type": "inline_math",
             "named": true
           },
           {
@@ -1401,6 +1421,10 @@
           "named": true
         },
         {
+          "type": "inline_math",
+          "named": true
+        },
+        {
           "type": "inline_raw",
           "named": true
         },
@@ -1421,6 +1445,42 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "inline_math",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "math_content",
+            "named": true
+          }
+        ]
+      },
+      "close": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "math_close",
+            "named": true
+          }
+        ]
+      },
+      "open": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "math_open",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -1755,6 +1815,42 @@
         "types": [
           {
             "type": "list_marker",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "math_block",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "math_block_content",
+            "named": true
+          }
+        ]
+      },
+      "close": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "math_block_close",
+            "named": true
+          }
+        ]
+      },
+      "open": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "math_block_open",
             "named": true
           }
         ]
@@ -2291,6 +2387,10 @@
             "named": true
           },
           {
+            "type": "inline_math",
+            "named": true
+          },
+          {
             "type": "inline_raw",
             "named": true
           },
@@ -2375,6 +2475,10 @@
           },
           {
             "type": "escaped_punctuation",
+            "named": true
+          },
+          {
+            "type": "inline_math",
             "named": true
           },
           {
@@ -2475,6 +2579,10 @@
         },
         {
           "type": "escaped_punctuation",
+          "named": true
+        },
+        {
+          "type": "inline_math",
           "named": true
         },
         {
@@ -2735,6 +2843,10 @@
             "named": true
           },
           {
+            "type": "inline_math",
+            "named": true
+          },
+          {
             "type": "inline_raw",
             "named": true
           },
@@ -2975,6 +3087,30 @@
   },
   {
     "type": "list_marker",
+    "named": true
+  },
+  {
+    "type": "math_block_close",
+    "named": true
+  },
+  {
+    "type": "math_block_content",
+    "named": true
+  },
+  {
+    "type": "math_block_open",
+    "named": true
+  },
+  {
+    "type": "math_close",
+    "named": true
+  },
+  {
+    "type": "math_content",
+    "named": true
+  },
+  {
+    "type": "math_open",
     "named": true
   },
   {

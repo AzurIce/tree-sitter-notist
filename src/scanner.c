@@ -29,6 +29,12 @@ enum TokenType {
     UNDERLINE_CLOSE,
     STRIKE_OPEN,
     STRIKE_CLOSE,
+    MATH_OPEN,
+    MATH_CONTENT,
+    MATH_CLOSE,
+    MATH_BLOCK_OPEN,
+    MATH_BLOCK_CONTENT,
+    MATH_BLOCK_CLOSE,
     TARGET_OPEN,
     HEADING_MARKER,
     LIST_MARKER,
@@ -52,6 +58,8 @@ typedef enum {
     MODE_RAW_INLINE,
     MODE_RAW_MULTILINE,
     MODE_FENCE,
+    MODE_MATH_BLOCK,
+    MODE_MATH_INLINE,
 } Mode;
 
 typedef struct {
@@ -130,6 +138,38 @@ static bool has_target_close(TSLexer *lexer) {
         }
         lexer->advance(lexer, false);
         has_content = true;
+    }
+    return false;
+}
+
+/// From just after an opening `$` (already consumed and marked): does the
+/// same line hold a valid math close? The first body character must be
+/// non-whitespace and not `$`; a close is an unescaped `$` preceded by a
+/// non-whitespace character (a `$` preceded by whitespace is content, the
+/// scan continues); a `\` pairs with the next character (so `\$` never
+/// terminates and stays in the payload). Pure lookahead: advances the lexer
+/// but the caller's `mark_end` decides the token end.
+static bool has_math_close(TSLexer *lexer) {
+    if (lexer->eof(lexer) || lexer->lookahead == '\r' || lexer->lookahead == '\n' ||
+        lexer->lookahead == '$' || lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+        return false;
+    }
+    int32_t previous = 0;
+    while (!lexer->eof(lexer) && lexer->lookahead != '\r' && lexer->lookahead != '\n') {
+        if (lexer->lookahead == '\\') {
+            lexer->advance(lexer, false);
+            if (lexer->eof(lexer) || lexer->lookahead == '\r' || lexer->lookahead == '\n') {
+                return false;
+            }
+            previous = lexer->lookahead;
+            lexer->advance(lexer, false);
+            continue;
+        }
+        if (lexer->lookahead == '$' && previous != ' ' && previous != '\t') {
+            return true;
+        }
+        previous = lexer->lookahead;
+        lexer->advance(lexer, false);
     }
     return false;
 }
@@ -269,6 +309,66 @@ static bool scan_fence_content(TSLexer *lexer, uint32_t delimiter_length) {
                     return false;
                 }
                 lexer->result_symbol = FENCE_CONTENT;
+                return true;
+            }
+        }
+
+        if (lexer->lookahead == '\n') {
+            lexer->advance(lexer, false);
+            lexer->mark_end(lexer);
+            has_content = true;
+            at_line_start = true;
+        } else if (lexer->lookahead == '\r') {
+            lexer->advance(lexer, false);
+            if (lexer->lookahead == '\n') {
+                lexer->advance(lexer, false);
+            }
+            lexer->mark_end(lexer);
+            has_content = true;
+            at_line_start = true;
+        } else {
+            lexer->advance(lexer, false);
+            lexer->mark_end(lexer);
+            has_content = true;
+            at_line_start = false;
+        }
+    }
+    return false;
+}
+
+/// 块级数学的 bare `$$` 行：行首空白 + `$$` + 其余仅空白到行尾。
+/// 与 fence close 同款：探测会消费字符但不 mark_end（调用方先前的
+/// mark_end 定界 content，随后的 mark_end 定界 close token）。
+static bool scan_math_bare_line(TSLexer *lexer) {
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+        lexer->advance(lexer, false);
+    }
+    if (lexer->lookahead != '$') {
+        return false;
+    }
+    lexer->advance(lexer, false);
+    if (lexer->lookahead != '$') {
+        return false;
+    }
+    lexer->advance(lexer, false);
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+        lexer->advance(lexer, false);
+    }
+    return lexer->eof(lexer) || lexer->lookahead == '\r' || lexer->lookahead == '\n';
+}
+
+static bool scan_math_block_content(TSLexer *lexer) {
+    bool has_content = false;
+    bool at_line_start = true;
+
+    while (!lexer->eof(lexer)) {
+        if (at_line_start) {
+            lexer->mark_end(lexer);
+            if (scan_math_bare_line(lexer)) {
+                if (!has_content) {
+                    return false;
+                }
+                lexer->result_symbol = MATH_BLOCK_CONTENT;
                 return true;
             }
         }
@@ -464,11 +564,44 @@ bool tree_sitter_notist_external_scanner_scan(
     if (scanner->mode == MODE_NONE && lexer->get_column(lexer) == 0 &&
         (valid_symbols[HEADING_MARKER] || valid_symbols[LIST_MARKER] ||
          valid_symbols[ENUM_MARKER] || valid_symbols[TASK_MARKER] ||
-         valid_symbols[RULE_MARKER] || valid_symbols[TABLE_DELIMITER_ROW])) {
+         valid_symbols[RULE_MARKER] || valid_symbols[TABLE_DELIMITER_ROW] ||
+         valid_symbols[MATH_BLOCK_OPEN])) {
         while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
             lexer->advance(lexer, false);
             lexer->mark_end(lexer);
             text_has_content = true;
+        }
+
+        // 块级数学开行：仅含 `$$` 的行（行首可有空白）；探测失败时落回
+        // 文本，不让 `$$` 拦截普通行。单个 `$` 开头的行顺带尝试行内开符，
+        // 避免拦截行内数学。
+        if (lexer->lookahead == '$' &&
+            (valid_symbols[MATH_BLOCK_OPEN] || valid_symbols[MATH_OPEN])) {
+            lexer->advance(lexer, false);
+            lexer->mark_end(lexer);
+            if (lexer->lookahead == '$' && valid_symbols[MATH_BLOCK_OPEN]) {
+                lexer->advance(lexer, false);
+                lexer->mark_end(lexer);
+                while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+                    lexer->advance(lexer, false);
+                    lexer->mark_end(lexer);
+                }
+                if (lexer->eof(lexer) || lexer->lookahead == '\r' ||
+                    lexer->lookahead == '\n') {
+                    scanner->mode = MODE_MATH_BLOCK;
+                    lexer->result_symbol = MATH_BLOCK_OPEN;
+                    return true;
+                }
+                // `$$` 后还有内容：不是 bare 行，整段落回文本（`$` 后紧跟
+                // `$` 本就不开行内数学）。
+                goto scan_text_chunk;
+            }
+            if (valid_symbols[MATH_OPEN] && has_math_close(lexer)) {
+                scanner->mode = MODE_MATH_INLINE;
+                lexer->result_symbol = MATH_OPEN;
+                return true;
+            }
+            goto scan_text_chunk;
         }
 
         // Heading: 行首 `=` run，数量即 level 无上限；其后必须跟空白或行尾/EOF。
@@ -607,6 +740,20 @@ bool tree_sitter_notist_external_scanner_scan(
         }
     }
 
+    // 行内数学开符：`$` 后必须紧跟非空白、非 `$`，且同一行内存在合法闭符
+    //（闭符前非空白、`\$` 不闭）。探测失败时 `$` 降级为普通文本，不跨行。
+    if (scanner->mode == MODE_NONE && lexer->lookahead == '$' &&
+        valid_symbols[MATH_OPEN]) {
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
+        if (has_math_close(lexer)) {
+            scanner->mode = MODE_MATH_INLINE;
+            lexer->result_symbol = MATH_OPEN;
+            return true;
+        }
+        return false;
+    }
+
     if (scanner->mode == MODE_NONE && lexer->lookahead == '/' &&
         (valid_symbols[LINE_COMMENT] || valid_symbols[BLOCK_COMMENT])) {
         lexer->advance(lexer, false);
@@ -722,7 +869,7 @@ scan_text_chunk:
             if (lexer->lookahead == '#' || lexer->lookahead == '[' || lexer->lookahead == ']' ||
                 lexer->lookahead == '`' || lexer->lookahead == '@' || lexer->lookahead == ',' ||
                 lexer->lookahead == '*' || lexer->lookahead == '_' || lexer->lookahead == '~' ||
-                lexer->lookahead == '\\' ||
+                lexer->lookahead == '$' || lexer->lookahead == '\\' ||
                 lexer->lookahead == '{' || lexer->lookahead == '}' || lexer->lookahead == '|' ||
                 lexer->lookahead == '(') {
                 break;
@@ -880,6 +1027,69 @@ scan_text_chunk:
         }
         if (valid_symbols[FENCE_CONTENT]) {
             return scan_fence_content(lexer, scanner->delimiter_length);
+        }
+        return false;
+    }
+
+    if (scanner->mode == MODE_MATH_INLINE) {
+        // 闭符：开符时扫描器已验证同行存在合法闭符（闭符前非空白、`\$`
+        // 不闭），content 扫描的选点规则与之严格一致，因此这里的 `$` 就是
+        // 那个闭符。
+        if (valid_symbols[MATH_CLOSE] && lexer->lookahead == '$') {
+            lexer->advance(lexer, false);
+            lexer->mark_end(lexer);
+            scanner->mode = MODE_NONE;
+            lexer->result_symbol = MATH_CLOSE;
+            return true;
+        }
+        // 行内数学内容：raw text，逐字保留（`\` 与其后字符成对吞入，`\$`
+        // 不终止、原样留在载荷里）；前一个字符是空白时 `$` 不是闭符，继续
+        // 作为内容吞入——与 has_math_close 的选点规则严格一致。
+        if (valid_symbols[MATH_CONTENT]) {
+            bool has_content = false;
+            int32_t previous = 0;
+            while (!lexer->eof(lexer) && lexer->lookahead != '\r' && lexer->lookahead != '\n') {
+                if (lexer->lookahead == '\\') {
+                    lexer->advance(lexer, false);
+                    if (lexer->eof(lexer) || lexer->lookahead == '\r' ||
+                        lexer->lookahead == '\n') {
+                        break;
+                    }
+                    previous = lexer->lookahead;
+                    lexer->advance(lexer, false);
+                    lexer->mark_end(lexer);
+                    has_content = true;
+                    continue;
+                }
+                if (lexer->lookahead == '$' && valid_symbols[MATH_CLOSE] &&
+                    previous != ' ' && previous != '\t') {
+                    break;
+                }
+                previous = lexer->lookahead;
+                lexer->advance(lexer, false);
+                lexer->mark_end(lexer);
+                has_content = true;
+            }
+            if (has_content) {
+                lexer->result_symbol = MATH_CONTENT;
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    if (scanner->mode == MODE_MATH_BLOCK) {
+        // scan_math_bare_line 成功后再 mark_end：close token 覆盖整行
+        //（含行首空白与尾随空白，与 fence close 同款）。
+        if (valid_symbols[MATH_BLOCK_CLOSE] && scan_math_bare_line(lexer)) {
+            lexer->mark_end(lexer);
+            scanner->mode = MODE_NONE;
+            lexer->result_symbol = MATH_BLOCK_CLOSE;
+            return true;
+        }
+        if (valid_symbols[MATH_BLOCK_CONTENT]) {
+            return scan_math_block_content(lexer);
         }
         return false;
     }
