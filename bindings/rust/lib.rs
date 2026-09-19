@@ -28,6 +28,9 @@ pub const OUTLINE_QUERY: &str = include_str!("../../queries/outline.scm");
 pub const BRACKETS_QUERY: &str = include_str!("../../queries/brackets.scm");
 
 #[cfg(test)]
+mod markup_tests;
+
+#[cfg(test)]
 mod tests {
     use tree_sitter::Query;
 
