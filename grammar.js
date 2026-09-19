@@ -85,7 +85,7 @@ module.exports = grammar({
     _statement: $ =>
       choice($.let_statement, $.use_statement, $.wasm_statement, $.expression_statement),
 
-    let_statement: $ => prec.dynamic(1, seq('let', field('name', $.identifier), '=', field('value', $.expression), ';')),
+    let_statement: $ => prec.dynamic(1, seq('let', field('name', $.identifier), optional(seq(':', field('type', $.type))), '=', field('value', $.expression), ';')),
     use_statement: $ => prec.dynamic(1, seq('use', $._use_tree, ';')),
     wasm_statement: $ => prec.dynamic(1, seq('wasm', field('path', $.string), ';')),
     expression_statement: $ => prec.dynamic(1, seq(field('value', $.expression), ';')),
@@ -149,6 +149,7 @@ module.exports = grammar({
 
     lambda: $ => seq(
       field('parameters', $.parameters),
+      optional(seq('->', field('return_type', $.type))),
       '=>',
       field('body', $.expression),
     ),
@@ -341,7 +342,7 @@ module.exports = grammar({
       $.declaration_use,
       $.declaration_wasm,
     )),
-    declaration_let: $ => seq('let', field('name', $.identifier), '=', field('value', $.expression), ';'),
+    declaration_let: $ => seq('let', field('name', $.identifier), optional(seq(':', field('type', $.type))), '=', field('value', $.expression), ';'),
     declaration_use: $ => seq('use', $._use_tree, ';'),
     declaration_wasm: $ => seq('wasm', field('path', $.string), ';'),
 

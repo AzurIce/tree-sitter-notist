@@ -1,0 +1,86 @@
+==================
+Typed bindings and lambda returns in code
+==================
+
+let count: Int = 1;
+let maybe: String? = none;
+let render = (value: Int = 1) -> String => "value";
+let empty = () -> Content => [body];
+
+---
+
+(source_file
+  (code_file
+    (let_statement
+      (identifier)
+      (type
+        (identifier))
+      (expression
+        (integer)))
+    (let_statement
+      (identifier)
+      (type
+        (identifier))
+      (expression))
+    (let_statement
+      (identifier)
+      (expression
+        (lambda
+          (parameters
+            (parameter
+              (identifier)
+              (type
+                (identifier))
+              (expression
+                (integer))))
+          (type
+            (identifier))
+          (expression
+            (string)))))
+    (let_statement
+      (identifier)
+      (expression
+        (lambda
+          (parameters)
+          (type
+            (identifier))
+          (expression
+            (content_block
+              (text
+                (identifier)))))))))
+
+==================
+Typed bindings and lambda returns in markup
+==================
+
+#let title: String = "Title";
+#let render = (value: String?) -> Content => [#value];
+
+---
+
+(source_file
+  (markup_file
+    (declaration
+      (declaration_let
+        (identifier)
+        (type
+          (identifier))
+        (expression
+          (string))))
+    (declaration
+      (declaration_let
+        (identifier)
+        (expression
+          (lambda
+            (parameters
+              (parameter
+                (identifier)
+                (type
+                  (identifier))))
+            (type
+              (identifier))
+            (expression
+              (content_block
+                (interpolation
+                  (qualified_name
+                    (identifier)))))))))))

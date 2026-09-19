@@ -27,6 +27,7 @@
   "/"
   "="
   "=>"
+  "->"
 ] @operator
 
 ["(" ")" "[" "]" "{" "}"] @punctuation.bracket
