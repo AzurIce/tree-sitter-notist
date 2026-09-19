@@ -4,6 +4,12 @@
 (string) @string
 (integer) @number
 (escape) @string.escape
+(raw) @string
+(math) @string.special
+(autolink) @link_text
+(list_marker) @punctuation.special
+(annotation "@" @punctuation.special)
+(annotation "!" @punctuation.special)
 
 ["true" "false" "none"] @constant.builtin
 ["let" "use" "wasm" "as" "if" "else"] @keyword

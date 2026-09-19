@@ -1445,7 +1445,27 @@
         },
         {
           "type": "SYMBOL",
-          "name": "content_block"
+          "name": "bracketed_text"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "annotation"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "raw"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "math"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "autolink"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "list_marker"
         },
         {
           "type": "SYMBOL",
@@ -1485,7 +1505,23 @@
           },
           {
             "type": "SYMBOL",
-            "name": "content_block"
+            "name": "bracketed_text"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "annotation"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "raw"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "math"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "autolink"
           },
           {
             "type": "SYMBOL",
@@ -1523,7 +1559,23 @@
         },
         {
           "type": "SYMBOL",
-          "name": "content_block"
+          "name": "bracketed_text"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "annotation"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "raw"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "math"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "autolink"
         },
         {
           "type": "SYMBOL",
@@ -1560,7 +1612,23 @@
         },
         {
           "type": "SYMBOL",
-          "name": "content_block"
+          "name": "bracketed_text"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "annotation"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "raw"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "math"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "autolink"
         },
         {
           "type": "SYMBOL",
@@ -1582,6 +1650,38 @@
         {
           "type": "FIELD",
           "name": "expression",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_interpolation_expression"
+          }
+        }
+      ]
+    },
+    "annotation": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "@"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "IMMEDIATE_TOKEN",
+              "content": {
+                "type": "STRING",
+                "value": "!"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "FIELD",
+          "name": "value",
           "content": {
             "type": "SYMBOL",
             "name": "_interpolation_expression"
@@ -1823,6 +1923,35 @@
       ]
     },
     "content_block": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "["
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_markup_item"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "section"
+              }
+            ]
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "]"
+        }
+      ]
+    },
+    "bracketed_text": {
       "type": "SEQ",
       "members": [
         {
@@ -2103,7 +2232,7 @@
       "type": "TOKEN",
       "content": {
         "type": "PATTERN",
-        "value": "[^\\p{L}\\p{N}_\\s#\\[\\]*_\\\\][^#\\[\\]*_\\\\\\n]*"
+        "value": "[^\\p{L}\\p{N}_\\s#@\\[\\]*\\\\`$]"
       }
     },
     "escape": {
@@ -2113,7 +2242,7 @@
         "value": 1,
         "content": {
           "type": "PATTERN",
-          "value": "\\\\."
+          "value": "\\\\(?:u\\{[0-9A-Fa-f]+\\}|[\\s\\S]?)"
         }
       }
     },
@@ -2135,17 +2264,6 @@
           "value": "\"(\\\\.|[^\"\\\\\\n])*\""
         }
       }
-    },
-    "comment": {
-      "type": "TOKEN",
-      "content": {
-        "type": "PREC",
-        "value": -1,
-        "content": {
-          "type": "PATTERN",
-          "value": "\\/\\/[^\\n]*"
-        }
-      }
     }
   },
   "extras": [
@@ -2159,6 +2277,10 @@
     }
   ],
   "conflicts": [
+    [
+      "content_block",
+      "bracketed_text"
+    ],
     [
       "parenthesized_expression",
       "list_literal"
@@ -2236,6 +2358,26 @@
     {
       "type": "SYMBOL",
       "name": "_immediate_content_open"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "raw"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "math"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "comment"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "list_marker"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "autolink"
     }
   ],
   "inline": [],

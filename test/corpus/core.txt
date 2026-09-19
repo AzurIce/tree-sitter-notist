@@ -12,6 +12,15 @@ Hello world, this is plain prose.
       (identifier))
     (text
       (identifier))
+    (text)
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text
+      (identifier))
     (text)))
 
 ==================
@@ -130,7 +139,9 @@ body
         (strong
           (text
             (integer))
-          (text))
+          (text)
+          (text
+            (integer)))
         (text
           (identifier))
         (text
@@ -154,6 +165,8 @@ a = b
     (text
       (identifier))
     (text)
+    (text
+      (identifier))
     (section
       (heading_marker)
       title: (title
@@ -170,7 +183,15 @@ a = b
         (text
           (identifier)))
       body: (section_body
-        (text)))))
+        (text)
+        (text
+          (identifier))
+        (text
+          (identifier))
+        (text
+          (identifier))
+        (text
+          (identifier))))))
 
 ==================
 Strong and emphasis
@@ -323,8 +344,10 @@ Value: #count and #module::path end
       (identifier))
     (interpolation
       expression: (qualified_name
+        (identifier)
         (identifier)))
-    (text)))
+    (text
+      (identifier))))
 
 ==================
 Adjacent interpolation call
@@ -364,7 +387,14 @@ Spaced call falls back to text
     (interpolation
       expression: (qualified_name
         (identifier)))
-    (text)))
+    (text)
+    (text
+      (identifier))
+    (text)
+    (text
+      (identifier))
+    (text
+      (identifier))))
 
 ==================
 Interpolation field and trailing content
@@ -470,7 +500,7 @@ body] after
 
 (source_file
   (markup_file
-    (content_block
+    (bracketed_text
       (text
         (identifier))
       (section
@@ -496,7 +526,7 @@ see // note and https://example.com path
   (markup_file
     (text
       (identifier))
-    (text)))
+    (comment)))
 
 ==================
 Empty heading title
@@ -905,12 +935,13 @@ let x = 1; // trailing comment
 ---
 
 (source_file
-  (markup_file
-    (text)
-    (text)
-    (text
-      (identifier))
-    (text)))
+  (code_file
+    (comment)
+    (let_statement
+      (identifier)
+      (expression
+        (integer))))
+  (comment))
 
 ==================
 String escapes

@@ -42,11 +42,17 @@ module.exports = grammar({
     $._immediate_call_open,
     $._immediate_field_dot,
     $._immediate_content_open,
+    $.raw,
+    $.math,
+    $.comment,
+    $.list_marker,
+    $.autolink,
   ],
 
   word: $ => $.identifier,
 
   conflicts: $ => [
+    [$.content_block, $.bracketed_text],
     [$.parenthesized_expression, $.list_literal],
     [$.parenthesized_expression, $.lambda],
     [$.list_literal, $.lambda],
@@ -243,7 +249,12 @@ module.exports = grammar({
       $.wikilink,
       $.strong,
       $.emphasis,
-      $.content_block,
+      $.bracketed_text,
+      $.annotation,
+      $.raw,
+      $.math,
+      $.autolink,
+      $.list_marker,
       $.interpolation,
       $.declaration,
     ),
@@ -254,7 +265,11 @@ module.exports = grammar({
       $.wikilink,
       $.strong,
       $.emphasis,
-      $.content_block,
+      $.bracketed_text,
+      $.annotation,
+      $.raw,
+      $.math,
+      $.autolink,
       $.interpolation,
       $.declaration,
     )),
@@ -265,7 +280,11 @@ module.exports = grammar({
       $.escape,
       $.wikilink,
       $.emphasis,
-      $.content_block,
+      $.bracketed_text,
+      $.annotation,
+      $.raw,
+      $.math,
+      $.autolink,
       $.interpolation,
       $.declaration,
     ),
@@ -276,7 +295,11 @@ module.exports = grammar({
       $.escape,
       $.wikilink,
       $.strong,
-      $.content_block,
+      $.bracketed_text,
+      $.annotation,
+      $.raw,
+      $.math,
+      $.autolink,
       $.interpolation,
       $.declaration,
     ),
@@ -287,6 +310,8 @@ module.exports = grammar({
     // The adjacency tokens are external: the scanner runs before the
     // internal lexer, so the longer text chunk cannot outbid them.
     interpolation: $ => seq('#', field('expression', $._interpolation_expression)),
+
+    annotation: $ => seq('@', optional(token.immediate('!')), field('value', $._interpolation_expression)),
 
     _interpolation_expression: $ =>
       choice($._primary_expression, $.interpolation_call, $.interpolation_field, $.interpolation_content),
@@ -321,6 +346,7 @@ module.exports = grammar({
     declaration_wasm: $ => seq('wasm', field('path', $.string), ';'),
 
     content_block: $ => seq('[', repeat(choice($._markup_item, $.section)), ']'),
+    bracketed_text: $ => seq('[', repeat(choice($._markup_item, $.section)), ']'),
 
     section: $ => prec.right(1, seq(
       $.heading_marker,
@@ -355,9 +381,9 @@ module.exports = grammar({
       ))),
     ),
 
-    _chunk: _ => token(/[^\p{L}\p{N}_\s#\[\]*_\\][^#\[\]*_\\\n]*/),
+    _chunk: _ => token(/[^\p{L}\p{N}_\s#@\[\]*\\`$]/),
 
-    escape: _ => token(prec(1, /\\./)),
+    escape: _ => token(prec(1, /\\(?:u\{[0-9A-Fa-f]+\}|[\s\S]?)/)),
 
     // ======================================================= lexicals
 
@@ -365,10 +391,6 @@ module.exports = grammar({
     integer: _ => /[0-9]+/,
     string: _ => token(prec(1, /"(\\.|[^"\\\n])*"/)),
 
-    // In markup, `//` is ordinary text; on their exact-length tie the chunk
-    // (declared earlier) wins, so this only lexes as a comment in code
-    // contexts where the chunk is not a valid symbol.
-    comment: _ => token(prec(-1, /\/\/[^\n]*/)),
   },
 });
 

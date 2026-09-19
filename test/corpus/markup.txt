@@ -1,0 +1,187 @@
+==================
+Repeated Item and Module annotations
+==================
+@!(lang: "en") @(id: "intro") @make(priority: 2) @data
+= Title
+@!(draft: true)
+Body
+---
+
+(source_file
+  (markup_file
+    (annotation
+      (dict_literal
+        (dict_entry
+          (identifier)
+          (expression
+            (string)))))
+    (annotation
+      (dict_literal
+        (dict_entry
+          (identifier)
+          (expression
+            (string)))))
+    (annotation
+      (interpolation_call
+        (qualified_name
+          (identifier))
+        (named_argument
+          (identifier)
+          (expression
+            (integer)))))
+    (annotation
+      (qualified_name
+        (identifier)))
+    (section
+      (heading_marker)
+      (title
+        (text
+          (identifier)))
+      (section_body
+        (annotation
+          (dict_literal
+            (dict_entry
+              (identifier)
+              (expression))))
+        (text
+          (identifier))))))
+
+==================
+Opaque raw fences and empty raw
+==================
+`@! #error("no") [text] * _ $ //`
+``
+```rust let x = 1;```
+````not
+```
+@!(hidden: true)
+#error("no")
+````
+After
+---
+
+(source_file
+  (markup_file
+    (raw)
+    (raw)
+    (raw)
+    (raw)
+    (text
+      (identifier))))
+
+==================
+Opaque inline and block math
+==================
+Inline $x_1 + #unknown$ and $"$" + x$ and $\$x$.
+$
+sum_(i=1)^n i
+$
+After
+---
+
+(source_file
+  (markup_file
+    (text
+      (identifier))
+    (math)
+    (text
+      (identifier))
+    (math)
+    (text
+      (identifier))
+    (math)
+    (text)
+    (math)
+    (text
+      (identifier))))
+
+==================
+Markup comments nest and stop before following text
+==================
+Before // hidden @! #error("no")
+/* outer /* inner */ still hidden */ After
+---
+
+(source_file
+  (markup_file
+    (text
+      (identifier))
+    (comment)
+    (comment)
+    (text
+      (identifier))))
+
+==================
+Lists and automatic links
+==================
+- First
+  + Nested
+  5. Five
+- Last
+/ Term: definition
+Text https://example.com/path and http://example.com.
+---
+
+(source_file
+  (markup_file
+    (list_marker)
+    (text
+      (identifier))
+    (list_marker)
+    (text
+      (identifier))
+    (list_marker)
+    (text
+      (identifier))
+    (list_marker)
+    (text
+      (identifier))
+    (list_marker)
+    (text
+      (identifier))
+    (text)
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (autolink)
+    (text
+      (identifier))
+    (autolink)
+    (text)))
+
+==================
+Ordinary brackets and Code Content remain distinct
+==================
+Text [outer [inner]] and [[vault::guide#intro]].
+#text("ok")[trailing [literal]]
+---
+
+(source_file
+  (markup_file
+    (text
+      (identifier))
+    (bracketed_text
+      (text
+        (identifier))
+      (bracketed_text
+        (text
+          (identifier))))
+    (text
+      (identifier))
+    (wikilink
+      (wikilink_module)
+      (wikilink_item))
+    (text)
+    (interpolation
+      (interpolation_content
+        (interpolation_call
+          (qualified_name
+            (identifier))
+          (expression
+            (string)))
+        (text
+          (identifier))
+        (bracketed_text
+          (text
+            (identifier)))))))

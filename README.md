@@ -13,12 +13,14 @@ Markup (`.not` — the file parses as one implicit content literal):
 
 - sections: a `= ` run at the start of a line opens a heading, with the level
   given by the number of `=`;
+- annotations `@expr` and `@!expr`, opaque backtick raw regions, `$math$`,
+  automatic HTTP(S) links, comments, and line-start list markers;
 - styled spans `*strong*` and `_emphasis_`, nestable across each other and
   across lines;
 - wikilinks `[[module::path]]` and `[[module::path#item]]`;
 - escapes `\c`, which yield the escaped character as text;
-- content blocks `[...]`, which nest the full markup grammar (including
-  sections after a line break);
+- ordinary paired brackets `[text]` in Markup; Code Content literals and
+  trailing content arguments remain distinct nodes;
 - `#` interpolation of a primary expression, whose postfix operators
   (`(...)`, `.name`, trailing `[...]`) must be adjacent to the expression,
   exactly as in the reference lexer;
@@ -34,7 +36,7 @@ Code (`.notc`, and the code contexts above):
   parameters and defaults, unary minus, and the comparison/additive/
   multiplicative operators;
 - list `(a, b)`, dict `(k: v)`, and the empty forms `()` and `(:)`;
-- `//` line comments and `"JSON-escaped"` strings.
+- `//` line comments, nested `/* */` comments, and `"JSON-escaped"` strings.
 
 ```not
 #use mermaid::diagram;
@@ -56,8 +58,7 @@ inputs are valid as both prose and code. The parser keeps both parses alive
 (GLR) and prefers the structured code parse via dynamic precedence whenever
 the whole file is valid as both; prose kills the code branch early.
 
-Known limits of the single-grammar approach, all degrading to plain
-un-highlighted text rather than errors:
+Known limits of the single-grammar approach:
 
 - a code module whose *first* statement is a bare expression starting with
   an identifier, string, or `(` (e.g. `f(1);` or `a::"x";` as the first
@@ -65,11 +66,15 @@ un-highlighted text rather than errors:
   blank line precedes it;
 - inside a styled span, a line-start `= ` degrades to text (sections do not
   open inside `*`/`_` spans).
+- identifiers containing underscores compete with emphasis delimiters;
+  style word boundaries remain an editor approximation.
 
 Editor-level divergences from the reference parser, kept deliberately:
 
 - sections are flat siblings (the level lives on the marker) instead of
   nesting by heading level;
+- lists expose their source markers; indentation-based Item grouping is
+  performed by the Notist frontend, not this highlighting grammar;
 - horizontal whitespace between markup nodes is trivia, so text runs never
   keep leading/trailing spaces they do not need;
 - markup text that starts with a word lexes as a sequence of word tokens, so
@@ -83,9 +88,7 @@ tree-sitter test
 cargo test
 ```
 
-Build the web-tree-sitter wasm artifact (what the Obsidian plugin ships in
-`assets/notist.wasm`; record the commit and date in the plugin's
-`assets/UPSTREAM.txt`):
+Build the grammar WASM artifact for editor consumers:
 
 ```sh
 tree-sitter build --wasm  # produces tree-sitter-notist.wasm

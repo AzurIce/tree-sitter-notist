@@ -25,6 +25,11 @@ enum TokenType {
   IMMEDIATE_CALL_OPEN,
   IMMEDIATE_FIELD_DOT,
   IMMEDIATE_CONTENT_OPEN,
+  RAW,
+  MATH,
+  COMMENT,
+  LIST_MARKER,
+  AUTOLINK,
 };
 
 void *tree_sitter_notist_external_scanner_create(void) { return NULL; }
@@ -62,6 +67,100 @@ static bool is_word_start(int32_t c) {
          (c >= 0x80); // treat any multibyte lead as a word character
 }
 
+static bool emit(TSLexer *lexer, enum TokenType symbol) {
+  lexer->mark_end(lexer);
+  lexer->result_symbol = symbol;
+  return true;
+}
+
+static bool scan_markup(TSLexer *lexer, const bool *valid, bool line_start) {
+  if (valid[AUTOLINK] && lexer->lookahead == 'h') {
+    const char *prefix = "http";
+    while (*prefix) {
+      if (lexer->lookahead != *prefix++) return false;
+      lexer->advance(lexer, false);
+    }
+    if (lexer->lookahead == 's') lexer->advance(lexer, false);
+    prefix = "://";
+    while (*prefix) {
+      if (lexer->lookahead != *prefix++) return false;
+      lexer->advance(lexer, false);
+    }
+    bool content = false;
+    unsigned parens = 0, brackets = 0;
+    while (!lexer->eof(lexer)) {
+      int32_t c = lexer->lookahead;
+      if (c <= ' ' || c == '<' || c == '>') break;
+      if (c == '(') parens++;
+      if (c == '[') brackets++;
+      if (c == ')' && !parens) break;
+      if (c == ']' && !brackets) break;
+      if (c == ')') parens--;
+      if (c == ']') brackets--;
+      lexer->advance(lexer, false);
+      if (c != '.' && c != ',' && c != ';' && c != '!' && c != '?') {
+        lexer->mark_end(lexer);
+        content = true;
+      }
+    }
+    if (!content) return false;
+    lexer->result_symbol = AUTOLINK;
+    return true;
+  }
+  if (valid[RAW] && lexer->lookahead == '`') {
+    unsigned fence = 0;
+    while (lexer->lookahead == '`') { lexer->advance(lexer, false); fence++; }
+    while (fence != 2 && !lexer->eof(lexer)) {
+      unsigned ticks = 0;
+      while (lexer->lookahead == '`') { lexer->advance(lexer, false); ticks++; }
+      if (ticks == fence) break;
+      if (!ticks) lexer->advance(lexer, false);
+    }
+    return emit(lexer, RAW);
+  }
+  if (valid[MATH] && lexer->lookahead == '$') {
+    lexer->advance(lexer, false);
+    bool quoted = false;
+    while (!lexer->eof(lexer)) {
+      int32_t c = lexer->lookahead; lexer->advance(lexer, false);
+      if (c == '\\' && !lexer->eof(lexer)) lexer->advance(lexer, false);
+      else if (c == '"') quoted = !quoted;
+      else if (c == '$' && !quoted) break;
+    }
+    return emit(lexer, MATH);
+  }
+  if (lexer->lookahead == '/') {
+    lexer->advance(lexer, false);
+    if (valid[COMMENT] && lexer->lookahead == '/') {
+      while (!lexer->eof(lexer) && lexer->lookahead != '\n') lexer->advance(lexer, false);
+      return emit(lexer, COMMENT);
+    }
+    if (valid[COMMENT] && lexer->lookahead == '*') {
+      lexer->advance(lexer, false);
+      unsigned nesting = 1;
+      while (nesting && !lexer->eof(lexer)) {
+        int32_t c = lexer->lookahead; lexer->advance(lexer, false);
+        if (c == '/' && lexer->lookahead == '*') { lexer->advance(lexer, false); nesting++; }
+        else if (c == '*' && lexer->lookahead == '/') { lexer->advance(lexer, false); nesting--; }
+      }
+      return emit(lexer, COMMENT);
+    }
+    if (valid[LIST_MARKER] && line_start && (lexer->lookahead == ' ' || lexer->lookahead == '\t')) return emit(lexer, LIST_MARKER);
+    return false;
+  }
+  if (valid[LIST_MARKER] && line_start) {
+    int32_t c = lexer->lookahead;
+    if (c == '-' || c == '+') lexer->advance(lexer, false);
+    else if (c >= '0' && c <= '9') {
+      do { lexer->advance(lexer, false); } while (lexer->lookahead >= '0' && lexer->lookahead <= '9');
+      if (lexer->lookahead != '.') return false;
+      lexer->advance(lexer, false);
+    } else return false;
+    if (lexer->lookahead == ' ' || lexer->lookahead == '\t') return emit(lexer, LIST_MARKER);
+  }
+  return false;
+}
+
 bool tree_sitter_notist_external_scanner_scan(
     void *payload,
     TSLexer *lexer,
@@ -84,7 +183,7 @@ bool tree_sitter_notist_external_scanner_scan(
     }
     // A heading needs one space after the `=` run; `=` without a following
     // space is plain text and is left to the internal lexer.
-    if (lexer->lookahead == ' ') {
+    if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
       lexer->advance(lexer, false);
       lexer->mark_end(lexer);
       lexer->result_symbol = HEADING_MARKER;
@@ -119,5 +218,7 @@ bool tree_sitter_notist_external_scanner_scan(
     return true;
   }
 
-  return false;
+  bool line_start = lexer->get_column(lexer) == 0;
+  while (lexer->lookahead == ' ' || lexer->lookahead == '\t' || lexer->lookahead == '\r') lexer->advance(lexer, true);
+  return scan_markup(lexer, valid_symbols, line_start);
 }
