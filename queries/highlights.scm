@@ -1,125 +1,67 @@
-"#" @punctuation.special
+; Lexical
 
-"[" @punctuation.bracket
-"]" @punctuation.bracket
-"(" @punctuation.bracket
-")" @punctuation.bracket
-"{" @punctuation.bracket
-"}" @punctuation.bracket
-"," @punctuation.delimiter
-";" @punctuation.delimiter
-":" @punctuation.delimiter
-"=" @operator
-"::" @punctuation.delimiter
-"@" @attribute
-"?" @operator
-"=>" @operator
-"->" @operator
-
-["let" "if" "else" "fn" "trailing"] @keyword
-["import" "as"] @keyword.import
-"not" @keyword.operator
-
-[(or_operator)
- (and_operator)] @keyword.operator
-
-[(comparison_operator)
- (additive_operator)
- (multiplicative_operator)] @operator
-
-(rule_marker) @punctuation.special
-
-(table_delimiter_row) @punctuation.special
-(pipe) @punctuation.delimiter
-
-["@" "@!"] @attribute
-
-(let_expression
-  parameters: (parameters)
-  name: (identifier) @function)
-
-(parameter
-  name: (identifier) @variable.parameter)
-
-(type_expression
-  (type_member
-    (qualified_name) @type))
-
-(target_literal
-  target: (_) @module
-  ">" @punctuation.bracket)
-
-(target_open) @punctuation.bracket
-
-(import_item
-  alias: (identifier) @variable)
-
-(heading
-  marker: (heading_marker) @punctuation.special
-  body: (inline_body) @title.markup)
-
-[(list_item marker: (list_marker) @punctuation.list_marker.markup)
- (enum_item marker: (enum_marker) @punctuation.list_marker.markup)
- (task_item marker: (task_marker) @punctuation.list_marker.markup)]
-
-[(strong_marker)
- (emphasis_marker)
- (underline_marker)
- (strike_marker)] @punctuation.special
-
-(strong) @emphasis.strong
-(emphasis) @emphasis
-(underline) @emphasis
-(strike) @emphasis.strikethrough
-(escaped_punctuation) @string.escape
-
-[(line_comment)
- (block_comment)] @comment
-
-(call_expression
-  function: (qualified_name) @function.call)
-
-(named_argument
-  name: (identifier) @variable.parameter)
-
-(unit_literal) @constant.builtin
-(boolean) @boolean
-(integer) @number
-(float) @number
+(comment) @comment
 (string) @string
-(escape_sequence) @string.escape
+(integer) @number
+(escape) @string.escape
 
-[(escaped_inline_open)
- (escaped_multiline_open)
- (raw_inline_open)
- (raw_multiline_open)
- (string_close)] @punctuation.bracket
+["true" "false" "none"] @constant.builtin
+["let" "use" "wasm" "as" "if" "else"] @keyword
 
-(inline_raw) @string.special
-(fence_open) @punctuation.bracket
-(fence_info) @label
-(fence_content) @string.special
-(fence_close) @punctuation.bracket
+[
+  "=="
+  "!="
+  "<"
+  ">"
+  "<="
+  ">="
+  "+"
+  "-"
+  "*"
+  "/"
+  "="
+  "=>"
+] @operator
 
-(inline_math
-  body: (math_content) @string.special)
-[(math_open)
- (math_close)] @punctuation.special
+["(" ")" "[" "]" "{" "}"] @punctuation.bracket
+[";" "," ":" "::" "." "#"] @punctuation.delimiter
 
-(math_block
-  body: (math_block_content) @string.special)
-[(math_block_open)
- (math_block_close)] @punctuation.bracket
+; Markup
 
-(annotation
-  payload: (qualified_name) @label)
+(heading_marker) @punctuation.special
+(section title: (title) @title)
 
-(module_annotation
-  payload: (qualified_name) @label)
+(strong "*" @punctuation.special) @emphasis.strong
+(emphasis "_" @punctuation.special) @emphasis
 
-(dict_literal
-  key: (identifier) @property)
+(wikilink
+  "[[" @punctuation.special
+  "]]" @punctuation.special)
+(wikilink_module) @module
+(wikilink_item) @label
 
-(dict_spread
-  ".." @punctuation.special
-  value: (qualified_name) @label)
+; References and targets
+
+(item_target module: (qualified_name) @module)
+
+(use_leaf alias: (identifier) @variable)
+(use_glob "*" @punctuation.special)
+(wasm_statement path: (string) @string.special)
+(declaration_wasm path: (string) @string.special)
+
+; Definitions and uses
+
+(let_statement name: (identifier) @variable)
+(declaration_let name: (identifier) @variable)
+
+(parameter name: (identifier) @variable.parameter)
+(named_argument name: (identifier) @variable.parameter)
+
+(dict_entry key: (identifier) @property)
+(field_access field: (identifier) @property)
+(interpolation_field field: (identifier) @property)
+
+(type name: (identifier) @type)
+
+(call_expression function: (_) @function.call)
+(interpolation_call function: (_) @function.call)

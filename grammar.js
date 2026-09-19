@@ -1,779 +1,377 @@
 /**
- * @file Notist grammar for tree-sitter
+ * @file Tree-sitter grammar for Notist: the `.not` markup frontend and the
+ * `.notc` code module format, tracking the reference parser in
+ * `crates/notist-next/src/syntax.rs` of the Notist repository.
+ *
+ * The two file kinds share one grammar because they share one expression
+ * language. `source_file` admits both parses; because tree-sitter resolves
+ * lexical competition by match length, the text chunk may not start with a
+ * word character: word-led runs lex as identifier/keyword sequences so that
+ * statement-shaped text keeps a live code branch, and `prec.dynamic` on the
+ * statements makes the structured code parse win whenever the file is valid
+ * as both. Prose kills the code branch early.
+ *
+ * Editor-level divergences from the reference parser, kept deliberately:
+ * - sections are flat siblings (level lives on the marker) instead of nested
+ *   by heading level, matching common markup grammars;
+ * - sections may not open inside `*`/`_` styled spans (the marker degrades
+ *   to text there);
+ * - horizontal whitespace between markup nodes is lexed as trivia, so text
+ *   runs never start or end with spaces they do not need.
+ * @author AzurIce
  * @license MIT OR Apache-2.0
  */
 
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
-module.exports = grammar({
-  name: "notist",
+const IDENTIFIER = /[\p{L}_][\p{L}\p{N}_]*/;
+const IMMEDIATE_IDENTIFIER = token.immediate(/[\p{L}_][\p{L}\p{N}_]*/);
 
-  extras: _ => [],
+module.exports = grammar({
+  name: 'notist',
+
+  extras: $ => [
+    /[ \t\r\n]+/,
+    $.comment,
+  ],
+
+  externals: $ => [
+    $._line_break,
+    $.heading_marker,
+    $._immediate_call_open,
+    $._immediate_field_dot,
+    $._immediate_content_open,
+  ],
 
   word: $ => $.identifier,
 
-  externals: $ => [
-    $.escaped_inline_open,
-    $.escaped_multiline_open,
-    $.raw_inline_open,
-    $.raw_multiline_open,
-    $.string_content,
-    $.escape_sequence,
-    $.string_close,
-    $.inline_raw,
-    $.fence_open,
-    $.fence_info,
-    $.fence_content,
-    $.fence_close,
-    $.line_comment,
-    $.block_comment,
-    $.text_chunk,
-    $.strong_open,
-    $.strong_close,
-    $.emphasis_open,
-    $.emphasis_close,
-    $.underline_open,
-    $.underline_close,
-    $.strike_open,
-    $.strike_close,
-    $.math_open,
-    $.math_content,
-    $.math_close,
-    $.math_block_open,
-    $.math_block_content,
-    $.math_block_close,
-    $.target_open,
-    $.heading_marker,
-    $.list_marker,
-    $.enum_marker,
-    $.task_marker,
-    $.rule_marker,
-    $.pipe,
-    $.table_delimiter_row,
-    $.or_operator,
-    $.and_operator,
-    $.comparison_operator,
-    $.additive_operator,
-    $.multiplicative_operator,
-    $.else_keyword,
-  ],
-
   conflicts: $ => [
-    // A line starting with `|` is a table only when a delimiter row follows;
-    // otherwise the pipes fall back to plain text.
-    [$._item, $.table_row],
-    // 分隔行之后遇到换行：继续 body 行还是结束 table，交给 GLR +
-    // table_row 的 dynamic precedence。
-    [$.table],
-    [$.table_row],
-    // `if c [a] else ...` — 空白后是 else 则继续，否则 if 结束。
-    [$.if_expression],
-    // `(x: Int) => ...` versus `(expression)`.
+    [$.parenthesized_expression, $.list_literal],
+    [$.parenthesized_expression, $.lambda],
+    [$.list_literal, $.lambda],
+    [$.dict_literal, $.lambda],
+    [$.code_file, $._markup_item],
+    [$.let_statement, $.text],
+    [$.use_statement, $.text],
+    [$.type, $.qualified_name],
     [$.parameter, $.qualified_name],
-    [$.parameters],
-    // `()` — Unit 字面量与空参数表（lambda / let 的 `name()`）同形，
-    // 由后随 token（`=>` / `->`）判别。
-    [$.unit_literal, $.parameters],
-    // Array / Dict 字面量与 parameters 同构：trivia 重的重复体交给 GLR。
-    [$.array_literal],
-    // `name: Type = default` — 空白后是 `=` 则带默认值，否则形参结束。
-    [$.parameter],
-    [$.arguments],
-    [$.import_item],
-    // `name: value` versus a positional bare name in arguments.
-    [$.qualified_name, $.named_argument],
-    // 前导空行后是否跟 @![...]：模块属性解析优先（dynamic precedence）。
-    [$.document],
+    [$.if_expression, $.text],
+    [$._primary_expression, $.text],
+    [$.qualified_name],
+    [$.qualified_name, $.text],
+    [$._primary_expression, $._markup_item],
   ],
 
   rules: {
-    document: $ => seq(
-      repeat($._line_break),
-      // 2026-08-31: 前导 `@!expr` 模块标注可堆叠——模块标注是元数据而非
-      // 内容，后续标注仍先于第一个 Item。位置违规由 analyzer 诊断。
-      repeat(choice($.module_annotation, $._item, $._line_break)),
-    ),
+    source_file: $ => optional(choice($.code_file, $.markup_file)),
 
-    _item: $ => choice(
-      $.heading,
-      $.list_item,
-      $.enum_item,
-      $.task_item,
-      $.rule,
-      $.table,
-      $.annotation,
-      $.code_block,
-      $.embedded_expression,
-      $.fenced_raw,
-      $.math_block,
-      $.inline_raw,
-      $.strong,
-      $.emphasis,
-      $.underline,
-      $.strike,
-      $.inline_math,
-      $.escaped_punctuation,
-      alias($.pipe, $.text),
-      alias($.text_chunk, $.text),
-      $.text,
-    ),
+    // ============================================================ files
 
-    text: _ => token(prec(-2, /[#\[\]`/@,*_~$\\{}(]/)),
+    // Leading newlines are tolerated so a code module may open with a
+    // blank line (the corpus runner also feeds every case a leading `\n`).
+    code_file: $ => seq(repeat($._line_break), repeat1($._statement)),
 
-    heading: $ => prec.right(seq(
-      field("marker", $.heading_marker),
-      optional(field("body", $.inline_body)),
-    )),
+    markup_file: $ => repeat1(choice($._markup_item, $.section)),
 
-    list_item: $ => prec.right(seq(
-      field("marker", $.list_marker),
-      optional(field("body", $.inline_body)),
-    )),
+    // ======================================================== statements
 
-    enum_item: $ => prec.right(seq(
-      field("marker", $.enum_marker),
-      optional(field("body", $.inline_body)),
-    )),
+    _statement: $ =>
+      choice($.let_statement, $.use_statement, $.wasm_statement, $.expression_statement),
 
-    task_item: $ => prec.right(seq(
-      field("marker", $.task_marker),
-      optional(field("body", $.inline_body)),
-    )),
+    let_statement: $ => prec.dynamic(1, seq('let', field('name', $.identifier), '=', field('value', $.expression), ';')),
+    use_statement: $ => prec.dynamic(1, seq('use', $._use_tree, ';')),
+    wasm_statement: $ => prec.dynamic(1, seq('wasm', field('path', $.string), ';')),
+    expression_statement: $ => prec.dynamic(1, seq(field('value', $.expression), ';')),
 
-    rule: $ => field("marker", $.rule_marker),
-
-    // Table = header row + delimiter row + body rows; the delimiter row is a
-    // single external token so that `|` lines without a delimiter stay text.
-    table: $ => seq(
-      field("header", $.table_row),
-      $._line_break,
-      $.table_delimiter_row,
-      repeat(seq($._line_break, field("row", $.table_row))),
-    ),
-
-    // 每多一行 dynamic precedence 加一：真正的 table 解析总是优于
-    // "table 提前结束后把后续 `|` 行按文本解析" 的回退解析。
-    table_row: $ => prec.dynamic(1, seq(
-      $.pipe,
-      repeat1(seq(
-        optional(field("cell", $.table_cell)),
-        $.pipe,
+    _use_tree: $ =>
+      prec.right(seq(
+        repeat(seq($._use_segment, '::')),
+        choice($.use_group, $.use_glob, $.use_leaf),
       )),
-    )),
 
-    // cell 是行内 markup 子文档，但 `|` 在 cell 内不做文本回退
-    //（否则 cell 会把分隔符吞成文本）；字面 `|` 写作 `\|`。
-    // dynamic precedence：吃掉更多 cell 的解析优先于 table 提前在行中结束。
-    table_cell: $ => prec.dynamic(1, prec.right(repeat1($._table_inline))),
-
-    _table_inline: $ => choice(
-      $.embedded_expression,
-      $.code_block,
-      $.inline_raw,
-      $.inline_math,
-      $.strong,
-      $.emphasis,
-      $.underline,
-      $.strike,
-      $.escaped_punctuation,
-      alias($.text_chunk, $.text),
-      $.text,
-    ),
-
-    inline_body: $ => prec.right(repeat1($._inline)),
-
-    _inline: $ => choice(
-      $.embedded_expression,
-      $.code_block,
-      $.inline_raw,
-      $.inline_math,
-      $.strong,
-      $.emphasis,
-      $.underline,
-      $.strike,
-      $.escaped_punctuation,
-      alias($.pipe, $.text),
-      alias($.text_chunk, $.text),
-      $.text,
-    ),
-
-    strong: $ => seq(
-      field("open", alias($.strong_open, $.strong_marker)),
-      field("body", repeat1($._strong_item)),
-      field("close", alias($.strong_close, $.strong_marker)),
-    ),
-
-    _strong_item: $ => choice(
-      $.emphasis,
-      $.underline,
-      $.strike,
-      $._strong_atom,
-    ),
-
-    _strong_atom: $ => choice(
-      $.embedded_expression,
-      $.inline_raw,
-      $.inline_math,
-      $.escaped_punctuation,
-      alias($.pipe, $.text),
-      alias($.text_chunk, $.text),
-      alias(token(prec(-2, /[#\[\]`/@,_~$\\{}(]/)), $.text),
-    ),
-
-    emphasis: $ => seq(
-      field("open", alias($.emphasis_open, $.emphasis_marker)),
-      field("body", repeat1($._emphasis_item)),
-      field("close", alias($.emphasis_close, $.emphasis_marker)),
-    ),
-
-    _emphasis_item: $ => choice(
-      $.strong,
-      $.strike,
-      $._emphasis_atom,
-    ),
-
-    _emphasis_atom: $ => choice(
-      $.embedded_expression,
-      $.inline_raw,
-      $.inline_math,
-      $.escaped_punctuation,
-      alias($.pipe, $.text),
-      alias($.text_chunk, $.text),
-      alias(token(prec(-2, /[#\[\]`/@,*~$\\{}(]/)), $.text),
-    ),
-
-    underline: $ => seq(
-      field("open", alias($.underline_open, $.underline_marker)),
-      field("body", repeat1($._underline_item)),
-      field("close", alias($.underline_close, $.underline_marker)),
-    ),
-
-    _underline_item: $ => choice(
-      $.strong,
-      $.strike,
-      $._emphasis_atom,
-    ),
-
-    strike: $ => seq(
-      field("open", alias($.strike_open, $.strike_marker)),
-      field("body", repeat1($._strike_item)),
-      field("close", alias($.strike_close, $.strike_marker)),
-    ),
-
-    _strike_item: $ => choice(
-      $.strong,
-      $.emphasis,
-      $.underline,
-      $._strike_atom,
-    ),
-
-    _strike_atom: $ => choice(
-      $.embedded_expression,
-      $.inline_raw,
-      $.inline_math,
-      $.escaped_punctuation,
-      alias($.pipe, $.text),
-      alias($.text_chunk, $.text),
-      alias(token(prec(-2, /[#\[\]`/@,*_$\\{}(]/)), $.text),
-    ),
-
-    // 行内数学 `$...$`：`$` 后必须紧跟非空白、非 `$` 才算开符；闭符 `$`
-    // 前必须是非空白；内容是 raw text（不解释 markup，`\$` 不闭、原样
-    // 保留）。开符 `math_open` 是外部 token：扫描器只在同一行内验证到
-    // 合法闭符时才产出，否则 `$` 降级为普通文本，不跨行。
-    inline_math: $ => seq(
-      field("open", $.math_open),
-      optional(field("body", $.math_content)),
-      field("close", $.math_close),
-    ),
-
-    escaped_punctuation: _ => token(/\\[\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e]/),
-
-    // Target literal `<path[/label]>` — the `<` `>` pair delimits the body.
-    // `target_open` is external so the scanner only fires it when the same
-    // line actually holds a closing `>`; otherwise `<` degrades to text like
-    // every other paired inline delimiter. `\<` `\>` `\\` escape the
-    // delimiters and the backslash; no line breaks inside.
-    target_literal: $ => seq(
-      $.target_open,
-      field("target", $.target_content),
-      ">",
-    ),
-
-    target_content: _ => token.immediate(/(\\[<>\\]|[^>\\\x00-\x1f\x7f])+/),
-
-    // EmbeddedExpression = "#" EmbeddedCode
-    // The top-level expression after "#" stops at whitespace: binary/unary
-    // operations need parentheses (`#(1 + 2)`), while `#1 + 2` embeds `1`.
-    embedded_expression: $ => seq(
-      "#",
-      field("expression", $._embedded_expression),
-    ),
-
-    _embedded_expression: $ => choice(
-      $.unit_literal,
-      $.boolean,
-      $.float,
-      $.integer,
-      $.string,
-      $.content_block,
-      $.code_block,
-      $.call_expression,
-      $.qualified_name,
-      $.parenthesized_expression,
-      $.if_expression,
-      $.lambda,
-      $.let_expression,
-      $.import_expression,
-      $.target_literal,
-    ),
-
-    _code_expression: $ => choice(
-      $.unit_literal,
-      $.boolean,
-      $.float,
-      $.integer,
-      $.string,
-      $.content_block,
-      $.code_block,
-      $.call_expression,
-      $.qualified_name,
-      $.parenthesized_expression,
-      $.unary_expression,
-      $.binary_expression,
-      $.if_expression,
-      $.lambda,
-      $.let_expression,
-      $.import_expression,
-      $.target_literal,
-    ),
-
-    // `()` 是 Unit 的字面量与唯一值（2026-08-31 裁决，替代 none 关键字）。
-    // 与 Array `(,)`、Dict `(:)` 由括号后首字符判别。
-    unit_literal: $ => seq("(", repeat($._code_trivia), ")"),
-    boolean: _ => choice("true", "false"),
-    integer: _ => token(prec(2, /[0-9]+/)),
-    float: _ => token(prec(2, /[0-9]+\.[0-9]+/)),
-
-    string: $ => choice(
-      $.escaped_inline_string,
-      $.escaped_multiline_string,
-      $.raw_inline_string,
-      $.raw_multiline_string,
-    ),
-
-    escaped_inline_string: $ => seq(
-      $.escaped_inline_open,
-      repeat(choice($.string_content, $.escape_sequence)),
-      $.string_close,
-    ),
-
-    escaped_multiline_string: $ => seq(
-      $.escaped_multiline_open,
-      repeat(choice($.string_content, $.escape_sequence)),
-      $.string_close,
-    ),
-
-    raw_inline_string: $ => seq(
-      $.raw_inline_open,
-      repeat($.string_content),
-      $.string_close,
-    ),
-
-    raw_multiline_string: $ => seq(
-      $.raw_multiline_open,
-      repeat($.string_content),
-      $.string_close,
-    ),
-
-    // ContentBlock = "[" Markup "]"
-    content_block: $ => seq(
-      "[",
-      optional(field("body", $.content_body)),
-      "]",
-    ),
-
-    content_body: $ => repeat1(choice($._item, $._line_break)),
-
-    // CodeBlock = "{" Statements "}"; statements are separated by ";" or
-    // line breaks (both are trivia here, so the grammar stays lenient).
-    code_block: $ => seq(
-      "{",
-      repeat(choice(
-        $._code_trivia,
-        ";",
-        $._code_expression,
+    use_group: $ => seq(
+      '{',
+      optional(seq(
+        $._use_tree,
+        repeat(seq(',', $._use_tree)),
+        optional(','),
       )),
-      "}",
+      '}',
     ),
 
-    // CallExpression = QualifiedName (Arguments ContentBlock* | ContentBlock+)
-    // 尾随块必须紧邻 callee/arguments（无空白），故 call 优先于语句切分。
-    call_expression: $ => prec.right(1, seq(
-      field("function", $.qualified_name),
-      choice(
-        seq(
-          field("arguments", $.arguments),
-          repeat(field("trailing", $.content_block)),
-        ),
-        repeat1(field("trailing", $.content_block)),
-      ),
-    )),
+    use_glob: _ => '*',
 
-    parenthesized_expression: $ => seq(
-      "(",
-      repeat($._code_trivia),
-      $._code_expression,
-      repeat($._code_trivia),
-      ")",
+    use_leaf: $ => seq(
+      $._use_segment,
+      optional(seq('as', field('alias', $.identifier))),
     ),
 
-    // `..expr`：集合字面量内的展开——Dict 拼接 Dict，Array 拼接 Array。
-    spread: $ => seq("..", $._code_expression),
+    _use_segment: $ => $.identifier,
 
-    // not a == b 是 not (a == b)，-a * b 是 (-a) * b。
-    unary_expression: $ => choice(
-      prec(3, seq(
-        "not",
-        repeat($._code_trivia),
-        field("operand", $._code_expression),
-      )),
-      prec(7, seq(
-        "-",
-        repeat($._code_trivia),
-        field("operand", $._code_expression),
-      )),
-    ),
+    // ====================================================== expressions
 
-    // 优先级从低到高：or -> and -> 比较/相等 -> 加减 -> 乘除。
-    // 二元运算符是 external token（scanner 跳过前导水平空白）：只在二元延续
-    // 合法的 parser 状态下产生，避免被 markup 文本栈的 text_chunk 抢先吞掉；
-    // 同时保证 `#1 + 2` 的 ` + 2` 仍按文本解析、换行后的 `- item` 不被吞进
-    // 上一行的 let 右值。
+    expression: $ => choice($.binary_expression, $._code_postfix_expression),
+
     binary_expression: $ => choice(
-      prec.left(1, seq(
-        field("left", $._code_expression),
-        field("operator", $.or_operator),
-        repeat($._code_trivia),
-        field("right", $._code_expression),
-      )),
-      prec.left(2, seq(
-        field("left", $._code_expression),
-        field("operator", $.and_operator),
-        repeat($._code_trivia),
-        field("right", $._code_expression),
-      )),
-      prec.left(4, seq(
-        field("left", $._code_expression),
-        field("operator", $.comparison_operator),
-        repeat($._code_trivia),
-        field("right", $._code_expression),
-      )),
-      prec.left(5, seq(
-        field("left", $._code_expression),
-        field("operator", $.additive_operator),
-        repeat($._code_trivia),
-        field("right", $._code_expression),
-      )),
-      prec.left(6, seq(
-        field("left", $._code_expression),
-        field("operator", $.multiplicative_operator),
-        repeat($._code_trivia),
-        field("right", $._code_expression),
-      )),
+      ...[
+        ['==', 1], ['!=', 1], ['<', 1], ['>', 1], ['<=', 1], ['>=', 1],
+        ['+', 2], ['-', 2],
+        ['*', 3], ['/', 3],
+      ].map(([operator, precedence]) =>
+        prec.left(precedence, seq(
+          field('left', $.expression),
+          field('operator', operator),
+          field('right', $.expression),
+        )),
+      ),
     ),
+
+    unary_expression: $ => prec(4, seq('-', field('operand', $.expression))),
 
     if_expression: $ => seq(
-      "if",
-      repeat($._code_trivia),
-      field("condition", $._code_expression),
-      repeat($._code_trivia),
-      field("then", choice($.code_block, $.content_block)),
-      optional(seq(
-        repeat($._code_trivia),
-        alias($.else_keyword, "else"),
-        repeat($._code_trivia),
-        field("else", choice($.if_expression, $.code_block, $.content_block)),
-      )),
+      'if',
+      field('condition', $.expression),
+      '{',
+      field('consequence', $.expression),
+      '}',
+      'else',
+      '{',
+      field('alternative', $.expression),
+      '}',
     ),
 
     lambda: $ => seq(
-      field("parameters", $.parameters),
-      repeat($._code_trivia),
-      "=>",
-      repeat($._code_trivia),
-      field("body", $._code_expression),
-    ),
-
-    // let name[: Type] = expr | let name(params) -> R = body
-    let_expression: $ => seq(
-      "let",
-      repeat1($._code_trivia),
-      field("name", $.identifier),
-      optional(seq(
-        repeat($._code_trivia),
-        ":",
-        repeat($._code_trivia),
-        field("type", $.type_expression),
-      )),
-      repeat($._code_trivia),
-      choice(
-        seq(
-          field("parameters", $.parameters),
-          repeat($._code_trivia),
-          "->",
-          repeat($._code_trivia),
-          field("return_type", $.type_expression),
-          repeat($._code_trivia),
-          "=",
-          repeat($._code_trivia),
-          field("body", $._code_expression),
-        ),
-        seq(
-          "=",
-          repeat($._code_trivia),
-          field("value", $._code_expression),
-        ),
-      ),
-    ),
-
-    // import <path>::{name, name as alias} — 显式选择器，无 wildcard。
-    import_expression: $ => seq(
-      "import",
-      repeat1($._code_trivia),
-      field("path", $.target_literal),
-      "::",
-      "{",
-      repeat($._code_trivia),
-      $.import_item,
-      repeat(seq(
-        repeat($._code_trivia),
-        ",",
-        repeat($._code_trivia),
-        $.import_item,
-      )),
-      optional(seq(repeat($._code_trivia), ",")),
-      repeat($._code_trivia),
-      "}",
-    ),
-
-    import_item: $ => seq(
-      field("name", $.identifier),
-      optional(seq(
-        repeat1($._code_trivia),
-        "as",
-        repeat1($._code_trivia),
-        field("alias", $.identifier),
-      )),
-    ),
-
-    // Type = TypeMember ("|" TypeMember)*
-    // 紧邻的 `?` 绑定最内层类型。
-    type_expression: $ => prec.right(1, seq(
-      $.type_member,
-      repeat(seq(
-        $.union_operator,
-        optional($._code_trivia),
-        $.type_member,
-      )),
-    )),
-
-    type_member: $ => prec.right(seq(
-      choice(
-        $.qualified_name,
-        $.function_type,
-      ),
-      optional("?"),
-    )),
-
-    union_operator: _ => token(prec(2, /[ \t]*\|/)),
-
-    function_type: $ => seq(
-      "fn",
-      repeat($._code_trivia),
-      field("parameters", $.parameters),
-      repeat($._code_trivia),
-      "->",
-      repeat($._code_trivia),
-      field("return_type", $.type_expression),
+      field('parameters', $.parameters),
+      '=>',
+      field('body', $.expression),
     ),
 
     parameters: $ => seq(
-      "(",
-      repeat($._code_trivia),
+      '(',
       optional(seq(
         $.parameter,
-        repeat(seq(
-          repeat($._code_trivia),
-          ",",
-          repeat($._code_trivia),
-          $.parameter,
-        )),
-        optional(seq(repeat($._code_trivia), ",")),
+        repeat(seq(',', $.parameter)),
+        optional(','),
       )),
-      repeat($._code_trivia),
-      ")",
+      ')',
     ),
 
-    // 形参带 "=" 的是 named 可省略；类型位置的 "=" 后无默认表达式。
     parameter: $ => seq(
-      optional(seq("trailing", repeat1($._code_trivia))),
-      field("name", $.identifier),
-      repeat($._code_trivia),
-      ":",
-      repeat($._code_trivia),
-      field("type", $.type_expression),
-      optional(choice(
-        seq(
-          repeat($._code_trivia),
-          "=",
-          repeat($._code_trivia),
-          field("default", $._code_expression),
-        ),
-        seq(repeat($._code_trivia), "="),
-      )),
+      field('name', $.identifier),
+      optional(seq(':', field('type', $.type))),
+      optional(seq('=', field('default', $.expression))),
     ),
 
-    qualified_name: $ => seq(
-      $.identifier,
-      repeat(seq("::", $.identifier)),
+    type: $ => seq(field('name', $.identifier), optional('?')),
+
+    // Parenthesized groups: `(e)` keeps the expression, `(a, b)` and `(a,)`
+    // are lists, `(k: v)` dicts, with `()` and `(:)` as the empty forms and
+    // `(params) => e` the lambda. GLR separates them on the next token.
+    parenthesized_expression: $ => seq('(', $.expression, ')'),
+    list_literal: $ => seq('(', commaSep1($.expression), optional(','), ')'),
+    dict_literal: $ => seq('(', commaSep1($.dict_entry), optional(','), ')'),
+    dict_entry: $ => seq(
+      field('key', choice($.identifier, $.string)),
+      ':',
+      field('value', $.expression),
     ),
+    empty_list: _ => seq('(', ')'),
+    empty_dict: _ => seq('(', ':', ')'),
 
-    identifier: _ => /[\p{L}_][\p{L}\p{N}_-]*/,
+    qualified_name: $ => seq($.identifier, repeat(seq('::', $.identifier))),
+    item_target: $ => seq(field('module', $.qualified_name), '::', field('item', $.string)),
 
-    arguments: $ => seq(
-      "(",
-      repeat($._code_trivia),
-      optional(seq(
-        $.argument,
-        repeat(seq(
-          repeat($._code_trivia),
-          ",",
-          repeat($._code_trivia),
-          $.argument,
-        )),
-        optional(seq(repeat($._code_trivia), ",")),
-      )),
-      repeat($._code_trivia),
-      ")",
-    ),
+    _code_postfix_expression: $ =>
+      choice($._primary_expression, $.call_expression, $.field_access),
 
-    argument: $ => choice(
-      $.named_argument,
-      $.positional_argument,
+    call_expression: $ => prec.left(1, seq(
+      field('function', $._code_postfix_expression),
+      choice(
+        field('arguments', $.arguments),
+        field('content', $.content_block),
+      ),
+    )),
+
+    field_access: $ => prec.left(1, seq(
+      field('object', $._code_postfix_expression),
+      '.',
+      field('field', alias(IMMEDIATE_IDENTIFIER, $.identifier)),
+    )),
+
+    arguments: $ => seq('(', optional($._argument_list), ')'),
+
+    _argument_list: $ => seq(
+      choice($.named_argument, $.expression),
+      repeat(seq(',', choice($.named_argument, $.expression))),
+      optional(','),
     ),
 
     named_argument: $ => seq(
-      field("name", $.identifier),
-      repeat($._code_trivia),
-      ":",
-      repeat($._code_trivia),
-      field("value", $._code_expression),
+      field('name', $.identifier),
+      ':',
+      field('value', $.expression),
     ),
 
-    positional_argument: $ => field("value", $._code_expression),
+    // ========================================================= markup
 
-    fenced_raw: $ => seq(
-      $.fence_open,
-      optional(field("language", $.fence_info)),
-      $._line_break,
-      optional(field("body", $.fence_content)),
-      field("close", $.fence_close),
-    ),
-
-    // 块级数学：开行与闭行都是"仅含 `$$` 的行"（行首可有空白）；内容为
-    // 多行 raw text。开行由扫描器验证（行首空白 + `$$` + 其余仅空白）才
-    // 产出 math_block_open；未闭合时错误节点吃到 EOF。开行后的换行与
-    // fenced_raw 同款用显式 _line_break 承接，内容行才都从行首起扫。
-    math_block: $ => seq(
-      field("open", $.math_block_open),
-      $._line_break,
-      optional(field("body", $.math_block_content)),
-      field("close", $.math_block_close),
-    ),
-
-    // 标注（2026-08-31 统一数据模型）：`@expr` 绑定其后紧邻的 Item，
-    // `@!expr` 在文件开头绑定模块根。载荷是求值为 Dict 的单个表达式：
-    // 标识符速记、调用，或 Dict 字面量。无 postfix、无裸键糖、无 fallback。
-    annotation: $ => seq("@", field("payload", $._annotation_payload)),
-
-    module_annotation: $ => seq("@!", field("payload", $._annotation_payload)),
-
-    _annotation_payload: $ => choice(
+    _primary_expression: $ => choice(
       $.qualified_name,
-      $.call_expression,
+      $.item_target,
+      $.string,
+      $.integer,
+      'true',
+      'false',
+      'none',
+      $.content_block,
+      $.if_expression,
+      $.unary_expression,
+      $.lambda,
+      $.parenthesized_expression,
+      $.list_literal,
       $.dict_literal,
+      $.empty_list,
+      $.empty_dict,
     ),
 
-    // `(,)` 空 Array；单元素尾逗号必需：`(a,)`。条目在重复体内必选，
-    // 尾逗号由独立 optional 子句承接（与 arguments 同构，避免 GLR 误判）。
-    array_literal: $ => seq(
-      "(",
-      repeat($._code_trivia),
-      choice(
-        ",",
-        seq(
-          choice(
-            field("element", $._code_expression),
-            field("spread", $.spread),
-          ),
-          repeat(seq(
-            repeat($._code_trivia),
-            ",",
-            repeat($._code_trivia),
-            choice(
-              field("element", $._code_expression),
-              field("spread", $.spread),
-            ),
-          )),
-          optional(seq(repeat($._code_trivia), ",")),
-        ),
-      ),
-      ")",
+    // Markup item sets per context: titles stop at newlines, styled spans
+    // exclude their own delimiter, section bodies exclude sections.
+    _markup_item: $ => choice(
+      $._line_break,
+      $.text,
+      $.escape,
+      $.wikilink,
+      $.strong,
+      $.emphasis,
+      $.content_block,
+      $.interpolation,
+      $.declaration,
     ),
 
-    // `(:)` 空 Dict；条目为 `key: value` 或 `..expr` 展开，尾逗号合法。
-    dict_literal: $ => seq(
-      "(",
-      repeat($._code_trivia),
-      choice(
-        ":",
-        seq(
-          field("entry", $._dict_entry),
-          repeat(seq(
-            repeat($._code_trivia),
-            ",",
-            repeat($._code_trivia),
-            field("entry", $._dict_entry),
-          )),
-          optional(seq(repeat($._code_trivia), ",")),
-        ),
-      ),
-      ")",
+    _inline_item: $ => prec(1, choice(
+      $.text,
+      $.escape,
+      $.wikilink,
+      $.strong,
+      $.emphasis,
+      $.content_block,
+      $.interpolation,
+      $.declaration,
+    )),
+
+    _strong_item: $ => choice(
+      $._line_break,
+      $.text,
+      $.escape,
+      $.wikilink,
+      $.emphasis,
+      $.content_block,
+      $.interpolation,
+      $.declaration,
     ),
 
-    _dict_entry: $ => choice(
-      seq(
-        field("key", choice($.identifier, $.string, $.integer, $.boolean)),
-        repeat($._code_trivia),
-        ":",
-        repeat($._code_trivia),
-        field("value", $._code_expression),
-      ),
-      $.dict_spread,
+    _emphasis_item: $ => choice(
+      $._line_break,
+      $.text,
+      $.escape,
+      $.wikilink,
+      $.strong,
+      $.content_block,
+      $.interpolation,
+      $.declaration,
     ),
 
-    dict_spread: $ => seq("..", field("value", $._code_expression)),
+    // Interpolation admits a primary expression whose postfix operators
+    // (`(...)`, `.name`, trailing `[...]`) must be adjacent, mirroring the
+    // reference lexer; anything non-adjacent falls back to markup text.
+    // The adjacency tokens are external: the scanner runs before the
+    // internal lexer, so the longer text chunk cannot outbid them.
+    interpolation: $ => seq('#', field('expression', $._interpolation_expression)),
 
-    _line_break: _ => /\r?\n/,
-    _whitespace: _ => /[ \t\r\n]+/,
+    _interpolation_expression: $ =>
+      choice($._primary_expression, $.interpolation_call, $.interpolation_field, $.interpolation_content),
 
-    // Code 上下文 trivia：空白与注释（注释只在 Code 上下文合法）。
-    _code_trivia: $ => choice(
-      $._whitespace,
-      $.line_comment,
-      $.block_comment,
+    interpolation_call: $ => prec.left(seq(
+      field('function', $._interpolation_expression),
+      $._immediate_call_open,
+      optional($._argument_list),
+      ')',
+    )),
+
+    interpolation_field: $ => prec.left(seq(
+      field('object', $._interpolation_expression),
+      $._immediate_field_dot,
+      field('field', alias(IMMEDIATE_IDENTIFIER, $.identifier)),
+    )),
+
+    interpolation_content: $ => prec.left(seq(
+      field('function', $._interpolation_expression),
+      $._immediate_content_open,
+      repeat(choice($._markup_item, $.section)),
+      ']',
+    )),
+
+    declaration: $ => seq('#', choice(
+      $.declaration_let,
+      $.declaration_use,
+      $.declaration_wasm,
+    )),
+    declaration_let: $ => seq('let', field('name', $.identifier), '=', field('value', $.expression), ';'),
+    declaration_use: $ => seq('use', $._use_tree, ';'),
+    declaration_wasm: $ => seq('wasm', field('path', $.string), ';'),
+
+    content_block: $ => seq('[', repeat(choice($._markup_item, $.section)), ']'),
+
+    section: $ => prec.right(1, seq(
+      $.heading_marker,
+      optional(field('title', $.title)),
+      optional(field('body', $.section_body)),
+    )),
+
+    title: $ => prec.right(repeat1($._inline_item)),
+    section_body: $ => prec.right(repeat1($._markup_item)),
+
+    strong: $ => prec.right(1, seq('*', repeat($._strong_item), '*')),
+    emphasis: $ => prec.right(1, seq('_', repeat($._emphasis_item), '_')),
+
+    wikilink: $ => seq(
+      '[[',
+      field('module', $.wikilink_module),
+      optional(seq('#', field('item', $.wikilink_item))),
+      ']]',
     ),
+    wikilink_module: _ => token(prec(1, /[^#\]]+/)),
+    wikilink_item: _ => token(prec(1, /[^\]]+/)),
+
+    // Text is either a run that starts with a non-word character, or a run
+    // of word tokens (identifiers, keywords, integers). The word form keeps
+    // code-shaped text parseable as code; see the header comment.
+    text: $ => choice(
+      $._chunk,
+      prec.right(1, repeat1(choice(
+        $.identifier,
+        $.integer,
+        'let', 'use', 'wasm', 'as', 'if', 'else', 'true', 'false', 'none',
+      ))),
+    ),
+
+    _chunk: _ => token(/[^\p{L}\p{N}_\s#\[\]*_\\][^#\[\]*_\\\n]*/),
+
+    escape: _ => token(prec(1, /\\./)),
+
+    // ======================================================= lexicals
+
+    identifier: _ => IDENTIFIER,
+    integer: _ => /[0-9]+/,
+    string: _ => token(prec(1, /"(\\.|[^"\\\n])*"/)),
+
+    // In markup, `//` is ordinary text; on their exact-length tie the chunk
+    // (declared earlier) wins, so this only lexes as a comment in code
+    // contexts where the chunk is not a valid symbol.
+    comment: _ => token(prec(-1, /\/\/[^\n]*/)),
   },
 });
+
+function commaSep1(rule) {
+  return seq(rule, repeat(seq(',', rule)));
+}

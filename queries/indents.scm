@@ -1,11 +1,7 @@
 (content_block
-  "["
-  "]" @end) @indent
+  "[" @indent
+  "]" @end)
 
-(code_block
-  "{"
-  "}" @end) @indent
-
-(fenced_raw
-  (fence_open)
-  (fence_close) @end) @indent
+(use_group
+  "{" @indent
+  "}" @end)

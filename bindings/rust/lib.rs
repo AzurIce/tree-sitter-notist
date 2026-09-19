@@ -15,9 +15,6 @@ pub const NODE_TYPES: &str = include_str!("../../src/node-types.json");
 /// The default syntax highlighting query.
 pub const HIGHLIGHTS_QUERY: &str = include_str!("../../queries/highlights.scm");
 
-/// The default language injection query.
-pub const INJECTIONS_QUERY: &str = include_str!("../../queries/injections.scm");
-
 /// The default code folding query.
 pub const FOLDS_QUERY: &str = include_str!("../../queries/folds.scm");
 
@@ -46,10 +43,9 @@ mod tests {
     fn compiles_the_queries() {
         let language = super::LANGUAGE.into();
         Query::new(&language, super::HIGHLIGHTS_QUERY).expect("highlight query should compile");
-        Query::new(&language, super::INJECTIONS_QUERY).expect("injection query should compile");
         Query::new(&language, super::FOLDS_QUERY).expect("fold query should compile");
         Query::new(&language, super::INDENTS_QUERY).expect("indent query should compile");
         Query::new(&language, super::OUTLINE_QUERY).expect("outline query should compile");
-        Query::new(&language, super::BRACKETS_QUERY).expect("bracket query should compile");
+        Query::new(&language, super::BRACKETS_QUERY).expect("brackets query should compile");
     }
 }

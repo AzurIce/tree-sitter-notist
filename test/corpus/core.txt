@@ -1,1283 +1,985 @@
 ==================
-Wiki references
+Plain text
 ==================
 
-Read #<self::intro> and #<vault::guide/section>.
+Hello world, this is plain prose.
 
 ---
 
-(document
-  (text)
-  (embedded_expression
-    (target_literal
-      (target_open)
-      (target_content)))
-  (text)
-  (embedded_expression
-    (target_literal
-      (target_open)
-      (target_content)))
-  (text))
+(source_file
+  (markup_file
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text)))
 
 ==================
-Comment markers are plain text in markup
+Blank lines between paragraphs
 ==================
 
-Visible // hidden
-text /* outer /* nested */ hidden */ after
-https://example.test/path
+First paragraph.
+
+
+Second paragraph after a blank line.
 
 ---
 
-(document
-  (text)
-  (text)
-  (strong
-    (strong_marker)
+(source_file
+  (markup_file
+    (text
+      (identifier))
+    (text
+      (identifier))
     (text)
-    (strong_marker))
-  (text)
-  (strong
-    (strong_marker)
-    (text)
-    (strong_marker))
-  (text)
-  (text))
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text)))
 
 ==================
-Comments in code contexts
+Heading levels are flat siblings
 ==================
 
-#(1 + /* outer /* nested */ still */ 2)
-#f(a, // note
-   b)
+= Top
+
+text under top
+== Child
+
+child text
+=== Grandchild
+
+grandchild text
+= Sibling
+
+sibling text
 
 ---
 
-(document
-  (embedded_expression
-    (parenthesized_expression
-      (binary_expression
-        (integer)
-        (additive_operator)
-        (block_comment)
-        (integer))))
-  (embedded_expression
-    (call_expression
-      (qualified_name
+(source_file
+  (markup_file
+    (section
+      (heading_marker)
+      title: (title
+        (text
+          (identifier)))
+      body: (section_body
+        (text
+          (identifier))
+        (text
+          (identifier))
+        (text
+          (identifier))))
+    (section
+      (heading_marker)
+      title: (title
+        (text
+          (identifier)))
+      body: (section_body
+        (text
+          (identifier))
+        (text
+          (identifier))))
+    (section
+      (heading_marker)
+      title: (title
+        (text
+          (identifier)))
+      body: (section_body
+        (text
+          (identifier))
+        (text
+          (identifier))))
+    (section
+      (heading_marker)
+      title: (title
+        (text
+          (identifier)))
+      body: (section_body
+        (text
+          (identifier))
+        (text
+          (identifier))))))
+
+==================
+Heading title with inline markup
+==================
+
+= Release *1.0* and _beyond_
+
+body
+
+---
+
+(source_file
+  (markup_file
+    (section
+      (heading_marker)
+      title: (title
+        (text
+          (identifier))
+        (strong
+          (text
+            (integer))
+          (text))
+        (text
+          (identifier))
+        (text
+          (identifier)))
+      body: (section_body
+        (text
+          (identifier))))))
+
+==================
+Equals without a space is text
+==================
+
+a = b
+== not a heading because of indent
+  = also not a heading
+
+---
+
+(source_file
+  (markup_file
+    (text
+      (identifier))
+    (text)
+    (section
+      (heading_marker)
+      title: (title
+        (text
+          (identifier))
+        (text
+          (identifier))
+        (text
+          (identifier))
+        (text
+          (identifier))
+        (text
+          (identifier))
+        (text
+          (identifier)))
+      body: (section_body
+        (text)))))
+
+==================
+Strong and emphasis
+==================
+
+*strong* and _emphasis_ stand alone
+
+---
+
+(source_file
+  (markup_file
+    (strong
+      (text
+        (identifier)))
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text
+      (identifier))))
+
+==================
+Nested styles
+==================
+
+_outer *inner* both_ and *outer _inner_ too*
+
+---
+
+(source_file
+  (markup_file
+    (text
+      (identifier))
+    (strong
+      (text
+        (identifier)))
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (strong
+      (text
         (identifier))
-      (arguments
-        (argument
-          (positional_argument
+      (text
+        (identifier))
+      (text
+        (identifier)))))
+
+==================
+Strong spanning lines
+==================
+
+*first line
+second line* tail
+
+---
+
+(source_file
+  (markup_file
+    (strong
+      (text
+        (identifier))
+      (text
+        (identifier))
+      (text
+        (identifier))
+      (text
+        (identifier)))
+    (text
+      (identifier))))
+
+==================
+Wikilinks
+==================
+
+See [[vault::guide]] and [[vault::guide#intro]] and [[dep::pkg::mod#item]] here.
+
+---
+
+(source_file
+  (markup_file
+    (text
+      (identifier))
+    (wikilink
+      module: (wikilink_module))
+    (text
+      (identifier))
+    (wikilink
+      module: (wikilink_module)
+      item: (wikilink_item))
+    (text
+      (identifier))
+    (wikilink
+      module: (wikilink_module)
+      item: (wikilink_item))
+    (text
+      (identifier))
+    (text)))
+
+==================
+Escapes
+==================
+
+\*not strong\* and \_plain\_ and \\ and \[ bracket
+
+---
+
+(source_file
+  (markup_file
+    (escape)
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (escape)
+    (text
+      (identifier))
+    (escape)
+    (text
+      (identifier))
+    (escape)
+    (text
+      (identifier))
+    (escape)
+    (text
+      (identifier))
+    (escape)
+    (text
+      (identifier))))
+
+==================
+Interpolation of a name
+==================
+
+Value: #count and #module::path end
+
+---
+
+(source_file
+  (markup_file
+    (text
+      (identifier))
+    (text)
+    (interpolation
+      expression: (qualified_name
+        (identifier)))
+    (text
+      (identifier))
+    (interpolation
+      expression: (qualified_name
+        (identifier)))
+    (text)))
+
+==================
+Adjacent interpolation call
+==================
+
+#text("hi") and #diagram("graph LR; A --> B")
+
+---
+
+(source_file
+  (markup_file
+    (interpolation
+      expression: (interpolation_call
+        function: (qualified_name
+          (identifier))
+        (expression
+          (string))))
+    (text
+      (identifier))
+    (interpolation
+      expression: (interpolation_call
+        function: (qualified_name
+          (identifier))
+        (expression
+          (string))))))
+
+==================
+Spaced call falls back to text
+==================
+
+#note (updated) stays text
+
+---
+
+(source_file
+  (markup_file
+    (interpolation
+      expression: (qualified_name
+        (identifier)))
+    (text)))
+
+==================
+Interpolation field and trailing content
+==================
+
+#value.args and #emph[*wrapped*] here
+
+---
+
+(source_file
+  (markup_file
+    (interpolation
+      expression: (interpolation_field
+        object: (qualified_name
+          (identifier))
+        field: (identifier)))
+    (text
+      (identifier))
+    (interpolation
+      expression: (interpolation_content
+        function: (qualified_name
+          (identifier))
+        (strong
+          (text
+            (identifier)))))
+    (text
+      (identifier))))
+
+==================
+Interpolation parenthesized expression
+==================
+
+#(1 + 2) and #(2 * 3) mix
+
+---
+
+(source_file
+  (markup_file
+    (interpolation
+      expression: (parenthesized_expression
+        (expression
+          (binary_expression
+            left: (expression
+              (integer))
+            right: (expression
+              (integer))))))
+    (text
+      (identifier))
+    (interpolation
+      expression: (parenthesized_expression
+        (expression
+          (binary_expression
+            left: (expression
+              (integer))
+            right: (expression
+              (integer))))))
+    (text
+      (identifier))))
+
+==================
+Declarations in markup
+==================
+
+#let x = 1;
+#use vault::helpers::*;
+#wasm "../wasm/semantic.wasm";
+body text #x
+
+---
+
+(source_file
+  (markup_file
+    (declaration
+      (declaration_let
+        name: (identifier)
+        value: (expression
+          (integer))))
+    (declaration
+      (declaration_use
+        (identifier)
+        (identifier)
+        (use_glob)))
+    (declaration
+      (declaration_wasm
+        path: (string)))
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (interpolation
+      expression: (qualified_name
+        (identifier)))))
+
+==================
+Content block with a section
+==================
+
+[before
+= Title
+body] after
+
+---
+
+(source_file
+  (markup_file
+    (content_block
+      (text
+        (identifier))
+      (section
+        (heading_marker)
+        title: (title
+          (text
+            (identifier)))
+        body: (section_body
+          (text
+            (identifier)))))
+    (text
+      (identifier))))
+
+==================
+Slash slash is markup text
+==================
+
+see // note and https://example.com path
+
+---
+
+(source_file
+  (markup_file
+    (text
+      (identifier))
+    (text)))
+
+==================
+Empty heading title
+==================
+
+= 
+body under empty title
+
+---
+
+(source_file
+  (markup_file
+    (section
+      (heading_marker)
+      body: (section_body
+        (text
+          (identifier))
+        (text
+          (identifier))
+        (text
+          (identifier))
+        (text
+          (identifier))))))
+
+==================
+Code file with let statements
+==================
+
+let x = 1;
+let name = "notist";
+let flag = true;
+let nothing = none;
+
+---
+
+(source_file
+  (code_file
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (integer)))
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (string)))
+    (let_statement
+      name: (identifier)
+      value: (expression))
+    (let_statement
+      name: (identifier)
+      value: (expression))))
+
+==================
+Code file with a lambda and calls
+==================
+
+let heading = (title: String, level: Int = 2) => item("heading", (level: level, body: [text here]));
+heading(title: "Intro")[body];
+
+---
+
+(source_file
+  (code_file
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (lambda
+          parameters: (parameters
+            (parameter
+              name: (identifier)
+              type: (type
+                name: (identifier)))
+            (parameter
+              name: (identifier)
+              type: (type
+                name: (identifier))
+              default: (expression
+                (integer))))
+          body: (expression
+            (call_expression
+              function: (qualified_name
+                (identifier))
+              arguments: (arguments
+                (expression
+                  (string))
+                (expression
+                  (dict_literal
+                    (dict_entry
+                      key: (identifier)
+                      value: (expression
+                        (qualified_name
+                          (identifier))))
+                    (dict_entry
+                      key: (identifier)
+                      value: (expression
+                        (content_block
+                          (text
+                            (identifier))
+                          (text
+                            (identifier)))))))))))))
+    (expression_statement
+      value: (expression
+        (call_expression
+          function: (call_expression
+            function: (qualified_name
+              (identifier))
+            arguments: (arguments
+              (named_argument
+                name: (identifier)
+                value: (expression
+                  (string)))))
+          content: (content_block
+            (text
+              (identifier))))))))
+
+==================
+Code file with an item target
+==================
+
+use vault::guide;
+guide::"intro";
+
+---
+
+(source_file
+  (code_file
+    (use_statement
+      (identifier)
+      (use_leaf
+        (identifier)))
+    (expression_statement
+      value: (expression
+        (item_target
+          module: (qualified_name
+            (identifier))
+          item: (string))))))
+
+==================
+Use forms
+==================
+
+use vault::helpers::{self as helpers, format};
+use theme::colors::*;
+use super::shared::value as shared;
+
+---
+
+(source_file
+  (code_file
+    (use_statement
+      (identifier)
+      (identifier)
+      (use_group
+        (use_leaf
+          (identifier)
+          alias: (identifier))
+        (use_leaf
+          (identifier))))
+    (use_statement
+      (identifier)
+      (identifier)
+      (use_glob))
+    (use_statement
+      (identifier)
+      (identifier)
+      (use_leaf
+        (identifier)
+        alias: (identifier)))))
+
+==================
+Wasm statement
+==================
+
+wasm "../wasm/semantic.wasm";
+
+---
+
+(source_file
+  (code_file
+    (wasm_statement
+      path: (string))))
+
+==================
+Call with named arguments and trailing content
+==================
+
+panel(title: "x", level: 2)[#text("body")];
+
+---
+
+(source_file
+  (code_file
+    (expression_statement
+      value: (expression
+        (call_expression
+          function: (call_expression
+            function: (qualified_name
+              (identifier))
+            arguments: (arguments
+              (named_argument
+                name: (identifier)
+                value: (expression
+                  (string)))
+              (named_argument
+                name: (identifier)
+                value: (expression
+                  (integer)))))
+          content: (content_block
+            (interpolation
+              expression: (interpolation_call
+                function: (qualified_name
+                  (identifier))
+                (expression
+                  (string))))))))))
+
+==================
+If expression
+==================
+
+let label = if x == 0 { "zero" } else { "many" };
+
+---
+
+(source_file
+  (code_file
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (if_expression
+          condition: (expression
+            (binary_expression
+              left: (expression
+                (qualified_name
+                  (identifier)))
+              right: (expression
+                (integer))))
+          consequence: (expression
+            (string))
+          alternative: (expression
+            (string)))))))
+
+==================
+Binary precedence
+==================
+
+let a = 1 + 2 * 3;
+let b = (1 + 2) * 3;
+let c = a == b;
+
+---
+
+(source_file
+  (code_file
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (binary_expression
+          left: (expression
+            (integer))
+          right: (expression
+            (binary_expression
+              left: (expression
+                (integer))
+              right: (expression
+                (integer)))))))
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (binary_expression
+          left: (expression
+            (parenthesized_expression
+              (expression
+                (binary_expression
+                  left: (expression
+                    (integer))
+                  right: (expression
+                    (integer))))))
+          right: (expression
+            (integer)))))
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (binary_expression
+          left: (expression
             (qualified_name
-              (identifier))))
-        (line_comment)
-        (argument
-          (positional_argument
+              (identifier)))
+          right: (expression
             (qualified_name
               (identifier))))))))
 
 ==================
-Surface headings and lists
+Unary minus
 ==================
 
-= Title
-  == Nested
-- item
-  + ordered
-- [x] done
+let n = -5;
+let m = -n * 2;
 
 ---
 
-(document
-  (heading
-    (heading_marker)
-    (inline_body
-      (text)))
-  (heading
-    (heading_marker)
-    (inline_body
-      (text)))
-  (list_item
-    (list_marker)
-    (inline_body
-      (text)))
-  (enum_item
-    (enum_marker)
-    (inline_body
-      (text)))
-  (task_item
-    (task_marker)
-    (inline_body
-      (text))))
-
-==================
-Heading levels and empty headings
-==================
-
-======= Deep
-=
-=not a heading
-
----
-
-(document
-  (heading
-    (heading_marker)
-    (inline_body
-      (text)))
-  (heading
-    (heading_marker))
-  (text))
-
-==================
-Embedded expressions and calls
-==================
-
-#[annotated #<self::target>]
-#heading(level: 2)[Title]
-#quote[
-Paragraph one.
-
-Paragraph two.
-]
-
----
-
-(document
-  (embedded_expression
-    (content_block
-      (content_body
-        (text)
-        (embedded_expression
-          (target_literal
-            (target_open)
-            (target_content))))))
-  (embedded_expression
-    (call_expression
-      (qualified_name
-        (identifier))
-      (arguments
-        (argument
-          (named_argument
-            (identifier)
-            (integer))))
-      (content_block
-        (content_body
-          (text)))))
-  (embedded_expression
-    (call_expression
-      (qualified_name
-        (identifier))
-      (content_block
-        (content_body
-          (text)
-          (text))))))
-
-==================
-Arguments, strings, and trailing comma
-==================
-
-#example(1, enabled: true, ratio: -1.5, label: "demo", missing: (),)[body]
-#raw(text: r#"fn main() {}"#, lang: "rust")
-
----
-
-(document
-  (embedded_expression
-    (call_expression
-      (qualified_name
-        (identifier))
-      (arguments
-        (argument
-          (positional_argument
-            (integer)))
-        (argument
-          (named_argument
-            (identifier)
-            (boolean)))
-        (argument
-          (named_argument
-            (identifier)
+(source_file
+  (code_file
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (unary_expression
+          operand: (expression
+            (integer)))))
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (binary_expression
+          left: (expression
             (unary_expression
-              (float))))
-        (argument
-          (named_argument
-            (identifier)
-            (string
-              (escaped_inline_string
-                (escaped_inline_open)
-                (string_content)
-                (string_close)))))
-        (argument
-          (named_argument
-            (identifier)
-            (unit_literal))))
-      (content_block
-        (content_body
-          (text)))))
-  (embedded_expression
-    (call_expression
-      (qualified_name
-        (identifier))
-      (arguments
-        (argument
-          (named_argument
-            (identifier)
-            (string
-              (raw_inline_string
-                (raw_inline_open)
-                (string_content)
-                (string_close)))))
-        (argument
-          (named_argument
-            (identifier)
-            (string
-              (escaped_inline_string
-                (escaped_inline_open)
-                (string_content)
-                (string_close)))))))))
-
-==================
-Multiline strings
-==================
-
-#raw(text: """
-escaped \n text
-""")
-#raw(text: r##"""
-raw "# text
-"""##)
-
----
-
-(document
-  (embedded_expression
-    (call_expression
-      (qualified_name
-        (identifier))
-      (arguments
-        (argument
-          (named_argument
-            (identifier)
-            (string
-              (escaped_multiline_string
-                (escaped_multiline_open)
-                (string_content)
-                (escape_sequence)
-                (string_content)
-                (string_close))))))))
-  (embedded_expression
-    (call_expression
-      (qualified_name
-        (identifier))
-      (arguments
-        (argument
-          (named_argument
-            (identifier)
-            (string
-              (raw_multiline_string
-                (raw_multiline_open)
-                (string_content)
-                (string_close)))))))))
-
-==================
-Raw inline quote ambiguity
-==================
-
-#raw(text: r#"""#)
-#raw(text: r#"""text"""#)
-
----
-
-(document
-  (embedded_expression
-    (call_expression
-      (qualified_name
-        (identifier))
-      (arguments
-        (argument
-          (named_argument
-            (identifier)
-            (string
-              (raw_inline_string
-                (raw_inline_open)
-                (string_content)
-                (string_close))))))))
-  (embedded_expression
-    (call_expression
-      (qualified_name
-        (identifier))
-      (arguments
-        (argument
-          (named_argument
-            (identifier)
-            (string
-              (raw_inline_string
-                (raw_inline_open)
-                (string_content)
-                (string_content)
-                (string_content)
-                (string_close)))))))))
-
-==================
-Inline and fenced raw syntax
-==================
-
-`#[shielded]`
-``contains ` inside``
-```triple inline```
-```rust
-#heading[shielded]
-````
-```
-plain fence
-```
-```
-```
-
----
-
-(document
-  (inline_raw)
-  (inline_raw)
-  (inline_raw)
-  (fenced_raw
-    (fence_open)
-    (fence_info)
-    (fence_content)
-    (fence_close))
-  (fenced_raw
-    (fence_open)
-    (fence_content)
-    (fence_close))
-  (fenced_raw
-    (fence_open)
-    (fence_close)))
-
-==================
-Nested code expressions in arguments
-==================
-
-#quote(body: [same])
-#heading(level: missing())[Title]
-#heading(level: (2))[T]
-
----
-
-(document
-  (embedded_expression
-    (call_expression
-      (qualified_name
-        (identifier))
-      (arguments
-        (argument
-          (named_argument
-            (identifier)
-            (content_block
-              (content_body
-                (text))))))))
-  (embedded_expression
-    (call_expression
-      (qualified_name
-        (identifier))
-      (arguments
-        (argument
-          (named_argument
-            (identifier)
-            (call_expression
-              (qualified_name
-                (identifier))
-              (arguments)))))
-      (content_block
-        (content_body
-          (text)))))
-  (embedded_expression
-    (call_expression
-      (qualified_name
-        (identifier))
-      (arguments
-        (argument
-          (named_argument
-            (identifier)
-            (parenthesized_expression
-              (integer)))))
-      (content_block
-        (content_body
-          (text))))))
-
-==================
-Embedded literals in markup
-==================
-
-a#"text"#[content]#() z
-
----
-
-(document
-  (text)
-  (embedded_expression
-    (string
-      (escaped_inline_string
-        (escaped_inline_open)
-        (string_content)
-        (string_close))))
-  (embedded_expression
-    (content_block
-      (content_body
-        (text))))
-  (embedded_expression
-    (unit_literal))
-  (text))
-
-==================
-Inline markup in headings and lists
-==================
-
-= *Important _note_* and `code`
-**Markdown-style delimiters are not canonical**
-A * B and unmatched _ ~ $
-- Read #<self::guide> with __care__
-  + ~~obsolete~~ and $x^2$
-- [ ] escape \*literally\*
-
----
-
-(document
-  (heading
-    (heading_marker)
-    (inline_body
-      (strong
-        (strong_marker)
-        (text)
-        (emphasis
-          (emphasis_marker)
-          (text)
-          (emphasis_marker))
-        (strong_marker))
-      (text)
-      (inline_raw)))
-  (text)
-  (strong
-    (strong_marker)
-    (text)
-    (strong_marker))
-  (text)
-  (text)
-  (text)
-  (text)
-  (text)
-  (text)
-  (text)
-  (text)
-  (text)
-  (list_item
-    (list_marker)
-    (inline_body
-      (text)
-      (embedded_expression
-        (target_literal
-          (target_open)
-          (target_content)))
-      (text)
-      (underline
-        (underline_marker)
-        (text)
-        (underline_marker))))
-  (enum_item
-    (enum_marker)
-    (inline_body
-      (strike
-        (strike_marker)
-        (text)
-        (strike_marker))
-      (text)
-      (inline_math
-        (math_open)
-        (math_content)
-        (math_close))))
-  (task_item
-    (task_marker)
-    (inline_body
-      (text)
-      (escaped_punctuation)
-      (text)
-      (escaped_punctuation))))
-
-==================
-Operators and precedence
-==================
-
-#(1 + 2 * 3)
-#(not a == b)
-#(a and not b)
-#(a or b and c)
-#(-a * b)
-#1 + 2
-
----
-
-(document
-  (embedded_expression
-    (parenthesized_expression
-      (binary_expression
-        (integer)
-        (additive_operator)
-        (binary_expression
-          (integer)
-          (multiplicative_operator)
-          (integer)))))
-  (embedded_expression
-    (parenthesized_expression
-      (unary_expression
-        (binary_expression
-          (qualified_name
-            (identifier))
-          (comparison_operator)
-          (qualified_name
-            (identifier))))))
-  (embedded_expression
-    (parenthesized_expression
-      (binary_expression
-        (qualified_name
-          (identifier))
-        (and_operator)
-        (unary_expression
-          (qualified_name
-            (identifier))))))
-  (embedded_expression
-    (parenthesized_expression
-      (binary_expression
-        (qualified_name
-          (identifier))
-        (or_operator)
-        (binary_expression
-          (qualified_name
-            (identifier))
-          (and_operator)
-          (qualified_name
-            (identifier))))))
-  (embedded_expression
-    (parenthesized_expression
-      (binary_expression
-        (unary_expression
-          (qualified_name
-            (identifier)))
-        (multiplicative_operator)
-        (qualified_name
-          (identifier)))))
-  (embedded_expression
-    (integer))
-  (text))
-
-==================
-If expressions
-==================
-
-#if ok { 1 } else { 2 }
-#if ok [yes] else [no]
-#if a [x]
-#if a { 1 } else if b { 2 } else { 3 }
-
----
-
-(document
-  (embedded_expression
-    (if_expression
-      (qualified_name
-        (identifier))
-      (code_block
-        (integer))
-      (code_block
-        (integer))))
-  (embedded_expression
-    (if_expression
-      (qualified_name
-        (identifier))
-      (content_block
-        (content_body
-          (text)))
-      (content_block
-        (content_body
-          (text)))))
-  (embedded_expression
-    (if_expression
-      (qualified_name
-        (identifier))
-      (content_block
-        (content_body
-          (text)))))
-  (embedded_expression
-    (if_expression
-      (qualified_name
-        (identifier))
-      (code_block
-        (integer))
-      (if_expression
-        (qualified_name
-          (identifier))
-        (code_block
-          (integer))
-        (code_block
-          (integer))))))
-
-==================
-Let, lambda, and import
-==================
-
-#let x = 1
-#let y: Int = 2
-#let double(x: Int) -> Int = x * 2
-#let add = (a: Int, b: Int) => a + b
-#import <self::theme>::{warning, accent as highlight}
-- item
-
----
-
-(document
-  (embedded_expression
-    (let_expression
-      (identifier)
-      (integer)))
-  (embedded_expression
-    (let_expression
-      (identifier)
-      (type_expression
-        (type_member
-          (qualified_name
-            (identifier))))
-      (integer)))
-  (embedded_expression
-    (let_expression
-      (identifier)
-      (parameters
-        (parameter
-          (identifier)
-          (type_expression
-            (type_member
-              (qualified_name
-                (identifier))))))
-      (type_expression
-        (type_member
-          (qualified_name
-            (identifier))))
-      (binary_expression
-        (qualified_name
-          (identifier))
-        (multiplicative_operator)
-        (integer))))
-  (embedded_expression
-    (let_expression
-      (identifier)
-      (lambda
-        (parameters
-          (parameter
-            (identifier)
-            (type_expression
-              (type_member
+              operand: (expression
                 (qualified_name
                   (identifier)))))
-          (parameter
-            (identifier)
-            (type_expression
-              (type_member
-                (qualified_name
-                  (identifier))))))
-        (binary_expression
-          (qualified_name
-            (identifier))
-          (additive_operator)
-          (qualified_name
-            (identifier))))))
-  (embedded_expression
-    (import_expression
-      (target_literal
-        (target_open)
-        (target_content))
-      (import_item
-        (identifier))
-      (import_item
-        (identifier)
-        (identifier))))
-  (list_item
-    (list_marker)
-    (inline_body
-      (text))))
+          right: (expression
+            (integer)))))))
 
 ==================
-Code blocks
+Collections
 ==================
 
-#{ let x = 1; x + 1 }
-{ 1 + 1 }
-#{
-  let a = 1
-  a
-}
+let empty_list = ();
+let empty_dict = (:);
+let one = (1,);
+let pair = (1, 2);
+let dict = (key: "v", "str key": 2);
 
 ---
 
-(document
-  (embedded_expression
-    (code_block
-      (let_expression
-        (identifier)
-        (integer))
-      (binary_expression
-        (qualified_name
-          (identifier))
-        (additive_operator)
-        (integer))))
-  (code_block
-    (binary_expression
-      (integer)
-      (additive_operator)
-      (integer)))
-  (embedded_expression
-    (code_block
-      (let_expression
-        (identifier)
-        (integer))
-      (qualified_name
-        (identifier)))))
+(source_file
+  (code_file
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (empty_list)))
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (empty_dict)))
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (list_literal
+          (expression
+            (integer)))))
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (list_literal
+          (expression
+            (integer))
+          (expression
+            (integer)))))
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (dict_literal
+          (dict_entry
+            key: (identifier)
+            value: (expression
+              (string)))
+          (dict_entry
+            key: (string)
+            value: (expression
+              (integer))))))))
 
 ==================
-Rules
+Field access chains
 ==================
 
----
---
-- - -
-text ---
-
----
-
-(document
-  (rule
-    (rule_marker))
-  (text)
-  (list_item
-    (list_marker)
-    (inline_body
-      (text)))
-  (text))
-
-==================
-Tables
-==================
-
-| Name  | Value |
-| :---- | ----: |
-| one   | 1     |
-| a \| b | *c* |
-
-just | text
+value.args.body;
+item("x").name;
 
 ---
 
-(document
-  (table
-    (table_row
-      (pipe)
-      (table_cell
-        (text))
-      (pipe)
-      (table_cell
-        (text))
-      (pipe))
-    (table_delimiter_row)
-    (table_row
-      (pipe)
-      (table_cell
-        (text))
-      (pipe)
-      (table_cell
-        (text))
-      (pipe))
-    (table_row
-      (pipe)
-      (table_cell
-        (text)
-        (escaped_punctuation)
-        (text))
-      (pipe)
-      (table_cell
-        (text)
-        (strong
-          (strong_marker)
-          (text)
-          (strong_marker))
-        (text))
-      (pipe)))
-  (text)
-  (text)
-  (text))
+(source_file
+  (code_file
+    (expression_statement
+      value: (expression
+        (field_access
+          object: (field_access
+            object: (qualified_name
+              (identifier))
+            field: (identifier))
+          field: (identifier))))
+    (expression_statement
+      value: (expression
+        (field_access
+          object: (call_expression
+            function: (qualified_name
+              (identifier))
+            arguments: (arguments
+              (expression
+                (string))))
+          field: (identifier))))))
 
 ==================
-Block and module attributes
+Comments in code
 ==================
 
-@!(design: true, wip: true, status: "draft")
-
-@(wip: true)
-= 标题
-
-@(id: "install", level: 2, ok: true)
-#warning[...]
+// leading comment
+let x = 1; // trailing comment
 
 ---
 
-(document
-  (module_annotation
-    (dict_literal
-      (identifier)
-      (boolean)
-      (identifier)
-      (boolean)
-      (identifier)
-      (string
-        (escaped_inline_string
-          (escaped_inline_open)
-          (string_content)
-          (string_close)))))
-  (annotation
-    (dict_literal
-      (identifier)
-      (boolean)))
-  (heading
-    (heading_marker)
-    (inline_body
-      (text)))
-  (annotation
-    (dict_literal
-      (identifier)
-      (string
-        (escaped_inline_string
-          (escaped_inline_open)
-          (string_content)
-          (string_close)))
-      (identifier)
-      (integer)
-      (identifier)
-      (boolean)))
-  (embedded_expression
-    (call_expression
-      (qualified_name
-        (identifier))
-      (content_block
-        (content_body
-          (text))))))
+(source_file
+  (markup_file
+    (text)
+    (text)
+    (text
+      (identifier))
+    (text)))
 
 ==================
-Stacked module attributes
+String escapes
 ==================
 
-@!(implementation: "partial")
-@!(agents: "cli")
-
-= 标题
+let s = "quote \" backslash \\ newline \n done";
 
 ---
 
-(document
-  (module_annotation
-    (dict_literal
-      (identifier)
-      (string
-        (escaped_inline_string
-          (escaped_inline_open)
-          (string_content)
-          (string_close)))))
-  (module_annotation
-    (dict_literal
-      (identifier)
-      (string
-        (escaped_inline_string
-          (escaped_inline_open)
-          (string_content)
-          (string_close)))))
-  (heading
-    (heading_marker)
-    (inline_body
-      (text))))
+(source_file
+  (code_file
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (string)))))
 
 ==================
-Attribute multiline string shares Code grammar
+Prose starting with let stays markup
 ==================
 
-@!(desc: """
-line1
-line2
-""")
-
-= 标题
+let me explain this slowly
+and more prose
 
 ---
 
-(document
-  (module_annotation
-    (dict_literal
-      (identifier)
-      (string
-        (escaped_multiline_string
-          (escaped_multiline_open)
-          (string_content)
-          (string_close)))))
-  (heading
-    (heading_marker)
-    (inline_body
-      (text))))
+(source_file
+  (markup_file
+    (text)
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text
+      (identifier))
+    (text
+      (identifier))))
 
 ==================
-Attribute inline string rejects line break
+Integer-led file is code
 ==================
 
-@!(desc: "first
-second")
+42;
 
 ---
 
-(document
-  (module_annotation
-    (dict_literal
-      (identifier)
-      (string
-        (escaped_inline_string
-          (escaped_inline_open)
-          (string_content)
-          (ERROR)
-          (string_content)
-          (string_close))))))
+(source_file
+  (code_file
+    (expression_statement
+      value: (expression
+        (integer)))))
 
 ==================
-Union types and target literals
+Content-led file is code
 ==================
 
-#let a: Target | String = <vault::wiki link/install>
-#let b: fn(x: Int) -> Int | Unit = ()
+[hello];
 
 ---
 
-(document
-  (embedded_expression
-    (let_expression
-      (identifier)
-      (type_expression
-        (type_member
-          (qualified_name
-            (identifier)))
-        (union_operator)
-        (type_member
-          (qualified_name
-            (identifier))))
-      (target_literal
-        (target_open)
-        (target_content))))
-  (embedded_expression
-    (let_expression
-      (identifier)
-      (type_expression
-        (type_member
-          (function_type
-            (parameters
-              (parameter
-                (identifier)
-                (type_expression
-                  (type_member
-                    (qualified_name
-                      (identifier))))))
-            (type_expression
-              (type_member
-                (qualified_name
-                  (identifier)))
-              (union_operator)
-              (type_member
-                (qualified_name
-                  (identifier)))))))
-      (unit_literal))))
-
-==================
-Unclosed target literal is a local error
-==================
-
-Read #<self::intro
-and then more.
-
----
-
-(document
-  (text)
-  (embedded_expression
-    (ERROR
-      (UNEXPECTED '<'))
-    (qualified_name
-      (identifier)))
-  (text)
-  (text))
-
-==================
-Empty target literal
-==================
-
-Read #<>.
-
----
-
-(document
-  (text)
-  (ERROR
-    (UNEXPECTED '<')
-    (comparison_operator)
-    (UNEXPECTED '\n')))
-
-==================
-Target literal escapes
-==================
-
-#<vault::a\>b\\c\<d> after
-
----
-
-(document
-  (embedded_expression
-    (target_literal
-      (target_open)
-      (target_content)))
-  (text))
-
-==================
-Bare angle brackets stay text
-==================
-
-a < b and c > d
-
----
-
-(document
-  (text))
-
-==================
-Dollar sign is plain text
-==================
-
-cost $5 and $x here
-
----
-
-(document
-  (text)
-  (text)
-  (text)
-  (text)
-  (text))
-==================
-Inline math
-==================
-
-Euler said $e^{i\pi} + 1 = 0$ loudly
-
----
-
-(document
-  (text)
-  (inline_math
-    (math_open)
-    (math_content)
-    (math_close))
-  (text))
-
-==================
-Backslash-dollar does not close inline math
-==================
-
-raw $a \$ b$ kept
-cost \$5 is escaped
-
----
-
-(document
-  (text)
-  (inline_math
-    (math_open)
-    (math_content)
-    (math_close))
-  (text)
-  (text)
-  (escaped_punctuation)
-  (text))
-
-==================
-Inline math delimiters require non-whitespace neighbors
-==================
-
-$ x$ stays text and so does $y $
-
----
-
-(document
-  (text)
-  (text)
-  (text)
-  (text)
-  (text)
-  (text))
-
-==================
-Unterminated inline math degrades to text
-==================
-
-$x + y
-next line
-
----
-
-(document
-  (text)
-  (text)
-  (text))
-
-==================
-First valid close wins
-==================
-
-cost $5 and $x$ here
-
----
-
-(document
-  (text)
-  (inline_math
-    (math_open)
-    (math_content)
-    (math_close))
-  (text))
-
-==================
-Math block spans lines
-==================
-
-$$
-x^2 + y^2 = z^2
-$$
-
----
-
-(document
-  (math_block
-    (math_block_open)
-    (math_block_content)
-    (math_block_close)))
-
-==================
-Math block lines may be indented
-==================
-
-  $$
-  raw *content*
-  $$
-
----
-
-(document
-  (math_block
-    (math_block_open)
-    (math_block_content)
-    (math_block_close)))
-
-==================
-Empty math block
-==================
-
-$$
-$$
-
----
-
-(document
-  (math_block
-    (math_block_open)
-    (math_block_close)))
-
-==================
-Unclosed math block eats to EOF
-==================
-
-$$
-x = 1
-
----
-
-(document
-  (ERROR
-    (math_block_open)
-    (identifier)
-    (integer)))
-
-==================
-Bare dollar-dollar line required for math block
-==================
-
-text $$ inline
-$$ not a block
-still text
-
----
-
-(document
-  (text)
-  (text)
-  (text)
-  (text)
-  (text)
-  (text))
-
-==================
-Math content stays raw
-==================
-
-$a * b _ c # d$
-
-$$
-* not emphasis _ not under # not header
-$$
-
----
-
-(document
-  (inline_math
-    (math_open)
-    (math_content)
-    (math_close))
-  (math_block
-    (math_block_open)
-    (math_block_content)
-    (math_block_close)))
-
-==================
-Inline math in headings and lists
-==================
-
-= Euler $e^x$ rule
-- run $a+b$ times
-
----
-
-(document
-  (heading
-    (heading_marker)
-    (inline_body
-      (text)
-      (inline_math
-        (math_open)
-        (math_content)
-        (math_close))
-      (text)))
-  (list_item
-    (list_marker)
-    (inline_body
-      (text)
-      (inline_math
-        (math_open)
-        (math_content)
-        (math_close))
-      (text))))
+(source_file
+  (code_file
+    (expression_statement
+      value: (expression
+        (content_block
+          (text
+            (identifier)))))))

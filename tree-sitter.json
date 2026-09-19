@@ -4,7 +4,7 @@
       "name": "notist",
       "camelcase": "Notist",
       "scope": "source.notist",
-      "file-types": ["not"],
+      "file-types": ["not", "notc"],
       "injection-regex": "^(not|notist)$"
     }
   ],

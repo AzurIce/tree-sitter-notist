@@ -1,48 +1,5 @@
 [
   {
-    "type": "annotation",
-    "named": true,
-    "fields": {
-      "payload": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "dict_literal",
-            "named": true
-          },
-          {
-            "type": "qualified_name",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "argument",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "named_argument",
-          "named": true
-        },
-        {
-          "type": "positional_argument",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "arguments",
     "named": true,
     "fields": {},
@@ -51,15 +8,11 @@
       "required": false,
       "types": [
         {
-          "type": "argument",
+          "type": "expression",
           "named": true
         },
         {
-          "type": "block_comment",
-          "named": true
-        },
-        {
-          "type": "line_comment",
+          "type": "named_argument",
           "named": true
         }
       ]
@@ -74,71 +27,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "code_block",
-            "named": true
-          },
-          {
-            "type": "content_block",
-            "named": true
-          },
-          {
-            "type": "float",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "import_expression",
-            "named": true
-          },
-          {
-            "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda",
-            "named": true
-          },
-          {
-            "type": "let_expression",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "qualified_name",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "target_literal",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "unit_literal",
+            "type": "expression",
             "named": true
           }
         ]
@@ -148,24 +37,44 @@
         "required": true,
         "types": [
           {
-            "type": "additive_operator",
-            "named": true
+            "type": "!=",
+            "named": false
           },
           {
-            "type": "and_operator",
-            "named": true
+            "type": "*",
+            "named": false
           },
           {
-            "type": "comparison_operator",
-            "named": true
+            "type": "+",
+            "named": false
           },
           {
-            "type": "multiplicative_operator",
-            "named": true
+            "type": "-",
+            "named": false
           },
           {
-            "type": "or_operator",
-            "named": true
+            "type": "/",
+            "named": false
+          },
+          {
+            "type": "<",
+            "named": false
+          },
+          {
+            "type": "<=",
+            "named": false
+          },
+          {
+            "type": "==",
+            "named": false
+          },
+          {
+            "type": ">",
+            "named": false
+          },
+          {
+            "type": ">=",
+            "named": false
           }
         ]
       },
@@ -174,95 +83,12 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "code_block",
-            "named": true
-          },
-          {
-            "type": "content_block",
-            "named": true
-          },
-          {
-            "type": "float",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "import_expression",
-            "named": true
-          },
-          {
-            "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda",
-            "named": true
-          },
-          {
-            "type": "let_expression",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "qualified_name",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "target_literal",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "unit_literal",
+            "type": "expression",
             "named": true
           }
         ]
       }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "block_comment",
-          "named": true
-        },
-        {
-          "type": "line_comment",
-          "named": true
-        }
-      ]
     }
-  },
-  {
-    "type": "boolean",
-    "named": true,
-    "fields": {}
   },
   {
     "type": "call_expression",
@@ -278,18 +104,8 @@
           }
         ]
       },
-      "function": {
+      "content": {
         "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "qualified_name",
-            "named": true
-          }
-        ]
-      },
-      "trailing": {
-        "multiple": true,
         "required": false,
         "types": [
           {
@@ -297,11 +113,116 @@
             "named": true
           }
         ]
+      },
+      "function": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "content_block",
+            "named": true
+          },
+          {
+            "type": "dict_literal",
+            "named": true
+          },
+          {
+            "type": "empty_dict",
+            "named": true
+          },
+          {
+            "type": "empty_list",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": false
+          },
+          {
+            "type": "field_access",
+            "named": true
+          },
+          {
+            "type": "if_expression",
+            "named": true
+          },
+          {
+            "type": "integer",
+            "named": true
+          },
+          {
+            "type": "item_target",
+            "named": true
+          },
+          {
+            "type": "lambda",
+            "named": true
+          },
+          {
+            "type": "list_literal",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": false
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "qualified_name",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": false
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          }
+        ]
       }
     }
   },
   {
-    "type": "code_block",
+    "type": "code_file",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expression_statement",
+          "named": true
+        },
+        {
+          "type": "let_statement",
+          "named": true
+        },
+        {
+          "type": "use_statement",
+          "named": true
+        },
+        {
+          "type": "wasm_statement",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "content_block",
     "named": true,
     "fields": {},
     "children": {
@@ -309,15 +230,240 @@
       "required": false,
       "types": [
         {
+          "type": "content_block",
+          "named": true
+        },
+        {
+          "type": "declaration",
+          "named": true
+        },
+        {
+          "type": "emphasis",
+          "named": true
+        },
+        {
+          "type": "escape",
+          "named": true
+        },
+        {
+          "type": "interpolation",
+          "named": true
+        },
+        {
+          "type": "section",
+          "named": true
+        },
+        {
+          "type": "strong",
+          "named": true
+        },
+        {
+          "type": "text",
+          "named": true
+        },
+        {
+          "type": "wikilink",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "declaration",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "declaration_let",
+          "named": true
+        },
+        {
+          "type": "declaration_use",
+          "named": true
+        },
+        {
+          "type": "declaration_wasm",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "declaration_let",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "declaration_use",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "use_glob",
+          "named": true
+        },
+        {
+          "type": "use_group",
+          "named": true
+        },
+        {
+          "type": "use_leaf",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "declaration_wasm",
+    "named": true,
+    "fields": {
+      "path": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "dict_entry",
+    "named": true,
+    "fields": {
+      "key": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "dict_literal",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "dict_entry",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "emphasis",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "content_block",
+          "named": true
+        },
+        {
+          "type": "declaration",
+          "named": true
+        },
+        {
+          "type": "escape",
+          "named": true
+        },
+        {
+          "type": "interpolation",
+          "named": true
+        },
+        {
+          "type": "strong",
+          "named": true
+        },
+        {
+          "type": "text",
+          "named": true
+        },
+        {
+          "type": "wikilink",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "empty_dict",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "empty_list",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
           "type": "binary_expression",
-          "named": true
-        },
-        {
-          "type": "block_comment",
-          "named": true
-        },
-        {
-          "type": "boolean",
           "named": true
         },
         {
@@ -325,15 +471,23 @@
           "named": true
         },
         {
-          "type": "code_block",
-          "named": true
-        },
-        {
           "type": "content_block",
           "named": true
         },
         {
-          "type": "float",
+          "type": "dict_literal",
+          "named": true
+        },
+        {
+          "type": "empty_dict",
+          "named": true
+        },
+        {
+          "type": "empty_list",
+          "named": true
+        },
+        {
+          "type": "field_access",
           "named": true
         },
         {
@@ -341,11 +495,11 @@
           "named": true
         },
         {
-          "type": "import_expression",
+          "type": "integer",
           "named": true
         },
         {
-          "type": "integer",
+          "type": "item_target",
           "named": true
         },
         {
@@ -353,11 +507,7 @@
           "named": true
         },
         {
-          "type": "let_expression",
-          "named": true
-        },
-        {
-          "type": "line_comment",
+          "type": "list_literal",
           "named": true
         },
         {
@@ -373,30 +523,22 @@
           "named": true
         },
         {
-          "type": "target_literal",
-          "named": true
-        },
-        {
           "type": "unary_expression",
-          "named": true
-        },
-        {
-          "type": "unit_literal",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "content_block",
+    "type": "expression_statement",
     "named": true,
     "fields": {
-      "body": {
+      "value": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
-            "type": "content_body",
+            "type": "expression",
             "named": true
           }
         ]
@@ -404,138 +546,49 @@
     }
   },
   {
-    "type": "content_body",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "annotation",
-          "named": true
-        },
-        {
-          "type": "code_block",
-          "named": true
-        },
-        {
-          "type": "embedded_expression",
-          "named": true
-        },
-        {
-          "type": "emphasis",
-          "named": true
-        },
-        {
-          "type": "enum_item",
-          "named": true
-        },
-        {
-          "type": "escaped_punctuation",
-          "named": true
-        },
-        {
-          "type": "fenced_raw",
-          "named": true
-        },
-        {
-          "type": "heading",
-          "named": true
-        },
-        {
-          "type": "inline_math",
-          "named": true
-        },
-        {
-          "type": "inline_raw",
-          "named": true
-        },
-        {
-          "type": "list_item",
-          "named": true
-        },
-        {
-          "type": "math_block",
-          "named": true
-        },
-        {
-          "type": "rule",
-          "named": true
-        },
-        {
-          "type": "strike",
-          "named": true
-        },
-        {
-          "type": "strong",
-          "named": true
-        },
-        {
-          "type": "table",
-          "named": true
-        },
-        {
-          "type": "task_item",
-          "named": true
-        },
-        {
-          "type": "text",
-          "named": true
-        },
-        {
-          "type": "underline",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "dict_literal",
+    "type": "field_access",
     "named": true,
     "fields": {
-      "entry": {
-        "multiple": true,
-        "required": false,
+      "field": {
+        "multiple": false,
+        "required": true,
         "types": [
           {
-            "type": ":",
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "object": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "content_block",
+            "named": true
+          },
+          {
+            "type": "dict_literal",
+            "named": true
+          },
+          {
+            "type": "empty_dict",
+            "named": true
+          },
+          {
+            "type": "empty_list",
+            "named": true
+          },
+          {
+            "type": "false",
             "named": false
           },
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "block_comment",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "code_block",
-            "named": true
-          },
-          {
-            "type": "content_block",
-            "named": true
-          },
-          {
-            "type": "dict_spread",
-            "named": true
-          },
-          {
-            "type": "float",
-            "named": true
-          },
-          {
-            "type": "identifier",
+            "type": "field_access",
             "named": true
           },
           {
@@ -543,11 +596,11 @@
             "named": true
           },
           {
-            "type": "import_expression",
+            "type": "integer",
             "named": true
           },
           {
-            "type": "integer",
+            "type": "item_target",
             "named": true
           },
           {
@@ -555,12 +608,12 @@
             "named": true
           },
           {
-            "type": "let_expression",
+            "type": "list_literal",
             "named": true
           },
           {
-            "type": "line_comment",
-            "named": true
+            "type": "none",
+            "named": false
           },
           {
             "type": "parenthesized_expression",
@@ -575,621 +628,11 @@
             "named": true
           },
           {
-            "type": "target_literal",
-            "named": true
+            "type": "true",
+            "named": false
           },
           {
             "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "unit_literal",
-            "named": true
-          }
-        ]
-      },
-      "key": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "integer",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          }
-        ]
-      },
-      "value": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "code_block",
-            "named": true
-          },
-          {
-            "type": "content_block",
-            "named": true
-          },
-          {
-            "type": "float",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "import_expression",
-            "named": true
-          },
-          {
-            "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda",
-            "named": true
-          },
-          {
-            "type": "let_expression",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "qualified_name",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "target_literal",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "unit_literal",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "block_comment",
-          "named": true
-        },
-        {
-          "type": "line_comment",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "dict_spread",
-    "named": true,
-    "fields": {
-      "value": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "code_block",
-            "named": true
-          },
-          {
-            "type": "content_block",
-            "named": true
-          },
-          {
-            "type": "float",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "import_expression",
-            "named": true
-          },
-          {
-            "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda",
-            "named": true
-          },
-          {
-            "type": "let_expression",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "qualified_name",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "target_literal",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "unit_literal",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "document",
-    "named": true,
-    "root": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "annotation",
-          "named": true
-        },
-        {
-          "type": "code_block",
-          "named": true
-        },
-        {
-          "type": "embedded_expression",
-          "named": true
-        },
-        {
-          "type": "emphasis",
-          "named": true
-        },
-        {
-          "type": "enum_item",
-          "named": true
-        },
-        {
-          "type": "escaped_punctuation",
-          "named": true
-        },
-        {
-          "type": "fenced_raw",
-          "named": true
-        },
-        {
-          "type": "heading",
-          "named": true
-        },
-        {
-          "type": "inline_math",
-          "named": true
-        },
-        {
-          "type": "inline_raw",
-          "named": true
-        },
-        {
-          "type": "list_item",
-          "named": true
-        },
-        {
-          "type": "math_block",
-          "named": true
-        },
-        {
-          "type": "module_annotation",
-          "named": true
-        },
-        {
-          "type": "rule",
-          "named": true
-        },
-        {
-          "type": "strike",
-          "named": true
-        },
-        {
-          "type": "strong",
-          "named": true
-        },
-        {
-          "type": "table",
-          "named": true
-        },
-        {
-          "type": "task_item",
-          "named": true
-        },
-        {
-          "type": "text",
-          "named": true
-        },
-        {
-          "type": "underline",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "embedded_expression",
-    "named": true,
-    "fields": {
-      "expression": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "code_block",
-            "named": true
-          },
-          {
-            "type": "content_block",
-            "named": true
-          },
-          {
-            "type": "float",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "import_expression",
-            "named": true
-          },
-          {
-            "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda",
-            "named": true
-          },
-          {
-            "type": "let_expression",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "qualified_name",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "target_literal",
-            "named": true
-          },
-          {
-            "type": "unit_literal",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "emphasis",
-    "named": true,
-    "fields": {
-      "body": {
-        "multiple": true,
-        "required": true,
-        "types": [
-          {
-            "type": "embedded_expression",
-            "named": true
-          },
-          {
-            "type": "escaped_punctuation",
-            "named": true
-          },
-          {
-            "type": "inline_math",
-            "named": true
-          },
-          {
-            "type": "inline_raw",
-            "named": true
-          },
-          {
-            "type": "strike",
-            "named": true
-          },
-          {
-            "type": "strong",
-            "named": true
-          },
-          {
-            "type": "text",
-            "named": true
-          }
-        ]
-      },
-      "close": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "emphasis_marker",
-            "named": true
-          }
-        ]
-      },
-      "open": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "emphasis_marker",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "enum_item",
-    "named": true,
-    "fields": {
-      "body": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "inline_body",
-            "named": true
-          }
-        ]
-      },
-      "marker": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "enum_marker",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "escaped_inline_string",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "escape_sequence",
-          "named": true
-        },
-        {
-          "type": "escaped_inline_open",
-          "named": true
-        },
-        {
-          "type": "string_close",
-          "named": true
-        },
-        {
-          "type": "string_content",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "escaped_multiline_string",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "escape_sequence",
-          "named": true
-        },
-        {
-          "type": "escaped_multiline_open",
-          "named": true
-        },
-        {
-          "type": "string_close",
-          "named": true
-        },
-        {
-          "type": "string_content",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "fenced_raw",
-    "named": true,
-    "fields": {
-      "body": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "fence_content",
-            "named": true
-          }
-        ]
-      },
-      "close": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "fence_close",
-            "named": true
-          }
-        ]
-      },
-      "language": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "fence_info",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "fence_open",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "function_type",
-    "named": true,
-    "fields": {
-      "parameters": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "parameters",
-            "named": true
-          }
-        ]
-      },
-      "return_type": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "type_expression",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "block_comment",
-          "named": true
-        },
-        {
-          "type": "line_comment",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "heading",
-    "named": true,
-    "fields": {
-      "body": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "inline_body",
-            "named": true
-          }
-        ]
-      },
-      "marker": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "heading_marker",
             "named": true
           }
         ]
@@ -1200,40 +643,68 @@
     "type": "if_expression",
     "named": true,
     "fields": {
+      "alternative": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
       "condition": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
+            "type": "expression",
             "named": true
-          },
+          }
+        ]
+      },
+      "consequence": {
+        "multiple": false,
+        "required": true,
+        "types": [
           {
-            "type": "boolean",
+            "type": "expression",
             "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "code_block",
-            "named": true
-          },
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "interpolation",
+    "named": true,
+    "fields": {
+      "expression": {
+        "multiple": false,
+        "required": true,
+        "types": [
           {
             "type": "content_block",
             "named": true
           },
           {
-            "type": "float",
+            "type": "dict_literal",
             "named": true
+          },
+          {
+            "type": "empty_dict",
+            "named": true
+          },
+          {
+            "type": "empty_list",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": false
           },
           {
             "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "import_expression",
             "named": true
           },
           {
@@ -1241,12 +712,32 @@
             "named": true
           },
           {
+            "type": "interpolation_call",
+            "named": true
+          },
+          {
+            "type": "interpolation_content",
+            "named": true
+          },
+          {
+            "type": "interpolation_field",
+            "named": true
+          },
+          {
+            "type": "item_target",
+            "named": true
+          },
+          {
             "type": "lambda",
             "named": true
           },
           {
-            "type": "let_expression",
+            "type": "list_literal",
             "named": true
+          },
+          {
+            "type": "none",
+            "named": false
           },
           {
             "type": "parenthesized_expression",
@@ -1261,48 +752,202 @@
             "named": true
           },
           {
-            "type": "target_literal",
-            "named": true
+            "type": "true",
+            "named": false
           },
           {
             "type": "unary_expression",
             "named": true
-          },
-          {
-            "type": "unit_literal",
-            "named": true
           }
         ]
-      },
-      "else": {
+      }
+    }
+  },
+  {
+    "type": "interpolation_call",
+    "named": true,
+    "fields": {
+      "function": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
-          {
-            "type": "code_block",
-            "named": true
-          },
           {
             "type": "content_block",
             "named": true
+          },
+          {
+            "type": "dict_literal",
+            "named": true
+          },
+          {
+            "type": "empty_dict",
+            "named": true
+          },
+          {
+            "type": "empty_list",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": false
           },
           {
             "type": "if_expression",
             "named": true
-          }
-        ]
-      },
-      "then": {
-        "multiple": false,
-        "required": true,
-        "types": [
+          },
           {
-            "type": "code_block",
+            "type": "integer",
             "named": true
           },
           {
+            "type": "interpolation_call",
+            "named": true
+          },
+          {
+            "type": "interpolation_content",
+            "named": true
+          },
+          {
+            "type": "interpolation_field",
+            "named": true
+          },
+          {
+            "type": "item_target",
+            "named": true
+          },
+          {
+            "type": "lambda",
+            "named": true
+          },
+          {
+            "type": "list_literal",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": false
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "qualified_name",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": false
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "expression",
+          "named": true
+        },
+        {
+          "type": "named_argument",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "interpolation_content",
+    "named": true,
+    "fields": {
+      "function": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
             "type": "content_block",
             "named": true
+          },
+          {
+            "type": "dict_literal",
+            "named": true
+          },
+          {
+            "type": "empty_dict",
+            "named": true
+          },
+          {
+            "type": "empty_list",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": false
+          },
+          {
+            "type": "if_expression",
+            "named": true
+          },
+          {
+            "type": "integer",
+            "named": true
+          },
+          {
+            "type": "interpolation_call",
+            "named": true
+          },
+          {
+            "type": "interpolation_content",
+            "named": true
+          },
+          {
+            "type": "interpolation_field",
+            "named": true
+          },
+          {
+            "type": "item_target",
+            "named": true
+          },
+          {
+            "type": "lambda",
+            "named": true
+          },
+          {
+            "type": "list_literal",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": false
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "qualified_name",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": false
+          },
+          {
+            "type": "unary_expression",
+            "named": true
           }
         ]
       }
@@ -1312,104 +957,11 @@
       "required": false,
       "types": [
         {
-          "type": "block_comment",
+          "type": "content_block",
           "named": true
         },
         {
-          "type": "line_comment",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "import_expression",
-    "named": true,
-    "fields": {
-      "path": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "target_literal",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "block_comment",
-          "named": true
-        },
-        {
-          "type": "import_item",
-          "named": true
-        },
-        {
-          "type": "line_comment",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "import_item",
-    "named": true,
-    "fields": {
-      "alias": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      },
-      "name": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "block_comment",
-          "named": true
-        },
-        {
-          "type": "line_comment",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "inline_body",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "code_block",
-          "named": true
-        },
-        {
-          "type": "embedded_expression",
+          "type": "declaration",
           "named": true
         },
         {
@@ -1417,19 +969,15 @@
           "named": true
         },
         {
-          "type": "escaped_punctuation",
+          "type": "escape",
           "named": true
         },
         {
-          "type": "inline_math",
+          "type": "interpolation",
           "named": true
         },
         {
-          "type": "inline_raw",
-          "named": true
-        },
-        {
-          "type": "strike",
+          "type": "section",
           "named": true
         },
         {
@@ -1441,42 +989,130 @@
           "named": true
         },
         {
-          "type": "underline",
+          "type": "wikilink",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "inline_math",
+    "type": "interpolation_field",
     "named": true,
     "fields": {
-      "body": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "math_content",
-            "named": true
-          }
-        ]
-      },
-      "close": {
+      "field": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "math_close",
+            "type": "identifier",
             "named": true
           }
         ]
       },
-      "open": {
+      "object": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "math_open",
+            "type": "content_block",
+            "named": true
+          },
+          {
+            "type": "dict_literal",
+            "named": true
+          },
+          {
+            "type": "empty_dict",
+            "named": true
+          },
+          {
+            "type": "empty_list",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": false
+          },
+          {
+            "type": "if_expression",
+            "named": true
+          },
+          {
+            "type": "integer",
+            "named": true
+          },
+          {
+            "type": "interpolation_call",
+            "named": true
+          },
+          {
+            "type": "interpolation_content",
+            "named": true
+          },
+          {
+            "type": "interpolation_field",
+            "named": true
+          },
+          {
+            "type": "item_target",
+            "named": true
+          },
+          {
+            "type": "lambda",
+            "named": true
+          },
+          {
+            "type": "list_literal",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": false
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "qualified_name",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": false
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "item_target",
+    "named": true,
+    "fields": {
+      "item": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      },
+      "module": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "qualified_name",
             "named": true
           }
         ]
@@ -1492,71 +1128,7 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "code_block",
-            "named": true
-          },
-          {
-            "type": "content_block",
-            "named": true
-          },
-          {
-            "type": "float",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "import_expression",
-            "named": true
-          },
-          {
-            "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda",
-            "named": true
-          },
-          {
-            "type": "let_expression",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "qualified_name",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "target_literal",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "unit_literal",
+            "type": "expression",
             "named": true
           }
         ]
@@ -1571,100 +1143,12 @@
           }
         ]
       }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "block_comment",
-          "named": true
-        },
-        {
-          "type": "line_comment",
-          "named": true
-        }
-      ]
     }
   },
   {
-    "type": "let_expression",
+    "type": "let_statement",
     "named": true,
     "fields": {
-      "body": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "code_block",
-            "named": true
-          },
-          {
-            "type": "content_block",
-            "named": true
-          },
-          {
-            "type": "float",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "import_expression",
-            "named": true
-          },
-          {
-            "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda",
-            "named": true
-          },
-          {
-            "type": "let_expression",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "qualified_name",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "target_literal",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "unit_literal",
-            "named": true
-          }
-        ]
-      },
       "name": {
         "multiple": false,
         "required": true,
@@ -1675,210 +1159,78 @@
           }
         ]
       },
-      "parameters": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "parameters",
-            "named": true
-          }
-        ]
-      },
-      "return_type": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "type_expression",
-            "named": true
-          }
-        ]
-      },
-      "type": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "type_expression",
-            "named": true
-          }
-        ]
-      },
       "value": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "code_block",
-            "named": true
-          },
-          {
-            "type": "content_block",
-            "named": true
-          },
-          {
-            "type": "float",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "import_expression",
-            "named": true
-          },
-          {
-            "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda",
-            "named": true
-          },
-          {
-            "type": "let_expression",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "qualified_name",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "target_literal",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "unit_literal",
+            "type": "expression",
             "named": true
           }
         ]
       }
-    },
+    }
+  },
+  {
+    "type": "list_literal",
+    "named": true,
+    "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
-          "type": "block_comment",
-          "named": true
-        },
-        {
-          "type": "line_comment",
+          "type": "expression",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "list_item",
+    "type": "markup_file",
     "named": true,
-    "fields": {
-      "body": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "inline_body",
-            "named": true
-          }
-        ]
-      },
-      "marker": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "list_marker",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "math_block",
-    "named": true,
-    "fields": {
-      "body": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "math_block_content",
-            "named": true
-          }
-        ]
-      },
-      "close": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "math_block_close",
-            "named": true
-          }
-        ]
-      },
-      "open": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "math_block_open",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "module_annotation",
-    "named": true,
-    "fields": {
-      "payload": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "dict_literal",
-            "named": true
-          },
-          {
-            "type": "qualified_name",
-            "named": true
-          }
-        ]
-      }
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "content_block",
+          "named": true
+        },
+        {
+          "type": "declaration",
+          "named": true
+        },
+        {
+          "type": "emphasis",
+          "named": true
+        },
+        {
+          "type": "escape",
+          "named": true
+        },
+        {
+          "type": "interpolation",
+          "named": true
+        },
+        {
+          "type": "section",
+          "named": true
+        },
+        {
+          "type": "strong",
+          "named": true
+        },
+        {
+          "type": "text",
+          "named": true
+        },
+        {
+          "type": "wikilink",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1900,89 +1252,11 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "code_block",
-            "named": true
-          },
-          {
-            "type": "content_block",
-            "named": true
-          },
-          {
-            "type": "float",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "import_expression",
-            "named": true
-          },
-          {
-            "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda",
-            "named": true
-          },
-          {
-            "type": "let_expression",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "qualified_name",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "target_literal",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "unit_literal",
+            "type": "expression",
             "named": true
           }
         ]
       }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "block_comment",
-          "named": true
-        },
-        {
-          "type": "line_comment",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -1994,71 +1268,7 @@
         "required": false,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "code_block",
-            "named": true
-          },
-          {
-            "type": "content_block",
-            "named": true
-          },
-          {
-            "type": "float",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "import_expression",
-            "named": true
-          },
-          {
-            "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda",
-            "named": true
-          },
-          {
-            "type": "let_expression",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "qualified_name",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "target_literal",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "unit_literal",
+            "type": "expression",
             "named": true
           }
         ]
@@ -2075,28 +1285,14 @@
       },
       "type": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
-            "type": "type_expression",
+            "type": "type",
             "named": true
           }
         ]
       }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "block_comment",
-          "named": true
-        },
-        {
-          "type": "line_comment",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -2107,14 +1303,6 @@
       "multiple": true,
       "required": false,
       "types": [
-        {
-          "type": "block_comment",
-          "named": true
-        },
-        {
-          "type": "line_comment",
-          "named": true
-        },
         {
           "type": "parameter",
           "named": true
@@ -2127,166 +1315,14 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
         {
-          "type": "binary_expression",
-          "named": true
-        },
-        {
-          "type": "block_comment",
-          "named": true
-        },
-        {
-          "type": "boolean",
-          "named": true
-        },
-        {
-          "type": "call_expression",
-          "named": true
-        },
-        {
-          "type": "code_block",
-          "named": true
-        },
-        {
-          "type": "content_block",
-          "named": true
-        },
-        {
-          "type": "float",
-          "named": true
-        },
-        {
-          "type": "if_expression",
-          "named": true
-        },
-        {
-          "type": "import_expression",
-          "named": true
-        },
-        {
-          "type": "integer",
-          "named": true
-        },
-        {
-          "type": "lambda",
-          "named": true
-        },
-        {
-          "type": "let_expression",
-          "named": true
-        },
-        {
-          "type": "line_comment",
-          "named": true
-        },
-        {
-          "type": "parenthesized_expression",
-          "named": true
-        },
-        {
-          "type": "qualified_name",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "target_literal",
-          "named": true
-        },
-        {
-          "type": "unary_expression",
-          "named": true
-        },
-        {
-          "type": "unit_literal",
+          "type": "expression",
           "named": true
         }
       ]
-    }
-  },
-  {
-    "type": "positional_argument",
-    "named": true,
-    "fields": {
-      "value": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "code_block",
-            "named": true
-          },
-          {
-            "type": "content_block",
-            "named": true
-          },
-          {
-            "type": "float",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "import_expression",
-            "named": true
-          },
-          {
-            "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda",
-            "named": true
-          },
-          {
-            "type": "let_expression",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "qualified_name",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "target_literal",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "unit_literal",
-            "named": true
-          }
-        ]
-      }
     }
   },
   {
@@ -2305,242 +1341,25 @@
     }
   },
   {
-    "type": "raw_inline_string",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "raw_inline_open",
-          "named": true
-        },
-        {
-          "type": "string_close",
-          "named": true
-        },
-        {
-          "type": "string_content",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "raw_multiline_string",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "raw_multiline_open",
-          "named": true
-        },
-        {
-          "type": "string_close",
-          "named": true
-        },
-        {
-          "type": "string_content",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "rule",
-    "named": true,
-    "fields": {
-      "marker": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "rule_marker",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "strike",
+    "type": "section",
     "named": true,
     "fields": {
       "body": {
-        "multiple": true,
-        "required": true,
-        "types": [
-          {
-            "type": "embedded_expression",
-            "named": true
-          },
-          {
-            "type": "emphasis",
-            "named": true
-          },
-          {
-            "type": "escaped_punctuation",
-            "named": true
-          },
-          {
-            "type": "inline_math",
-            "named": true
-          },
-          {
-            "type": "inline_raw",
-            "named": true
-          },
-          {
-            "type": "strong",
-            "named": true
-          },
-          {
-            "type": "text",
-            "named": true
-          },
-          {
-            "type": "underline",
-            "named": true
-          }
-        ]
-      },
-      "close": {
         "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "strike_marker",
-            "named": true
-          }
-        ]
-      },
-      "open": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "strike_marker",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "string",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "escaped_inline_string",
-          "named": true
-        },
-        {
-          "type": "escaped_multiline_string",
-          "named": true
-        },
-        {
-          "type": "raw_inline_string",
-          "named": true
-        },
-        {
-          "type": "raw_multiline_string",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "strong",
-    "named": true,
-    "fields": {
-      "body": {
-        "multiple": true,
-        "required": true,
-        "types": [
-          {
-            "type": "embedded_expression",
-            "named": true
-          },
-          {
-            "type": "emphasis",
-            "named": true
-          },
-          {
-            "type": "escaped_punctuation",
-            "named": true
-          },
-          {
-            "type": "inline_math",
-            "named": true
-          },
-          {
-            "type": "inline_raw",
-            "named": true
-          },
-          {
-            "type": "strike",
-            "named": true
-          },
-          {
-            "type": "text",
-            "named": true
-          },
-          {
-            "type": "underline",
-            "named": true
-          }
-        ]
-      },
-      "close": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "strong_marker",
-            "named": true
-          }
-        ]
-      },
-      "open": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "strong_marker",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "table",
-    "named": true,
-    "fields": {
-      "header": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "table_row",
-            "named": true
-          }
-        ]
-      },
-      "row": {
-        "multiple": true,
         "required": false,
         "types": [
           {
-            "type": "table_row",
+            "type": "section_body",
+            "named": true
+          }
+        ]
+      },
+      "title": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "title",
             "named": true
           }
         ]
@@ -2551,26 +1370,26 @@
       "required": true,
       "types": [
         {
-          "type": "table_delimiter_row",
+          "type": "heading_marker",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "table_cell",
+    "type": "section_body",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
-          "type": "code_block",
+          "type": "content_block",
           "named": true
         },
         {
-          "type": "embedded_expression",
+          "type": "declaration",
           "named": true
         },
         {
@@ -2578,19 +1397,11 @@
           "named": true
         },
         {
-          "type": "escaped_punctuation",
+          "type": "escape",
           "named": true
         },
         {
-          "type": "inline_math",
-          "named": true
-        },
-        {
-          "type": "inline_raw",
-          "named": true
-        },
-        {
-          "type": "strike",
+          "type": "interpolation",
           "named": true
         },
         {
@@ -2602,92 +1413,92 @@
           "named": true
         },
         {
-          "type": "underline",
+          "type": "wikilink",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "table_row",
+    "type": "source_file",
     "named": true,
-    "fields": {
-      "cell": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": "table_cell",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "pipe",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "target_literal",
-    "named": true,
-    "fields": {
-      "target": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "target_content",
-            "named": true
-          }
-        ]
-      }
-    },
+    "root": true,
+    "fields": {},
     "children": {
       "multiple": false,
-      "required": true,
+      "required": false,
       "types": [
         {
-          "type": "target_open",
+          "type": "code_file",
+          "named": true
+        },
+        {
+          "type": "markup_file",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "task_item",
+    "type": "strong",
     "named": true,
-    "fields": {
-      "body": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "inline_body",
-            "named": true
-          }
-        ]
-      },
-      "marker": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "task_marker",
-            "named": true
-          }
-        ]
-      }
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "content_block",
+          "named": true
+        },
+        {
+          "type": "declaration",
+          "named": true
+        },
+        {
+          "type": "emphasis",
+          "named": true
+        },
+        {
+          "type": "escape",
+          "named": true
+        },
+        {
+          "type": "interpolation",
+          "named": true
+        },
+        {
+          "type": "text",
+          "named": true
+        },
+        {
+          "type": "wikilink",
+          "named": true
+        }
+      ]
     }
   },
   {
-    "type": "type_expression",
+    "type": "text",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "integer",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "title",
     "named": true,
     "fields": {},
     "children": {
@@ -2695,41 +1506,54 @@
       "required": true,
       "types": [
         {
-          "type": "block_comment",
+          "type": "content_block",
           "named": true
         },
         {
-          "type": "line_comment",
+          "type": "declaration",
           "named": true
         },
         {
-          "type": "type_member",
+          "type": "emphasis",
           "named": true
         },
         {
-          "type": "union_operator",
+          "type": "escape",
+          "named": true
+        },
+        {
+          "type": "interpolation",
+          "named": true
+        },
+        {
+          "type": "strong",
+          "named": true
+        },
+        {
+          "type": "text",
+          "named": true
+        },
+        {
+          "type": "wikilink",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "type_member",
+    "type": "type",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "function_type",
-          "named": true
-        },
-        {
-          "type": "qualified_name",
-          "named": true
-        }
-      ]
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -2741,153 +1565,20 @@
         "required": true,
         "types": [
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "code_block",
-            "named": true
-          },
-          {
-            "type": "content_block",
-            "named": true
-          },
-          {
-            "type": "float",
-            "named": true
-          },
-          {
-            "type": "if_expression",
-            "named": true
-          },
-          {
-            "type": "import_expression",
-            "named": true
-          },
-          {
-            "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda",
-            "named": true
-          },
-          {
-            "type": "let_expression",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "qualified_name",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "target_literal",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "unit_literal",
+            "type": "expression",
             "named": true
           }
         ]
       }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "block_comment",
-          "named": true
-        },
-        {
-          "type": "line_comment",
-          "named": true
-        }
-      ]
     }
   },
   {
-    "type": "underline",
+    "type": "use_glob",
     "named": true,
-    "fields": {
-      "body": {
-        "multiple": true,
-        "required": true,
-        "types": [
-          {
-            "type": "embedded_expression",
-            "named": true
-          },
-          {
-            "type": "escaped_punctuation",
-            "named": true
-          },
-          {
-            "type": "inline_math",
-            "named": true
-          },
-          {
-            "type": "inline_raw",
-            "named": true
-          },
-          {
-            "type": "strike",
-            "named": true
-          },
-          {
-            "type": "strong",
-            "named": true
-          },
-          {
-            "type": "text",
-            "named": true
-          }
-        ]
-      },
-      "close": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "underline_marker",
-            "named": true
-          }
-        ]
-      },
-      "open": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "underline_marker",
-            "named": true
-          }
-        ]
-      }
-    }
+    "fields": {}
   },
   {
-    "type": "unit_literal",
+    "type": "use_group",
     "named": true,
     "fields": {},
     "children": {
@@ -2895,15 +1586,122 @@
       "required": false,
       "types": [
         {
-          "type": "block_comment",
+          "type": "identifier",
           "named": true
         },
         {
-          "type": "line_comment",
+          "type": "use_glob",
+          "named": true
+        },
+        {
+          "type": "use_group",
+          "named": true
+        },
+        {
+          "type": "use_leaf",
           "named": true
         }
       ]
     }
+  },
+  {
+    "type": "use_leaf",
+    "named": true,
+    "fields": {
+      "alias": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "use_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "use_glob",
+          "named": true
+        },
+        {
+          "type": "use_group",
+          "named": true
+        },
+        {
+          "type": "use_leaf",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "wasm_statement",
+    "named": true,
+    "fields": {
+      "path": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "wikilink",
+    "named": true,
+    "fields": {
+      "item": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "wikilink_item",
+            "named": true
+          }
+        ]
+      },
+      "module": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "wikilink_module",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "!=",
+    "named": false
   },
   {
     "type": "#",
@@ -2918,6 +1716,14 @@
     "named": false
   },
   {
+    "type": "*",
+    "named": false
+  },
+  {
+    "type": "+",
+    "named": false
+  },
+  {
     "type": ",",
     "named": false
   },
@@ -2926,11 +1732,11 @@
     "named": false
   },
   {
-    "type": "->",
+    "type": ".",
     "named": false
   },
   {
-    "type": "..",
+    "type": "/",
     "named": false
   },
   {
@@ -2946,7 +1752,19 @@
     "named": false
   },
   {
+    "type": "<",
+    "named": false
+  },
+  {
+    "type": "<=",
+    "named": false
+  },
+  {
     "type": "=",
+    "named": false
+  },
+  {
+    "type": "==",
     "named": false
   },
   {
@@ -2958,15 +1776,11 @@
     "named": false
   },
   {
+    "type": ">=",
+    "named": false
+  },
+  {
     "type": "?",
-    "named": false
-  },
-  {
-    "type": "@",
-    "named": false
-  },
-  {
-    "type": "@!",
     "named": false
   },
   {
@@ -2974,83 +1788,40 @@
     "named": false
   },
   {
+    "type": "[[",
+    "named": false
+  },
+  {
     "type": "]",
     "named": false
   },
   {
-    "type": "additive_operator",
-    "named": true
+    "type": "]]",
+    "named": false
   },
   {
-    "type": "and_operator",
-    "named": true
+    "type": "_",
+    "named": false
   },
   {
     "type": "as",
     "named": false
   },
   {
-    "type": "block_comment",
-    "named": true
-  },
-  {
-    "type": "comparison_operator",
-    "named": true
+    "type": "comment",
+    "named": true,
+    "extra": true
   },
   {
     "type": "else",
     "named": false
   },
   {
-    "type": "emphasis_marker",
-    "named": true
-  },
-  {
-    "type": "enum_marker",
-    "named": true
-  },
-  {
-    "type": "escape_sequence",
-    "named": true
-  },
-  {
-    "type": "escaped_inline_open",
-    "named": true
-  },
-  {
-    "type": "escaped_multiline_open",
-    "named": true
-  },
-  {
-    "type": "escaped_punctuation",
+    "type": "escape",
     "named": true
   },
   {
     "type": "false",
-    "named": false
-  },
-  {
-    "type": "fence_close",
-    "named": true
-  },
-  {
-    "type": "fence_content",
-    "named": true
-  },
-  {
-    "type": "fence_info",
-    "named": true
-  },
-  {
-    "type": "fence_open",
-    "named": true
-  },
-  {
-    "type": "float",
-    "named": true
-  },
-  {
-    "type": "fn",
     "named": false
   },
   {
@@ -3066,14 +1837,6 @@
     "named": false
   },
   {
-    "type": "import",
-    "named": false
-  },
-  {
-    "type": "inline_raw",
-    "named": true
-  },
-  {
     "type": "integer",
     "named": true
   },
@@ -3082,115 +1845,31 @@
     "named": false
   },
   {
-    "type": "line_comment",
-    "named": true
-  },
-  {
-    "type": "list_marker",
-    "named": true
-  },
-  {
-    "type": "math_block_close",
-    "named": true
-  },
-  {
-    "type": "math_block_content",
-    "named": true
-  },
-  {
-    "type": "math_block_open",
-    "named": true
-  },
-  {
-    "type": "math_close",
-    "named": true
-  },
-  {
-    "type": "math_content",
-    "named": true
-  },
-  {
-    "type": "math_open",
-    "named": true
-  },
-  {
-    "type": "multiplicative_operator",
-    "named": true
-  },
-  {
-    "type": "not",
+    "type": "none",
     "named": false
   },
   {
-    "type": "or_operator",
+    "type": "string",
     "named": true
-  },
-  {
-    "type": "pipe",
-    "named": true
-  },
-  {
-    "type": "raw_inline_open",
-    "named": true
-  },
-  {
-    "type": "raw_multiline_open",
-    "named": true
-  },
-  {
-    "type": "rule_marker",
-    "named": true
-  },
-  {
-    "type": "strike_marker",
-    "named": true
-  },
-  {
-    "type": "string_close",
-    "named": true
-  },
-  {
-    "type": "string_content",
-    "named": true
-  },
-  {
-    "type": "strong_marker",
-    "named": true
-  },
-  {
-    "type": "table_delimiter_row",
-    "named": true
-  },
-  {
-    "type": "target_content",
-    "named": true
-  },
-  {
-    "type": "target_open",
-    "named": true
-  },
-  {
-    "type": "task_marker",
-    "named": true
-  },
-  {
-    "type": "text",
-    "named": true
-  },
-  {
-    "type": "trailing",
-    "named": false
   },
   {
     "type": "true",
     "named": false
   },
   {
-    "type": "underline_marker",
+    "type": "use",
+    "named": false
+  },
+  {
+    "type": "wasm",
+    "named": false
+  },
+  {
+    "type": "wikilink_item",
     "named": true
   },
   {
-    "type": "union_operator",
+    "type": "wikilink_module",
     "named": true
   },
   {
