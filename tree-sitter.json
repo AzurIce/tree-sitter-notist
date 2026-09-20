@@ -4,8 +4,17 @@
       "name": "notist",
       "camelcase": "Notist",
       "scope": "source.notist",
-      "file-types": ["not", "notc"],
+      "path": ".",
+      "file-types": ["not"],
       "injection-regex": "^(not|notist)$"
+    },
+    {
+      "name": "notist_code",
+      "camelcase": "NotistCode",
+      "scope": "source.notist_code",
+      "path": "notist-code",
+      "file-types": ["notc"],
+      "injection-regex": "^(notc|notist_code)$"
     }
   ],
   "metadata": {

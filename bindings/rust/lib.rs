@@ -4,10 +4,20 @@ use tree_sitter_language::LanguageFn;
 
 unsafe extern "C" {
     fn tree_sitter_notist() -> *const ();
+    fn tree_sitter_notist_code() -> *const ();
 }
 
 /// The tree-sitter language function for Notist.
 pub const LANGUAGE: LanguageFn = unsafe { LanguageFn::from_raw(tree_sitter_notist) };
+
+/// The fixed Code entry point for `.notc` files.
+pub const CODE_LANGUAGE: LanguageFn = unsafe { LanguageFn::from_raw(tree_sitter_notist_code) };
+
+/// The generated node types for the Code grammar.
+pub const CODE_NODE_TYPES: &str = include_str!("../../notist-code/src/node-types.json");
+
+/// Code syntax highlighting, including declarations outside content literals.
+pub const CODE_HIGHLIGHTS_QUERY: &str = include_str!("../../notist-code/queries/highlights.scm");
 
 /// The generated node type definitions.
 pub const NODE_TYPES: &str = include_str!("../../src/node-types.json");
@@ -50,5 +60,16 @@ mod tests {
         Query::new(&language, super::INDENTS_QUERY).expect("indent query should compile");
         Query::new(&language, super::OUTLINE_QUERY).expect("outline query should compile");
         Query::new(&language, super::BRACKETS_QUERY).expect("brackets query should compile");
+        let language = super::CODE_LANGUAGE.into();
+        Query::new(&language, super::CODE_HIGHLIGHTS_QUERY)
+            .expect("code highlights should compile");
+        for query in [
+            include_str!("../../notist-code/queries/folds.scm"),
+            include_str!("../../notist-code/queries/indents.scm"),
+            include_str!("../../notist-code/queries/outline.scm"),
+            include_str!("../../notist-code/queries/brackets.scm"),
+        ] {
+            Query::new(&language, query).expect("shared queries should compile for code");
+        }
     }
 }

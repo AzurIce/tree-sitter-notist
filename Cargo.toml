@@ -10,7 +10,7 @@ repository = "https://github.com/AzurIce/tree-sitter-notist"
 edition = "2024"
 autoexamples = false
 build = "bindings/rust/build.rs"
-include = ["bindings/rust/*", "grammar.js", "queries/*", "src/*", "tree-sitter.json"]
+include = ["bindings/rust/*", "grammar.js", "queries/*", "src/**", "notist-code/**", "scripts/*", "tree-sitter.json"]
 
 [lib]
 path = "bindings/rust/lib.rs"

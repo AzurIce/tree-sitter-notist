@@ -1,0 +1,50 @@
+==================
+Typed bindings and lambda returns in code
+==================
+
+let count: Int = 1;
+let maybe: String? = none;
+let render = (value: Int = 1) -> String => "value";
+let empty = () -> Content => [body];
+
+---
+
+(source_file
+  (code_file
+    (let_statement
+      (identifier)
+      (type
+        (identifier))
+      (expression
+        (integer)))
+    (let_statement
+      (identifier)
+      (type
+        (identifier))
+      (expression))
+    (let_statement
+      (identifier)
+      (expression
+        (lambda
+          (parameters
+            (parameter
+              (identifier)
+              (type
+                (identifier))
+              (expression
+                (integer))))
+          (type
+            (identifier))
+          (expression
+            (string)))))
+    (let_statement
+      (identifier)
+      (expression
+        (lambda
+          (parameters)
+          (type
+            (identifier))
+          (expression
+            (content_block
+              (text
+                (text_word)))))))))

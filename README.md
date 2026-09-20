@@ -1,7 +1,8 @@
 # tree-sitter-notist
 
-Tree-sitter grammar for Notist, covering both file kinds of the current
-syntax: `.not` markup documents and `.notc` code modules.
+Two Tree-sitter parsers for Notist: `notist` parses `.not` markup documents,
+and `notist_code` parses `.notc` code modules. Both share expression rules
+and the external scanner in this repository.
 
 The grammar tracks the reference parser in
 [`crates/notist-next/src/syntax.rs`](https://github.com/AzurIce/Notist/blob/main/crates/notist-next/src/syntax.rs)
@@ -51,19 +52,23 @@ let heading = (title: String, level: Int = 2) => item("heading", (level: level, 
 heading(title: "Intro")[body];
 ```
 
-## File-kind disambiguation
+## Parser selection
 
-Both file kinds share one grammar and one expression language, and some
-inputs are valid as both prose and code. The parser keeps both parses alive
-(GLR) and prefers the structured code parse via dynamic precedence whenever
-the whole file is valid as both; prose kills the code branch early.
+Select the parser by file kind, not by file contents:
 
-Known limits of the single-grammar approach:
+| File | Grammar | Grammar directory | Rust binding |
+| --- | --- | --- | --- |
+| `.not` | `notist` | `.` | `LANGUAGE` |
+| `.notc` | `notist_code` | `notist-code` | `CODE_LANGUAGE` |
 
-- a code module whose *first* statement is a bare expression starting with
-  an identifier, string, or `(` (e.g. `f(1);` or `a::"x";` as the first
-  line) lexes as markup text unless a `let`/`use`/`wasm` statement or a
-  blank line precedes it;
+`let x = 1;` is prose in `.not` and a declaration in `.notc`.
+Markup uses `#let x = 1;` for declarations; Code content literals enter
+Markup mode. `notist-code/grammar.js` inherits the root grammar and changes
+only its name and entry point. Its scanner wrapper compiles the same scanner
+source under distinct exported symbols.
+
+Known editor approximations:
+
 - inside a styled span, a line-start `= ` degrades to text (sections do not
   open inside `*`/`_` spans).
 - identifiers containing underscores compete with emphasis delimiters;
@@ -77,19 +82,31 @@ Editor-level divergences from the reference parser, kept deliberately:
   performed by the Notist frontend, not this highlighting grammar;
 - horizontal whitespace between markup nodes is trivia, so text runs never
   keep leading/trailing spaces they do not need;
-- markup text that starts with a word lexes as a sequence of word tokens, so
-  word-led prose produces per-word `text` nodes.
+- markup words use `text_word` nodes, separate from code identifiers,
+  keywords, and numbers so ordinary prose does not receive code highlighting.
 
 ## Development
 
 ```sh
 tree-sitter generate --js-runtime native
 tree-sitter test
-cargo test
+cd notist-code
+tree-sitter generate --js-runtime native
+tree-sitter test
+cd ..
+node scripts/sync-queries.mjs
+cargo test -j8 -- --test-threads=4
 ```
 
 Build the grammar WASM artifact for editor consumers:
 
 ```sh
-tree-sitter build --wasm  # produces tree-sitter-notist.wasm
+tree-sitter build --wasm .
+tree-sitter build --wasm notist-code
 ```
+
+`queries/` is the authoritative shared query set. The sync script generates
+`notist-code/queries/` with additional top-level Code declaration captures.
+Both sets are checked against their own parser by the Rust tests.
+Editors register two languages and associate both with the same Notist LSP;
+the grammar repository does not start language servers.

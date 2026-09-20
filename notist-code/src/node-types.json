@@ -350,6 +350,33 @@
     }
   },
   {
+    "type": "code_file",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expression_statement",
+          "named": true
+        },
+        {
+          "type": "let_statement",
+          "named": true
+        },
+        {
+          "type": "use_statement",
+          "named": true
+        },
+        {
+          "type": "wasm_statement",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "content_block",
     "named": true,
     "fields": {},
@@ -701,6 +728,22 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "expression_statement",
+    "named": true,
+    "fields": {
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -1334,6 +1377,42 @@
     }
   },
   {
+    "type": "let_statement",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "list_literal",
     "named": true,
     "fields": {},
@@ -1343,73 +1422,6 @@
       "types": [
         {
           "type": "expression",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "markup_file",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "annotation",
-          "named": true
-        },
-        {
-          "type": "autolink",
-          "named": true
-        },
-        {
-          "type": "bracketed_text",
-          "named": true
-        },
-        {
-          "type": "declaration",
-          "named": true
-        },
-        {
-          "type": "emphasis",
-          "named": true
-        },
-        {
-          "type": "escape",
-          "named": true
-        },
-        {
-          "type": "interpolation",
-          "named": true
-        },
-        {
-          "type": "list_marker",
-          "named": true
-        },
-        {
-          "type": "math",
-          "named": true
-        },
-        {
-          "type": "raw",
-          "named": true
-        },
-        {
-          "type": "section",
-          "named": true
-        },
-        {
-          "type": "strong",
-          "named": true
-        },
-        {
-          "type": "text",
-          "named": true
-        },
-        {
-          "type": "wikilink",
           "named": true
         }
       ]
@@ -1631,7 +1643,7 @@
       "required": false,
       "types": [
         {
-          "type": "markup_file",
+          "type": "code_file",
           "named": true
         }
       ]
@@ -1854,6 +1866,49 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "use_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "use_glob",
+          "named": true
+        },
+        {
+          "type": "use_group",
+          "named": true
+        },
+        {
+          "type": "use_leaf",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "wasm_statement",
+    "named": true,
+    "fields": {
+      "path": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {

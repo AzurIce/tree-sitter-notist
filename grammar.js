@@ -3,13 +3,8 @@
  * `.notc` code module format, tracking the reference parser in
  * `crates/notist-next/src/syntax.rs` of the Notist repository.
  *
- * The two file kinds share one grammar because they share one expression
- * language. `source_file` admits both parses; because tree-sitter resolves
- * lexical competition by match length, the text chunk may not start with a
- * word character: word-led runs lex as identifier/keyword sequences so that
- * statement-shaped text keeps a live code branch, and `prec.dynamic` on the
- * statements makes the structured code parse win whenever the file is valid
- * as both. Prose kills the code branch early.
+ * This grammar has a fixed Markup entry point. notist-code/grammar.js
+ * inherits the shared rules and selects the Code entry point.
  *
  * Editor-level divergences from the reference parser, kept deliberately:
  * - sections are flat siblings (level lives on the marker) instead of nested
@@ -57,9 +52,6 @@ module.exports = grammar({
     [$.parenthesized_expression, $.lambda],
     [$.list_literal, $.lambda],
     [$.dict_literal, $.lambda],
-    [$.code_file, $._markup_item],
-    [$.let_statement, $.text],
-    [$.use_statement, $.text],
     [$.type, $.qualified_name],
     [$.parameter, $.qualified_name],
     [$.if_expression, $.text],
@@ -70,7 +62,7 @@ module.exports = grammar({
   ],
 
   rules: {
-    source_file: $ => optional(choice($.code_file, $.markup_file)),
+    source_file: $ => optional($.markup_file),
 
     // ============================================================ files
 
@@ -370,17 +362,14 @@ module.exports = grammar({
     wikilink_module: _ => token(prec(1, /[^#\]]+/)),
     wikilink_item: _ => token(prec(1, /[^\]]+/)),
 
-    // Text is either a run that starts with a non-word character, or a run
-    // of word tokens (identifiers, keywords, integers). The word form keeps
-    // code-shaped text parseable as code; see the header comment.
+    // Prose words have their own node, so keyword and number highlighting
+    // cannot accidentally apply to code-shaped text in Markup.
     text: $ => choice(
       $._chunk,
-      prec.right(1, repeat1(choice(
-        $.identifier,
-        $.integer,
-        'let', 'use', 'wasm', 'as', 'if', 'else', 'true', 'false', 'none',
-      ))),
+      prec.right(1, repeat1($.text_word)),
     ),
+
+    text_word: _ => /[\p{L}\p{N}_]+/,
 
     _chunk: _ => token(/[^\p{L}\p{N}_\s#@\[\]*\\`$]/),
 

@@ -9,18 +9,18 @@ Hello world, this is plain prose.
 (source_file
   (markup_file
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text)
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text)))
 
 ==================
@@ -37,22 +37,22 @@ Second paragraph after a blank line.
 (source_file
   (markup_file
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text)
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text)))
 
 ==================
@@ -80,44 +80,44 @@ sibling text
       (heading_marker)
       title: (title
         (text
-          (identifier)))
+          (text_word)))
       body: (section_body
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))))
+          (text_word))))
     (section
       (heading_marker)
       title: (title
         (text
-          (identifier)))
+          (text_word)))
       body: (section_body
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))))
+          (text_word))))
     (section
       (heading_marker)
       title: (title
         (text
-          (identifier)))
+          (text_word)))
       body: (section_body
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))))
+          (text_word))))
     (section
       (heading_marker)
       title: (title
         (text
-          (identifier)))
+          (text_word)))
       body: (section_body
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))))))
+          (text_word))))))
 
 ==================
 Heading title with inline markup
@@ -135,20 +135,20 @@ body
       (heading_marker)
       title: (title
         (text
-          (identifier))
+          (text_word))
         (strong
           (text
-            (integer))
+            (text_word))
           (text)
           (text
-            (integer)))
+            (text_word)))
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier)))
+          (text_word)))
       body: (section_body
         (text
-          (identifier))))))
+          (text_word))))))
 
 ==================
 Equals without a space is text
@@ -163,35 +163,35 @@ a = b
 (source_file
   (markup_file
     (text
-      (identifier))
+      (text_word))
     (text)
     (text
-      (identifier))
+      (text_word))
     (section
       (heading_marker)
       title: (title
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier)))
+          (text_word)))
       body: (section_body
         (text)
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))))))
+          (text_word))))))
 
 ==================
 Strong and emphasis
@@ -205,15 +205,15 @@ Strong and emphasis
   (markup_file
     (strong
       (text
-        (identifier)))
+        (text_word)))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))))
+      (text_word))))
 
 ==================
 Nested styles
@@ -226,21 +226,21 @@ _outer *inner* both_ and *outer _inner_ too*
 (source_file
   (markup_file
     (text
-      (identifier))
+      (text_word))
     (strong
       (text
-        (identifier)))
+        (text_word)))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (strong
       (text
-        (identifier))
+        (text_word))
       (text
-        (identifier))
+        (text_word))
       (text
-        (identifier)))))
+        (text_word)))))
 
 ==================
 Strong spanning lines
@@ -255,15 +255,15 @@ second line* tail
   (markup_file
     (strong
       (text
-        (identifier))
+        (text_word))
       (text
-        (identifier))
+        (text_word))
       (text
-        (identifier))
+        (text_word))
       (text
-        (identifier)))
+        (text_word)))
     (text
-      (identifier))))
+      (text_word))))
 
 ==================
 Wikilinks
@@ -276,21 +276,21 @@ See [[vault::guide]] and [[vault::guide#intro]] and [[dep::pkg::mod#item]] here.
 (source_file
   (markup_file
     (text
-      (identifier))
+      (text_word))
     (wikilink
       module: (wikilink_module))
     (text
-      (identifier))
+      (text_word))
     (wikilink
       module: (wikilink_module)
       item: (wikilink_item))
     (text
-      (identifier))
+      (text_word))
     (wikilink
       module: (wikilink_module)
       item: (wikilink_item))
     (text
-      (identifier))
+      (text_word))
     (text)))
 
 ==================
@@ -305,24 +305,24 @@ Escapes
   (markup_file
     (escape)
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (escape)
     (text
-      (identifier))
+      (text_word))
     (escape)
     (text
-      (identifier))
+      (text_word))
     (escape)
     (text
-      (identifier))
+      (text_word))
     (escape)
     (text
-      (identifier))
+      (text_word))
     (escape)
     (text
-      (identifier))))
+      (text_word))))
 
 ==================
 Interpolation of a name
@@ -335,19 +335,19 @@ Value: #count and #module::path end
 (source_file
   (markup_file
     (text
-      (identifier))
+      (text_word))
     (text)
     (interpolation
       expression: (qualified_name
         (identifier)))
     (text
-      (identifier))
+      (text_word))
     (interpolation
       expression: (qualified_name
         (identifier)
         (identifier)))
     (text
-      (identifier))))
+      (text_word))))
 
 ==================
 Adjacent interpolation call
@@ -366,7 +366,7 @@ Adjacent interpolation call
         (expression
           (string))))
     (text
-      (identifier))
+      (text_word))
     (interpolation
       expression: (interpolation_call
         function: (qualified_name
@@ -389,12 +389,12 @@ Spaced call falls back to text
         (identifier)))
     (text)
     (text
-      (identifier))
+      (text_word))
     (text)
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))))
+      (text_word))))
 
 ==================
 Interpolation field and trailing content
@@ -412,16 +412,16 @@ Interpolation field and trailing content
           (identifier))
         field: (identifier)))
     (text
-      (identifier))
+      (text_word))
     (interpolation
       expression: (interpolation_content
         function: (qualified_name
           (identifier))
         (strong
           (text
-            (identifier)))))
+            (text_word)))))
     (text
-      (identifier))))
+      (text_word))))
 
 ==================
 Interpolation parenthesized expression
@@ -442,7 +442,7 @@ Interpolation parenthesized expression
             right: (expression
               (integer))))))
     (text
-      (identifier))
+      (text_word))
     (interpolation
       expression: (parenthesized_expression
         (expression
@@ -452,7 +452,7 @@ Interpolation parenthesized expression
             right: (expression
               (integer))))))
     (text
-      (identifier))))
+      (text_word))))
 
 ==================
 Declarations in markup
@@ -481,9 +481,9 @@ body text #x
       (declaration_wasm
         path: (string)))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (interpolation
       expression: (qualified_name
         (identifier)))))
@@ -502,17 +502,17 @@ body] after
   (markup_file
     (bracketed_text
       (text
-        (identifier))
+        (text_word))
       (section
         (heading_marker)
         title: (title
           (text
-            (identifier)))
+            (text_word)))
         body: (section_body
           (text
-            (identifier)))))
+            (text_word)))))
     (text
-      (identifier))))
+      (text_word))))
 
 ==================
 Slash slash is markup text
@@ -525,7 +525,7 @@ see // note and https://example.com path
 (source_file
   (markup_file
     (text
-      (identifier))
+      (text_word))
     (comment)))
 
 ==================
@@ -543,420 +543,13 @@ body under empty title
       (heading_marker)
       body: (section_body
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))
+          (text_word))
         (text
-          (identifier))))))
-
-==================
-Code file with let statements
-==================
-
-let x = 1;
-let name = "notist";
-let flag = true;
-let nothing = none;
-
----
-
-(source_file
-  (code_file
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (integer)))
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (string)))
-    (let_statement
-      name: (identifier)
-      value: (expression))
-    (let_statement
-      name: (identifier)
-      value: (expression))))
-
-==================
-Code file with a lambda and calls
-==================
-
-let heading = (title: String, level: Int = 2) => item("heading", (level: level, body: [text here]));
-heading(title: "Intro")[body];
-
----
-
-(source_file
-  (code_file
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (lambda
-          parameters: (parameters
-            (parameter
-              name: (identifier)
-              type: (type
-                name: (identifier)))
-            (parameter
-              name: (identifier)
-              type: (type
-                name: (identifier))
-              default: (expression
-                (integer))))
-          body: (expression
-            (call_expression
-              function: (qualified_name
-                (identifier))
-              arguments: (arguments
-                (expression
-                  (string))
-                (expression
-                  (dict_literal
-                    (dict_entry
-                      key: (identifier)
-                      value: (expression
-                        (qualified_name
-                          (identifier))))
-                    (dict_entry
-                      key: (identifier)
-                      value: (expression
-                        (content_block
-                          (text
-                            (identifier))
-                          (text
-                            (identifier)))))))))))))
-    (expression_statement
-      value: (expression
-        (call_expression
-          function: (call_expression
-            function: (qualified_name
-              (identifier))
-            arguments: (arguments
-              (named_argument
-                name: (identifier)
-                value: (expression
-                  (string)))))
-          content: (content_block
-            (text
-              (identifier))))))))
-
-==================
-Code file with an item target
-==================
-
-use vault::guide;
-guide::"intro";
-
----
-
-(source_file
-  (code_file
-    (use_statement
-      (identifier)
-      (use_leaf
-        (identifier)))
-    (expression_statement
-      value: (expression
-        (item_target
-          module: (qualified_name
-            (identifier))
-          item: (string))))))
-
-==================
-Use forms
-==================
-
-use vault::helpers::{self as helpers, format};
-use theme::colors::*;
-use super::shared::value as shared;
-
----
-
-(source_file
-  (code_file
-    (use_statement
-      (identifier)
-      (identifier)
-      (use_group
-        (use_leaf
-          (identifier)
-          alias: (identifier))
-        (use_leaf
-          (identifier))))
-    (use_statement
-      (identifier)
-      (identifier)
-      (use_glob))
-    (use_statement
-      (identifier)
-      (identifier)
-      (use_leaf
-        (identifier)
-        alias: (identifier)))))
-
-==================
-Wasm statement
-==================
-
-wasm "../wasm/semantic.wasm";
-
----
-
-(source_file
-  (code_file
-    (wasm_statement
-      path: (string))))
-
-==================
-Call with named arguments and trailing content
-==================
-
-panel(title: "x", level: 2)[#text("body")];
-
----
-
-(source_file
-  (code_file
-    (expression_statement
-      value: (expression
-        (call_expression
-          function: (call_expression
-            function: (qualified_name
-              (identifier))
-            arguments: (arguments
-              (named_argument
-                name: (identifier)
-                value: (expression
-                  (string)))
-              (named_argument
-                name: (identifier)
-                value: (expression
-                  (integer)))))
-          content: (content_block
-            (interpolation
-              expression: (interpolation_call
-                function: (qualified_name
-                  (identifier))
-                (expression
-                  (string))))))))))
-
-==================
-If expression
-==================
-
-let label = if x == 0 { "zero" } else { "many" };
-
----
-
-(source_file
-  (code_file
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (if_expression
-          condition: (expression
-            (binary_expression
-              left: (expression
-                (qualified_name
-                  (identifier)))
-              right: (expression
-                (integer))))
-          consequence: (expression
-            (string))
-          alternative: (expression
-            (string)))))))
-
-==================
-Binary precedence
-==================
-
-let a = 1 + 2 * 3;
-let b = (1 + 2) * 3;
-let c = a == b;
-
----
-
-(source_file
-  (code_file
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (binary_expression
-          left: (expression
-            (integer))
-          right: (expression
-            (binary_expression
-              left: (expression
-                (integer))
-              right: (expression
-                (integer)))))))
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (binary_expression
-          left: (expression
-            (parenthesized_expression
-              (expression
-                (binary_expression
-                  left: (expression
-                    (integer))
-                  right: (expression
-                    (integer))))))
-          right: (expression
-            (integer)))))
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (binary_expression
-          left: (expression
-            (qualified_name
-              (identifier)))
-          right: (expression
-            (qualified_name
-              (identifier))))))))
-
-==================
-Unary minus
-==================
-
-let n = -5;
-let m = -n * 2;
-
----
-
-(source_file
-  (code_file
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (unary_expression
-          operand: (expression
-            (integer)))))
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (binary_expression
-          left: (expression
-            (unary_expression
-              operand: (expression
-                (qualified_name
-                  (identifier)))))
-          right: (expression
-            (integer)))))))
-
-==================
-Collections
-==================
-
-let empty_list = ();
-let empty_dict = (:);
-let one = (1,);
-let pair = (1, 2);
-let dict = (key: "v", "str key": 2);
-
----
-
-(source_file
-  (code_file
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (empty_list)))
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (empty_dict)))
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (list_literal
-          (expression
-            (integer)))))
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (list_literal
-          (expression
-            (integer))
-          (expression
-            (integer)))))
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (dict_literal
-          (dict_entry
-            key: (identifier)
-            value: (expression
-              (string)))
-          (dict_entry
-            key: (string)
-            value: (expression
-              (integer))))))))
-
-==================
-Field access chains
-==================
-
-value.args.body;
-item("x").name;
-
----
-
-(source_file
-  (code_file
-    (expression_statement
-      value: (expression
-        (field_access
-          object: (field_access
-            object: (qualified_name
-              (identifier))
-            field: (identifier))
-          field: (identifier))))
-    (expression_statement
-      value: (expression
-        (field_access
-          object: (call_expression
-            function: (qualified_name
-              (identifier))
-            arguments: (arguments
-              (expression
-                (string))))
-          field: (identifier))))))
-
-==================
-Comments in code
-==================
-
-// leading comment
-let x = 1; // trailing comment
-
----
-
-(source_file
-  (code_file
-    (comment)
-    (let_statement
-      (identifier)
-      (expression
-        (integer))))
-  (comment))
-
-==================
-String escapes
-==================
-
-let s = "quote \" backslash \\ newline \n done";
-
----
-
-(source_file
-  (code_file
-    (let_statement
-      name: (identifier)
-      value: (expression
-        (string)))))
+          (text_word))))))
 
 ==================
 Prose starting with let stays markup
@@ -969,48 +562,19 @@ and more prose
 
 (source_file
   (markup_file
-    (text)
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))))
-
-==================
-Integer-led file is code
-==================
-
-42;
-
----
-
-(source_file
-  (code_file
-    (expression_statement
-      value: (expression
-        (integer)))))
-
-==================
-Content-led file is code
-==================
-
-[hello];
-
----
-
-(source_file
-  (code_file
-    (expression_statement
-      value: (expression
-        (content_block
-          (text
-            (identifier)))))))
+      (text_word))
+    (text
+      (text_word))))

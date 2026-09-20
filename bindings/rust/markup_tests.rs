@@ -1,9 +1,81 @@
+use tree_sitter::StreamingIterator;
 use tree_sitter::{InputEdit, Node, Parser, Point, Tree};
 
 fn parser() -> Parser {
     let mut parser = Parser::new();
     parser.set_language(&crate::LANGUAGE.into()).unwrap();
     parser
+}
+
+#[test]
+fn file_kind_is_fixed_even_when_prose_is_valid_code() {
+    let source = "let x = true; use helpers::{a, b}; wasm \"plugin.wasm\"; f(1 + 2);";
+    let markup = parser().parse(source, None).unwrap();
+    assert!(
+        !markup.root_node().has_error(),
+        "{}",
+        markup.root_node().to_sexp()
+    );
+    assert_eq!(text_of(&markup, source, "markup_file").len(), 1);
+    assert!(text_of(&markup, source, "let_statement").is_empty());
+
+    let query = tree_sitter::Query::new(&crate::LANGUAGE.into(), crate::HIGHLIGHTS_QUERY).unwrap();
+    let mut cursor = tree_sitter::QueryCursor::new();
+    let mut captures = cursor.captures(&query, markup.root_node(), source.as_bytes());
+    assert!(
+        captures.next().is_none(),
+        "plain prose must not receive code highlighting"
+    );
+
+    let mut code = Parser::new();
+    code.set_language(&crate::CODE_LANGUAGE.into()).unwrap();
+    let tree = code.parse(source, None).unwrap();
+    assert!(
+        !tree.root_node().has_error(),
+        "{}",
+        tree.root_node().to_sexp()
+    );
+    assert_eq!(text_of(&tree, source, "let_statement").len(), 1);
+
+    for source in [
+        "f(1);",
+        "a::\"item\";",
+        "\"string\";",
+        "(1 + 2);",
+        "[let x = 1; #x];",
+    ] {
+        let tree = code.parse(source, None).unwrap();
+        assert!(
+            !tree.root_node().has_error(),
+            "{source}: {}",
+            tree.root_node().to_sexp()
+        );
+        assert_eq!(text_of(&tree, source, "code_file").len(), 1);
+    }
+    assert!(
+        code.parse("Ordinary prose.", None)
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+}
+
+#[test]
+fn markup_interpolation_and_code_content_keep_their_modes() {
+    let source = "let plain = true; #let real: Int = 1; #real";
+    let tree = parser().parse(source, None).unwrap();
+    assert!(!tree.root_node().has_error());
+    assert_eq!(
+        text_of(&tree, source, "declaration_let"),
+        ["let real: Int = 1;"]
+    );
+    let mut code = Parser::new();
+    code.set_language(&crate::CODE_LANGUAGE.into()).unwrap();
+    let source = "let body = [let plain = true; #let real = 1; #real];";
+    let tree = code.parse(source, None).unwrap();
+    assert!(!tree.root_node().has_error());
+    assert_eq!(text_of(&tree, source, "let_statement").len(), 1);
+    assert_eq!(text_of(&tree, source, "declaration_let"), ["let real = 1;"]);
 }
 
 fn nodes<'a>(node: Node<'a>, kind: &str, out: &mut Vec<Node<'a>>) {
@@ -51,13 +123,17 @@ fn markup_boundaries_preserve_opaque_regions() {
 
 #[test]
 fn markup_does_not_capture_code_strings_or_operators() {
+    let mut code_parser = Parser::new();
+    code_parser
+        .set_language(&crate::CODE_LANGUAGE.into())
+        .unwrap();
     for source in [
         "let x = \"` $ @ /*\"; x;",
         "// leading\nlet x = 6 / 2; // trailing\n",
         "let x = [@!(lang: \"en\") $x$ `code`]; x;",
         "let f = (x: Int) => x + 1; f(2);",
     ] {
-        let tree = parser().parse(source, None).unwrap();
+        let tree = code_parser.parse(source, None).unwrap();
         assert!(
             !tree.root_node().has_error(),
             "{source}: {}",

@@ -36,7 +36,7 @@ Body
       (heading_marker)
       (title
         (text
-          (identifier)))
+          (text_word)))
       (section_body
         (annotation
           (dict_literal
@@ -44,7 +44,7 @@ Body
               (identifier)
               (expression))))
         (text
-          (identifier))))))
+          (text_word))))))
 
 ==================
 Opaque raw fences and empty raw
@@ -67,7 +67,7 @@ After
     (raw)
     (raw)
     (text
-      (identifier))))
+      (text_word))))
 
 ==================
 Opaque inline and block math
@@ -82,18 +82,18 @@ After
 (source_file
   (markup_file
     (text
-      (identifier))
+      (text_word))
     (math)
     (text
-      (identifier))
+      (text_word))
     (math)
     (text
-      (identifier))
+      (text_word))
     (math)
     (text)
     (math)
     (text
-      (identifier))))
+      (text_word))))
 
 ==================
 Markup comments nest and stop before following text
@@ -105,11 +105,11 @@ Before // hidden @! #error("no")
 (source_file
   (markup_file
     (text
-      (identifier))
+      (text_word))
     (comment)
     (comment)
     (text
-      (identifier))))
+      (text_word))))
 
 ==================
 Lists and automatic links
@@ -126,27 +126,27 @@ Text https://example.com/path and http://example.com.
   (markup_file
     (list_marker)
     (text
-      (identifier))
+      (text_word))
     (list_marker)
     (text
-      (identifier))
+      (text_word))
     (list_marker)
     (text
-      (identifier))
+      (text_word))
     (list_marker)
     (text
-      (identifier))
+      (text_word))
     (list_marker)
     (text
-      (identifier))
+      (text_word))
     (text)
     (text
-      (identifier))
+      (text_word))
     (text
-      (identifier))
+      (text_word))
     (autolink)
     (text
-      (identifier))
+      (text_word))
     (autolink)
     (text)))
 
@@ -160,15 +160,15 @@ Text [outer [inner]] and [[vault::guide#intro]].
 (source_file
   (markup_file
     (text
-      (identifier))
+      (text_word))
     (bracketed_text
       (text
-        (identifier))
+        (text_word))
       (bracketed_text
         (text
-          (identifier))))
+          (text_word))))
     (text
-      (identifier))
+      (text_word))
     (wikilink
       (wikilink_module)
       (wikilink_item))
@@ -181,7 +181,7 @@ Text [outer [inner]] and [[vault::guide#intro]].
           (expression
             (string)))
         (text
-          (identifier))
+          (text_word))
         (bracketed_text
           (text
-            (identifier)))))))
+            (text_word)))))))
