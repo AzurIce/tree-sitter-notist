@@ -78,6 +78,60 @@ fn markup_interpolation_and_code_content_keep_their_modes() {
     assert_eq!(text_of(&tree, source, "declaration_let"), ["let real = 1;"]);
 }
 
+#[test]
+fn label_paths_keep_quoted_segments_and_markup_delimiters() {
+    let source = r#"[[vault::guide::"安装"::"例子 ]] 和 \"引号\""]]"#;
+    let tree = parser().parse(source, None).unwrap();
+    assert!(!tree.root_node().has_error(), "{}", tree.root_node().to_sexp());
+    assert_eq!(text_of(&tree, source, "wikilink"), [source]);
+    assert_eq!(text_of(&tree, source, "wikilink_module"), ["vault::guide"]);
+    assert_eq!(
+        text_of(&tree, source, "string"),
+        [r#""安装""#, r#""例子 ]] 和 \"引号\"""#]
+    );
+
+    let mut code = Parser::new();
+    code.set_language(&crate::CODE_LANGUAGE.into()).unwrap();
+    let source = r#"vault::guide::"安装"::"例子";"#;
+    let tree = code.parse(source, None).unwrap();
+    assert!(!tree.root_node().has_error(), "{}", tree.root_node().to_sexp());
+    assert_eq!(text_of(&tree, source, "item_target"), [source.trim_end_matches(';')]);
+    assert_eq!(text_of(&tree, source, "string"), [r#""安装""#, r#""例子""#]);
+}
+
+#[test]
+fn labels_cannot_be_followed_by_unquoted_module_segments() {
+    let mut code = Parser::new();
+    code.set_language(&crate::CODE_LANGUAGE.into()).unwrap();
+    for source in [r#"guide::"Intro"::child;"#, r#"guide::"Intro"::;"#, r#"guide::"";"#] {
+        assert!(code.parse(source, None).unwrap().root_node().has_error(), "{source}");
+    }
+}
+
+#[test]
+fn standalone_annotations_before_headings_keep_their_source_and_kind() {
+    let source = concat!(
+        "= First\nBody\n",
+        "@(label: \"Second\")\n/* between annotation and heading */\n\n",
+        "= Second\n== Child\nBody\n",
+        "@!(scope: \"child\")\n@(label: \"Third\")\n",
+        "= Third\n",
+    );
+    let tree = parser().parse(source, None).unwrap();
+    assert!(!tree.root_node().has_error(), "{}", tree.root_node().to_sexp());
+    assert_eq!(text_of(&tree, source, "section").len(), 4);
+    assert_eq!(
+        text_of(&tree, source, "annotation"),
+        [
+            "@(label: \"Second\")",
+            "@!(scope: \"child\")",
+            "@(label: \"Third\")",
+        ]
+    );
+    assert_eq!(text_of(&tree, source, "title"), ["First", "Second", "Child", "Third"]);
+    assert_eq!(text_of(&tree, source, "comment"), ["/* between annotation and heading */"]);
+}
+
 fn nodes<'a>(node: Node<'a>, kind: &str, out: &mut Vec<Node<'a>>) {
     if node.kind() == kind {
         out.push(node);
@@ -98,7 +152,7 @@ fn text_of(tree: &Tree, source: &str, kind: &str) -> Vec<String> {
 
 #[test]
 fn markup_boundaries_preserve_opaque_regions() {
-    let source = "@!(lang: \"en\") @(id: \"intro\")\n= Title\n`@! #bad $` $\"$\" + x$\n/* outer /* nested */ end */\nLine\\\nNext \\u{1f600}\n- One\n  + Two\nText [ordinary] https://example.com/a_(b).\n";
+    let source = "@!(lang: \"en\") @(label: \"intro\")\n= Title\n`@! #bad $` $\"$\" + x$\n/* outer /* nested */ end */\nLine\\\nNext \\u{1f600}\n- One\n  + Two\nText [ordinary] https://example.com/a_(b).\n";
     let tree = parser().parse(source, None).unwrap();
     assert!(
         !tree.root_node().has_error(),

@@ -1179,15 +1179,23 @@
           }
         },
         {
-          "type": "STRING",
-          "value": "::"
-        },
-        {
-          "type": "FIELD",
-          "name": "item",
+          "type": "REPEAT1",
           "content": {
-            "type": "SYMBOL",
-            "name": "string"
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "::"
+              },
+              {
+                "type": "FIELD",
+                "name": "label",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_label_string"
+                }
+              }
+            ]
           }
         }
       ]
@@ -2178,29 +2186,24 @@
           }
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": "#"
-                },
-                {
-                  "type": "FIELD",
-                  "name": "item",
-                  "content": {
-                    "type": "SYMBOL",
-                    "name": "wikilink_item"
-                  }
+          "type": "REPEAT",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "::"
+              },
+              {
+                "type": "FIELD",
+                "name": "label",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_label_string"
                 }
-              ]
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
+              }
+            ]
+          }
         },
         {
           "type": "STRING",
@@ -2209,26 +2212,24 @@
       ]
     },
     "wikilink_module": {
-      "type": "TOKEN",
-      "content": {
-        "type": "PREC",
-        "value": 1,
-        "content": {
-          "type": "PATTERN",
-          "value": "[^#\\]]+"
-        }
-      }
+      "type": "SYMBOL",
+      "name": "qualified_name"
     },
-    "wikilink_item": {
-      "type": "TOKEN",
+    "_label_string": {
+      "type": "ALIAS",
       "content": {
-        "type": "PREC",
-        "value": 1,
+        "type": "TOKEN",
         "content": {
-          "type": "PATTERN",
-          "value": "[^\\]]+"
+          "type": "PREC",
+          "value": 1,
+          "content": {
+            "type": "PATTERN",
+            "value": "\"(\\\\.|[^\"\\\\\\n])+\""
+          }
         }
-      }
+      },
+      "named": true,
+      "value": "string"
     },
     "text": {
       "type": "CHOICE",

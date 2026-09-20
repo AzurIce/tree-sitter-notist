@@ -5,7 +5,7 @@ and `notist_code` parses `.notc` code modules. Both share expression rules
 and the external scanner in this repository.
 
 The grammar tracks the reference parser in
-[`crates/notist-next/src/syntax.rs`](https://github.com/AzurIce/Notist/blob/main/crates/notist-next/src/syntax.rs)
+[`crates/notist-syntax/src/lib.rs`](https://github.com/AzurIce/Notist/blob/main/crates/notist-syntax/src/lib.rs)
 of the main Notist repository.
 
 ## What is covered
@@ -18,7 +18,7 @@ Markup (`.not` — the file parses as one implicit content literal):
   automatic HTTP(S) links, comments, and line-start list markers;
 - styled spans `*strong*` and `_emphasis_`, nestable across each other and
   across lines;
-- wikilinks `[[module::path]]` and `[[module::path#item]]`;
+- wikilinks `[[module::path]]` and `[[module::path::"Parent"::"Child"]]`;
 - escapes `\c`, which yield the escaped character as text;
 - ordinary paired brackets `[text]` in Markup; Code Content literals and
   trailing content arguments remain distinct nodes;
@@ -31,7 +31,7 @@ Code (`.notc`, and the code contexts above):
 
 - `use path::{a, b as c, self, *};`, `wasm "path";`,
   `let name = expr;`, and expression statements, all `;`-terminated;
-- module-qualified names `a::b`, item targets `a::"item-id"`;
+- module-qualified names `a::b`, item targets `a::"Parent"::"Child"`;
 - calls with positional/named arguments and trailing content
   (`f(a, b: 1)[body]`), field access, `if`/`else`, lambdas with typed
   parameters and defaults, unary minus, and the comparison/additive/
@@ -43,7 +43,7 @@ Code (`.notc`, and the code contexts above):
 #use mermaid::diagram;
 = Package graph
 #diagram("graph LR; Source --> Code")
-See [[vault::designs#grammar]] and *[[vault::guide]]*.
+See [[vault::designs::"Grammar"]] and *[[vault::guide]]*.
 ```
 
 ```notc
@@ -51,6 +51,12 @@ use vault::helpers::{self as helpers, format};
 let heading = (title: String, level: Int = 2) => item("heading", (level: level, body: [#text(title)]));
 heading(title: "Intro")[body];
 ```
+
+An Item's `label` defaults to its section title and can be overridden by
+`@(label: "...")`. Label paths end at the target itself; preceding labels
+match ancestors in order and may skip intervening ancestors. Repeated labels
+are legal. Notist's analysis resolves the path and reports missing or
+ambiguous targets; this grammar only describes its source syntax.
 
 ## Parser selection
 
@@ -78,6 +84,10 @@ Editor-level divergences from the reference parser, kept deliberately:
 
 - sections are flat siblings (the level lives on the marker) instead of
   nesting by heading level;
+- standalone Item annotations before a heading retain their lexical source
+  position. A preceding section's Tree-sitter fold range can include them;
+  attachment to the following heading, and the lexical scope of `@!`
+  annotations, are resolved by the Notist frontend;
 - lists expose their source markers; indentation-based Item grouping is
   performed by the Notist frontend, not this highlighting grammar;
 - horizontal whitespace between markup nodes is trivia, so text runs never

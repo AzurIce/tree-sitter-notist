@@ -94,7 +94,7 @@ Code file with an item target
 ==================
 
 use vault::guide;
-guide::"intro";
+guide::"Intro"::"Example";
 
 ---
 
@@ -109,7 +109,8 @@ guide::"intro";
         (item_target
           module: (qualified_name
             (identifier))
-          item: (string))))))
+          label: (string)
+          label: (string))))))
 
 ==================
 Use forms

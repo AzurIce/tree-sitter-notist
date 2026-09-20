@@ -1318,8 +1318,8 @@
     "type": "item_target",
     "named": true,
     "fields": {
-      "item": {
-        "multiple": false,
+      "label": {
+        "multiple": true,
         "required": true,
         "types": [
           {
@@ -1915,12 +1915,12 @@
     "type": "wikilink",
     "named": true,
     "fields": {
-      "item": {
-        "multiple": false,
+      "label": {
+        "multiple": true,
         "required": false,
         "types": [
           {
-            "type": "wikilink_item",
+            "type": "string",
             "named": true
           }
         ]
@@ -1935,6 +1935,21 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "wikilink_module",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "qualified_name",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -2133,14 +2148,6 @@
   {
     "type": "wasm",
     "named": false
-  },
-  {
-    "type": "wikilink_item",
-    "named": true
-  },
-  {
-    "type": "wikilink_module",
-    "named": true
   },
   {
     "type": "{",

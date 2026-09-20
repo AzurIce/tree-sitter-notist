@@ -1,7 +1,7 @@
 /**
  * @file Tree-sitter grammar for Notist: the `.not` markup frontend and the
  * `.notc` code module format, tracking the reference parser in
- * `crates/notist-next/src/syntax.rs` of the Notist repository.
+ * `crates/notist-syntax/src/lib.rs` of the Notist repository.
  *
  * This grammar has a fixed Markup entry point. notist-code/grammar.js
  * inherits the shared rules and selects the Code entry point.
@@ -9,6 +9,9 @@
  * Editor-level divergences from the reference parser, kept deliberately:
  * - sections are flat siblings (level lives on the marker) instead of nested
  *   by heading level, matching common markup grammars;
+ * - section bodies keep preceding annotations in lexical order; attachment
+ *   to the following heading is performed by the Notist frontend, so fold
+ *   ranges may include that heading's leading Item annotations;
  * - sections may not open inside `*`/`_` styled spans (the marker degrades
  *   to text there);
  * - horizontal whitespace between markup nodes is lexed as trivia, so text
@@ -179,7 +182,10 @@ module.exports = grammar({
     empty_dict: _ => seq('(', ':', ')'),
 
     qualified_name: $ => seq($.identifier, repeat(seq('::', $.identifier))),
-    item_target: $ => seq(field('module', $.qualified_name), '::', field('item', $.string)),
+    item_target: $ => seq(
+      field('module', $.qualified_name),
+      repeat1(seq('::', field('label', $._label_string))),
+    ),
 
     _code_postfix_expression: $ =>
       choice($._primary_expression, $.call_expression, $.field_access),
@@ -356,11 +362,11 @@ module.exports = grammar({
     wikilink: $ => seq(
       '[[',
       field('module', $.wikilink_module),
-      optional(seq('#', field('item', $.wikilink_item))),
+      repeat(seq('::', field('label', $._label_string))),
       ']]',
     ),
-    wikilink_module: _ => token(prec(1, /[^#\]]+/)),
-    wikilink_item: _ => token(prec(1, /[^\]]+/)),
+    wikilink_module: $ => $.qualified_name,
+    _label_string: $ => alias(token(prec(1, /"(\\.|[^"\\\n])+"/)), $.string),
 
     // Prose words have their own node, so keyword and number highlighting
     // cannot accidentally apply to code-shaped text in Markup.

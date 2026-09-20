@@ -45,11 +45,12 @@
   "[[" @punctuation.special
   "]]" @punctuation.special)
 (wikilink_module) @module
-(wikilink_item) @label
+(wikilink label: (string) @label)
 
 ; References and targets
 
 (item_target module: (qualified_name) @module)
+(item_target label: (string) @label)
 
 (use_leaf alias: (identifier) @variable)
 (use_glob "*" @punctuation.special)

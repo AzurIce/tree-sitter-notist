@@ -269,7 +269,7 @@ second line* tail
 Wikilinks
 ==================
 
-See [[vault::guide]] and [[vault::guide#intro]] and [[dep::pkg::mod#item]] here.
+See [[vault::guide]] and [[vault::guide::"Intro"::"Example"]] and [[dep::pkg::mod::"Item"]] here.
 
 ---
 
@@ -278,17 +278,28 @@ See [[vault::guide]] and [[vault::guide#intro]] and [[dep::pkg::mod#item]] here.
     (text
       (text_word))
     (wikilink
-      module: (wikilink_module))
+      module: (wikilink_module
+        (qualified_name
+          (identifier)
+          (identifier))))
     (text
       (text_word))
     (wikilink
-      module: (wikilink_module)
-      item: (wikilink_item))
+      module: (wikilink_module
+        (qualified_name
+          (identifier)
+          (identifier)))
+      label: (string)
+      label: (string))
     (text
       (text_word))
     (wikilink
-      module: (wikilink_module)
-      item: (wikilink_item))
+      module: (wikilink_module
+        (qualified_name
+          (identifier)
+          (identifier)
+          (identifier)))
+      label: (string))
     (text
       (text_word))
     (text)))

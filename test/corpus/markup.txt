@@ -1,7 +1,7 @@
 ==================
 Repeated Item and Module annotations
 ==================
-@!(lang: "en") @(id: "intro") @make(priority: 2) @data
+@!(lang: "en") @(label: "intro") @make(priority: 2) @data
 = Title
 @!(draft: true)
 Body
@@ -153,7 +153,7 @@ Text https://example.com/path and http://example.com.
 ==================
 Ordinary brackets and Code Content remain distinct
 ==================
-Text [outer [inner]] and [[vault::guide#intro]].
+Text [outer [inner]] and [[vault::guide::"Intro"::"Example"]].
 #text("ok")[trailing [literal]]
 ---
 
@@ -170,8 +170,12 @@ Text [outer [inner]] and [[vault::guide#intro]].
     (text
       (text_word))
     (wikilink
-      (wikilink_module)
-      (wikilink_item))
+      (wikilink_module
+        (qualified_name
+          (identifier)
+          (identifier)))
+      (string)
+      (string))
     (text)
     (interpolation
       (interpolation_content
