@@ -3,7 +3,7 @@ Typed bindings and lambda returns in code
 ==================
 
 let count: Int = 1;
-let maybe: String? = none;
+let maybe: String? = ();
 let render = (value: Int = 1) -> String => "value";
 let empty = () -> Content => [body];
 
@@ -21,7 +21,8 @@ let empty = () -> Content => [body];
       (identifier)
       (type
         (identifier))
-      (expression))
+      (expression
+        (unit_literal)))
     (let_statement
       (identifier)
       (expression

@@ -168,17 +168,19 @@ module.exports = grammar({
     type: $ => seq(field('name', $.identifier), optional('?')),
 
     // Parenthesized groups: `(e)` keeps the expression, `(a, b)` and `(a,)`
-    // are lists, `(k: v)` dicts, with `()` and `(:)` as the empty forms and
-    // `(params) => e` the lambda. GLR separates them on the next token.
+    // are lists, `(k: v)` dicts, with `()` for Unit, `(,)` for an empty list,
+    // and `(:)` for an empty dict. `(params) => e` is a lambda.
+    // GLR separates them on the next token.
     parenthesized_expression: $ => seq('(', $.expression, ')'),
-    list_literal: $ => seq('(', commaSep1($.expression), optional(','), ')'),
+    list_literal: $ => seq('(', $.expression, ',', optional(seq(commaSep1($.expression), optional(','))), ')'),
     dict_literal: $ => seq('(', commaSep1($.dict_entry), optional(','), ')'),
     dict_entry: $ => seq(
       field('key', choice($.identifier, $.string)),
       ':',
       field('value', $.expression),
     ),
-    empty_list: _ => seq('(', ')'),
+    unit_literal: _ => seq('(', ')'),
+    empty_list: _ => seq('(', ',', ')'),
     empty_dict: _ => seq('(', ':', ')'),
 
     qualified_name: $ => seq($.identifier, repeat(seq('::', $.identifier))),
@@ -227,7 +229,6 @@ module.exports = grammar({
       $.integer,
       'true',
       'false',
-      'none',
       $.content_block,
       $.if_expression,
       $.unary_expression,
@@ -235,6 +236,7 @@ module.exports = grammar({
       $.parenthesized_expression,
       $.list_literal,
       $.dict_literal,
+      $.unit_literal,
       $.empty_list,
       $.empty_dict,
     ),

@@ -5,7 +5,7 @@ Code file with let statements
 let x = 1;
 let name = "notist";
 let flag = true;
-let nothing = none;
+let nothing = ();
 
 ---
 
@@ -24,7 +24,8 @@ let nothing = none;
       value: (expression))
     (let_statement
       name: (identifier)
-      value: (expression))))
+      value: (expression
+        (unit_literal)))))
 
 ==================
 Code file with a lambda and calls
@@ -298,8 +299,10 @@ let m = -n * 2;
 Collections
 ==================
 
-let empty_list = ();
+let unit = ();
+let empty_list = (,);
 let empty_dict = (:);
+let grouped = (1);
 let one = (1,);
 let pair = (1, 2);
 let dict = (key: "v", "str key": 2);
@@ -311,11 +314,21 @@ let dict = (key: "v", "str key": 2);
     (let_statement
       name: (identifier)
       value: (expression
+        (unit_literal)))
+    (let_statement
+      name: (identifier)
+      value: (expression
         (empty_list)))
     (let_statement
       name: (identifier)
       value: (expression
         (empty_dict)))
+    (let_statement
+      name: (identifier)
+      value: (expression
+        (parenthesized_expression
+          (expression
+            (integer)))))
     (let_statement
       name: (identifier)
       value: (expression

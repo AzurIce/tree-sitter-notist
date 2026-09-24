@@ -12,7 +12,8 @@
 (annotation "@" @punctuation.special)
 (annotation "!" @punctuation.special)
 
-["true" "false" "none"] @constant.builtin
+["true" "false"] @constant.builtin
+(unit_literal) @constant.builtin
 ["let" "use" "wasm" "as" "if" "else"] @keyword
 
 [

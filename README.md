@@ -36,7 +36,7 @@ Code (`.notc`, and the code contexts above):
   (`f(a, b: 1)[body]`), field access, `if`/`else`, lambdas with typed
   parameters and defaults, unary minus, and the comparison/additive/
   multiplicative operators;
-- list `(a, b)`, dict `(k: v)`, and the empty forms `()` and `(:)`;
+- Unit `()`, grouped expression `(a)`, list `(,)` / `(a,)` / `(a, b)`, and dict `(:)` / `(k: v)`;
 - `//` line comments, nested `/* */` comments, and `"JSON-escaped"` strings.
 
 ```not

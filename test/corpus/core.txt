@@ -216,6 +216,21 @@ Strong and emphasis
       (text_word))))
 
 ==================
+Unit and empty List interpolation
+==================
+
+#() #(,)
+
+---
+
+(source_file
+  (markup_file
+    (interpolation
+      (unit_literal))
+    (interpolation
+      (empty_list))))
+
+==================
 Nested styles
 ==================
 
