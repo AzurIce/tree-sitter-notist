@@ -490,3 +490,23 @@ let body = [
                   (text
                     (text_word))))
               (pipe))))))))
+
+==================
+Code identifiers and markup emphasis in content
+==================
+let _value = [_Hello_ snake_case];
+---
+
+(source_file
+  (code_file
+    (let_statement
+      (identifier)
+      (expression
+        (content_block
+          (emphasis
+            (emphasis_marker)
+            (text
+              (text_word))
+            (emphasis_marker))
+          (text
+            (text_word)))))))

@@ -49,6 +49,7 @@ module.exports = grammar({
     $.table_delimiter_row,
     $.table_row_start,
     $.pipe,
+    $.emphasis_marker,
   ],
 
   word: $ => $.identifier,
@@ -374,7 +375,7 @@ module.exports = grammar({
     table_cell: $ => repeat1($._inline_item),
 
     strong: $ => prec.right(1, seq('*', repeat($._strong_item), '*')),
-    emphasis: $ => prec.right(1, seq('_', repeat($._emphasis_item), '_')),
+    emphasis: $ => prec.right(1, seq($.emphasis_marker, repeat($._emphasis_item), $.emphasis_marker)),
 
     wikilink: $ => seq(
       '[[',
@@ -392,7 +393,10 @@ module.exports = grammar({
       prec.right(1, repeat1($.text_word)),
     ),
 
-    text_word: _ => /[\p{L}\p{N}_]+/,
+    // An underscore can delimit emphasis at a word boundary. Keep interior
+    // underscores in prose words, but leave leading/trailing ones to the
+    // emphasis rule (matching the reference Markup parser).
+    text_word: _ => /[\p{L}\p{N}]+(?:_[\p{L}\p{N}]+)*/,
 
     _chunk: _ => token(/[^\p{L}\p{N}_\s#@\[\]*\\`$]/),
 

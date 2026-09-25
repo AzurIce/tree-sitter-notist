@@ -16,6 +16,8 @@
 //    expression; non-adjacent `(`/`.`/`[` belong to the following text.
 //    The scanner is invoked before the internal lexer and before extras
 //    are skipped, so "adjacent" is simply "the scanner sees the character".
+//  - EMPHASIS_MARKER: a leading `_` must win over a Code identifier token
+//    while parsing Markup, without changing identifiers in Code.
 //
 // No state needs to survive between tokens.
 
@@ -34,6 +36,7 @@ enum TokenType {
   TABLE_DELIMITER_ROW,
   TABLE_ROW_START,
   PIPE,
+  EMPHASIS_MARKER,
 };
 
 void *tree_sitter_notist_external_scanner_create(void) { return NULL; }
@@ -120,6 +123,10 @@ static bool table_start(TSLexer *lexer) {
 }
 
 static bool scan_markup(TSLexer *lexer, const bool *valid, bool line_start) {
+  if (valid[EMPHASIS_MARKER] && lexer->lookahead == '_') {
+    lexer->advance(lexer, false);
+    return emit(lexer, EMPHASIS_MARKER);
+  }
   if (line_start && valid[TABLE_START] && lexer->lookahead == '|' && table_start(lexer)) {
     lexer->result_symbol = TABLE_START;
     return true;

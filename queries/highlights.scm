@@ -44,7 +44,7 @@
 (pipe) @punctuation.delimiter
 
 (strong "*" @punctuation.special) @emphasis.strong
-(emphasis "_" @punctuation.special) @emphasis
+(emphasis (emphasis_marker) @punctuation.special) @emphasis
 
 (wikilink
   "[[" @punctuation.special

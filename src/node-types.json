@@ -577,7 +577,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "annotation",
@@ -593,6 +593,10 @@
         },
         {
           "type": "declaration",
+          "named": true
+        },
+        {
+          "type": "emphasis_marker",
           "named": true
         },
         {
@@ -2152,10 +2156,6 @@
     "named": false
   },
   {
-    "type": "_",
-    "named": false
-  },
-  {
     "type": "as",
     "named": false
   },
@@ -2171,6 +2171,10 @@
   {
     "type": "else",
     "named": false
+  },
+  {
+    "type": "emphasis_marker",
+    "named": true
   },
   {
     "type": "escape",

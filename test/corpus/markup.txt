@@ -253,3 +253,45 @@ Pipe lines without a delimiter stay prose
     (text)
     (text)
     (text)))
+
+==================
+Emphasis closes before links and interior underscores stay prose
+==================
+_Therefore, patterns are valid._
+#link("https://example.com")[AST]; and snake_case remain text.
+---
+
+(source_file
+  (markup_file
+    (emphasis
+      (emphasis_marker)
+      (text
+        (text_word))
+      (text)
+      (text
+        (text_word))
+      (text
+        (text_word))
+      (text
+        (text_word))
+      (text)
+      (emphasis_marker))
+    (interpolation
+      (interpolation_content
+        (interpolation_call
+          (qualified_name
+            (identifier))
+          (expression
+            (string)))
+        (text
+          (text_word))))
+    (text)
+    (text
+      (text_word))
+    (text
+      (text_word))
+    (text
+      (text_word))
+    (text
+      (text_word))
+    (text)))

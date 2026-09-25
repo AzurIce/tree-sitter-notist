@@ -144,8 +144,11 @@ body
             (text_word)))
         (text
           (text_word))
-        (text
-          (text_word)))
+        (emphasis
+          (emphasis_marker)
+          (text
+            (text_word))
+          (emphasis_marker)))
       body: (section_body
         (text
           (text_word))))))
@@ -208,8 +211,11 @@ Strong and emphasis
         (text_word)))
     (text
       (text_word))
-    (text
-      (text_word))
+    (emphasis
+      (emphasis_marker)
+      (text
+        (text_word))
+      (emphasis_marker))
     (text
       (text_word))
     (text
@@ -240,20 +246,26 @@ _outer *inner* both_ and *outer _inner_ too*
 
 (source_file
   (markup_file
-    (text
-      (text_word))
-    (strong
+    (emphasis
+      (emphasis_marker)
       (text
-        (text_word)))
-    (text
-      (text_word))
+        (text_word))
+      (strong
+        (text
+          (text_word)))
+      (text
+        (text_word))
+      (emphasis_marker))
     (text
       (text_word))
     (strong
       (text
         (text_word))
-      (text
-        (text_word))
+      (emphasis
+        (emphasis_marker)
+        (text
+          (text_word))
+        (emphasis_marker))
       (text
         (text_word)))))
 

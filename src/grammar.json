@@ -2286,8 +2286,8 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "STRING",
-            "value": "_"
+            "type": "SYMBOL",
+            "name": "emphasis_marker"
           },
           {
             "type": "REPEAT",
@@ -2297,8 +2297,8 @@
             }
           },
           {
-            "type": "STRING",
-            "value": "_"
+            "type": "SYMBOL",
+            "name": "emphasis_marker"
           }
         ]
       }
@@ -2386,7 +2386,7 @@
     },
     "text_word": {
       "type": "PATTERN",
-      "value": "[\\p{L}\\p{N}_]+"
+      "value": "[\\p{L}\\p{N}]+(?:_[\\p{L}\\p{N}]+)*"
     },
     "_chunk": {
       "type": "TOKEN",
@@ -2542,6 +2542,10 @@
     {
       "type": "SYMBOL",
       "name": "pipe"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "emphasis_marker"
     }
   ],
   "inline": [],
