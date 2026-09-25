@@ -226,3 +226,28 @@ fn incremental_raw_fence_edits_match_fresh_parses() {
         assert_eq!(text_of(&tree, &source, "math").len(), usize::from(insert));
     }
 }
+
+#[test]
+fn table_detection_updates_when_the_delimiter_line_changes() {
+    let mut source = "| A | B |\n| - | - |\n| 1 | 2 |\n".to_owned();
+    let offset = source.find("| - | - |").unwrap() + 2;
+    let mut parser = parser();
+    let mut tree = parser.parse(&source, None).unwrap();
+    assert_eq!(text_of(&tree, &source, "table").len(), 1);
+
+    for (replacement, expected_tables) in [("x", 0), ("-", 1)] {
+        tree.edit(&InputEdit {
+            start_byte: offset,
+            old_end_byte: offset + 1,
+            new_end_byte: offset + 1,
+            start_position: Point::new(1, 2),
+            old_end_position: Point::new(1, 3),
+            new_end_position: Point::new(1, 3),
+        });
+        source.replace_range(offset..offset + 1, replacement);
+        tree = parser.parse(&source, Some(&tree)).unwrap();
+        let fresh = parser.parse(&source, None).unwrap();
+        assert_eq!(tree.root_node().to_sexp(), fresh.root_node().to_sexp());
+        assert_eq!(text_of(&tree, &source, "table").len(), expected_tables);
+    }
+}

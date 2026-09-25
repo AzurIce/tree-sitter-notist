@@ -448,3 +448,45 @@ Content-led file is code
         (content_block
           (text
             (text_word)))))))
+
+==================
+Pipe table inside a Code content literal
+==================
+let body = [
+| Name | Value |
+| :--- | ---: |
+| A\|B | *two* |
+];
+---
+
+(source_file
+  (code_file
+    (let_statement
+      (identifier)
+      (expression
+        (content_block
+          (table
+            (table_start)
+            (table_cell
+              (text
+                (text_word)))
+            (pipe)
+            (table_cell
+              (text
+                (text_word)))
+            (pipe)
+            (table_delimiter_row)
+            (table_row
+              (table_row_start)
+              (table_cell
+                (text
+                  (text_word))
+                (escape)
+                (text
+                  (text_word)))
+              (pipe)
+              (table_cell
+                (strong
+                  (text
+                    (text_word))))
+              (pipe))))))))

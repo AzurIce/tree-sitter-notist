@@ -45,6 +45,10 @@ module.exports = grammar({
     $.comment,
     $.list_marker,
     $.autolink,
+    $.table_start,
+    $.table_delimiter_row,
+    $.table_row_start,
+    $.pipe,
   ],
 
   word: $ => $.identifier,
@@ -256,6 +260,7 @@ module.exports = grammar({
       $.math,
       $.autolink,
       $.list_marker,
+      $.table,
       $.interpolation,
       $.declaration,
     ),
@@ -357,6 +362,16 @@ module.exports = grammar({
 
     title: $ => prec.right(repeat1($._inline_item)),
     section_body: $ => prec.right(repeat1($._markup_item)),
+
+    table: $ => seq(
+      $.table_start,
+      repeat1(seq(optional($.table_cell), $.pipe)),
+      $._line_break,
+      $.table_delimiter_row,
+      repeat($.table_row),
+    ),
+    table_row: $ => prec.right(seq($.table_row_start, repeat1(seq(optional($.table_cell), $.pipe)))),
+    table_cell: $ => repeat1($._inline_item),
 
     strong: $ => prec.right(1, seq('*', repeat($._strong_item), '*')),
     emphasis: $ => prec.right(1, seq('_', repeat($._emphasis_item), '_')),

@@ -38,6 +38,10 @@
 
 (heading_marker) @punctuation.special
 (section title: (title) @title)
+(table_start) @punctuation.delimiter
+(table_row_start) @punctuation.delimiter
+(table_delimiter_row) @punctuation.special
+(pipe) @punctuation.delimiter
 
 (strong "*" @punctuation.special) @emphasis.strong
 (emphasis "_" @punctuation.special) @emphasis

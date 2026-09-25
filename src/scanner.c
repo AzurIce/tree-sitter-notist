@@ -30,6 +30,10 @@ enum TokenType {
   COMMENT,
   LIST_MARKER,
   AUTOLINK,
+  TABLE_START,
+  TABLE_DELIMITER_ROW,
+  TABLE_ROW_START,
+  PIPE,
 };
 
 void *tree_sitter_notist_external_scanner_create(void) { return NULL; }
@@ -73,7 +77,66 @@ static bool emit(TSLexer *lexer, enum TokenType symbol) {
   return true;
 }
 
+static bool table_delimiter_row(TSLexer *lexer, bool mark_end) {
+  if (lexer->lookahead != '|') return false;
+  lexer->advance(lexer, false);
+  unsigned columns = 0;
+  for (;;) {
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') lexer->advance(lexer, false);
+    if (lexer->lookahead == ':') lexer->advance(lexer, false);
+    unsigned dashes = 0;
+    while (lexer->lookahead == '-') { lexer->advance(lexer, false); dashes++; }
+    if (!dashes) return false;
+    if (lexer->lookahead == ':') lexer->advance(lexer, false);
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') lexer->advance(lexer, false);
+    if (lexer->lookahead != '|') return false;
+    lexer->advance(lexer, false);
+    if (mark_end) lexer->mark_end(lexer);
+    columns++;
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') lexer->advance(lexer, false);
+    if (lexer->eof(lexer) || lexer->lookahead == '\r' || lexer->lookahead == '\n') {
+      return columns > 0;
+    }
+  }
+}
+
+static bool table_start(TSLexer *lexer) {
+  if (lexer->lookahead != '|') return false;
+  lexer->advance(lexer, false);
+  lexer->mark_end(lexer);
+  bool escaped = false, trailing_pipe = false;
+  while (!lexer->eof(lexer) && lexer->lookahead != '\n') {
+    int32_t c = lexer->lookahead;
+    lexer->advance(lexer, false);
+    if (c == '\\' && !escaped) { escaped = true; trailing_pipe = false; continue; }
+    if (c == '|' && !escaped) trailing_pipe = true;
+    else if (c != ' ' && c != '\t' && c != '\r') trailing_pipe = false;
+    escaped = false;
+  }
+  if (!trailing_pipe || lexer->eof(lexer)) return false;
+  lexer->advance(lexer, false);
+  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') lexer->advance(lexer, false);
+  return table_delimiter_row(lexer, false);
+}
+
 static bool scan_markup(TSLexer *lexer, const bool *valid, bool line_start) {
+  if (line_start && valid[TABLE_START] && lexer->lookahead == '|' && table_start(lexer)) {
+    lexer->result_symbol = TABLE_START;
+    return true;
+  }
+  if (valid[TABLE_DELIMITER_ROW] && lexer->lookahead == '|' &&
+      table_delimiter_row(lexer, true)) {
+    lexer->result_symbol = TABLE_DELIMITER_ROW;
+    return true;
+  }
+  if (line_start && valid[TABLE_ROW_START] && lexer->lookahead == '|') {
+    lexer->advance(lexer, false);
+    return emit(lexer, TABLE_ROW_START);
+  }
+  if (valid[PIPE] && lexer->lookahead == '|') {
+    lexer->advance(lexer, false);
+    return emit(lexer, PIPE);
+  }
   if (valid[AUTOLINK] && lexer->lookahead == 'h') {
     const char *prefix = "http";
     while (*prefix) {
@@ -167,6 +230,23 @@ bool tree_sitter_notist_external_scanner_scan(
     const bool *valid_symbols
 ) {
   (void)payload;
+
+  if (valid_symbols[TABLE_ROW_START] && lexer->lookahead == '\n') {
+    lexer->advance(lexer, false);
+    lexer->mark_end(lexer);
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+      lexer->advance(lexer, false);
+    }
+    if (lexer->lookahead == '|') {
+      lexer->advance(lexer, false);
+      return emit(lexer, TABLE_ROW_START);
+    }
+    if (valid_symbols[LINE_BREAK]) {
+      lexer->result_symbol = LINE_BREAK;
+      return true;
+    }
+    return false;
+  }
 
   if (valid_symbols[LINE_BREAK] && lexer->lookahead == '\n') {
     lexer->advance(lexer, false);

@@ -189,3 +189,67 @@ Text [outer [inner]] and [[vault::guide::"Intro"::"Example"]].
         (bracketed_text
           (text
             (text_word)))))))
+
+==================
+Pipe table with alignment and escaped cell pipe
+==================
+| Name | Value |
+| :--- | ---: |
+| A\|B | *two* |
+After
+---
+
+(source_file
+  (markup_file
+    (table
+      (table_start)
+      (table_cell
+        (text
+          (text_word)))
+      (pipe)
+      (table_cell
+        (text
+          (text_word)))
+      (pipe)
+      (table_delimiter_row)
+      (table_row
+        (table_row_start)
+        (table_cell
+          (text
+            (text_word))
+          (escape)
+          (text
+            (text_word)))
+        (pipe)
+        (table_cell
+          (strong
+            (text
+              (text_word))))
+        (pipe)))
+    (text
+      (text_word))))
+
+==================
+Pipe lines without a delimiter stay prose
+==================
+| Name | Value |
+| nope | --- |
+---
+
+(source_file
+  (markup_file
+    (text)
+    (text
+      (text_word))
+    (text)
+    (text
+      (text_word))
+    (text)
+    (text)
+    (text
+      (text_word))
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)))

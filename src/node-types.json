@@ -235,6 +235,10 @@
           "named": true
         },
         {
+          "type": "table",
+          "named": true
+        },
+        {
           "type": "text",
           "named": true
         },
@@ -403,6 +407,10 @@
         },
         {
           "type": "strong",
+          "named": true
+        },
+        {
+          "type": "table",
           "named": true
         },
         {
@@ -1167,6 +1175,10 @@
           "named": true
         },
         {
+          "type": "table",
+          "named": true
+        },
+        {
           "type": "text",
           "named": true
         },
@@ -1409,6 +1421,10 @@
           "named": true
         },
         {
+          "type": "table",
+          "named": true
+        },
+        {
           "type": "text",
           "named": true
         },
@@ -1615,6 +1631,10 @@
           "named": true
         },
         {
+          "type": "table",
+          "named": true
+        },
+        {
           "type": "text",
           "named": true
         },
@@ -1691,6 +1711,119 @@
         },
         {
           "type": "wikilink",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "table",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "pipe",
+          "named": true
+        },
+        {
+          "type": "table_cell",
+          "named": true
+        },
+        {
+          "type": "table_delimiter_row",
+          "named": true
+        },
+        {
+          "type": "table_row",
+          "named": true
+        },
+        {
+          "type": "table_start",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "table_cell",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "autolink",
+          "named": true
+        },
+        {
+          "type": "bracketed_text",
+          "named": true
+        },
+        {
+          "type": "declaration",
+          "named": true
+        },
+        {
+          "type": "emphasis",
+          "named": true
+        },
+        {
+          "type": "escape",
+          "named": true
+        },
+        {
+          "type": "interpolation",
+          "named": true
+        },
+        {
+          "type": "math",
+          "named": true
+        },
+        {
+          "type": "raw",
+          "named": true
+        },
+        {
+          "type": "strong",
+          "named": true
+        },
+        {
+          "type": "text",
+          "named": true
+        },
+        {
+          "type": "wikilink",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "table_row",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "pipe",
+          "named": true
+        },
+        {
+          "type": "table_cell",
+          "named": true
+        },
+        {
+          "type": "table_row_start",
           "named": true
         }
       ]
@@ -2076,11 +2209,27 @@
     "named": true
   },
   {
+    "type": "pipe",
+    "named": true
+  },
+  {
     "type": "raw",
     "named": true
   },
   {
     "type": "string",
+    "named": true
+  },
+  {
+    "type": "table_delimiter_row",
+    "named": true
+  },
+  {
+    "type": "table_row_start",
+    "named": true
+  },
+  {
+    "type": "table_start",
     "named": true
   },
   {
