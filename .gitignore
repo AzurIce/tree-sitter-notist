@@ -1,0 +1,10 @@
+.direnv/
+target/
+*.o
+*.obj
+*.dll
+*.so
+*.dylib
+*.wasm
+build/
+node_modules/

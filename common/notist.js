@@ -1,0 +1,38 @@
+// Shared Notist call headers, annotations and literal syntax.
+module.exports = {
+  _whitespace: _ => /[ \t]+/,
+  _trivia: $ => choice($._whitespace, $._newline),
+  call: $ => prec.right(10, seq(alias($._call_start, '#'), field('name', $.path), choice(
+    seq(optional(field('comptime', $.comptime_arguments)), field('arguments', $.arguments), optional(field('body', $.content_block))),
+    seq(field('comptime', $.comptime_arguments), optional(field('body', $.content_block))),
+    field('body', $.content_block)))),
+  reference: $ => seq(alias($._call_start, '#'), field('name', $.path)),
+  import_declaration: $ => seq(alias($._import_start, '#import'), repeat1($._trivia),
+    field('source', $.string), repeat($._trivia), optional(seq('as', repeat1($._trivia),
+      field('alias', $.identifier), repeat($._trivia))), ';'),
+  content_block: $ => seq(alias($._body_open, '['), repeat($._markup_item), alias($._body_close, ']')),
+  path: $ => prec.right(seq($.identifier, repeat(seq(alias($._path_dot, '.'), $.identifier)))),
+  arguments: $ => seq(alias($._arguments_open, '('), repeat($._trivia), optional(seq(
+     choice($.named_argument, $._expression), repeat(seq(repeat($._trivia), ',',
+       repeat($._trivia), choice($.named_argument, $._expression))),
+    repeat($._trivia), optional(','), repeat($._trivia))), ')'),
+  named_argument: $ => seq(field('name', choice($.identifier, $.string)), ':',
+    repeat($._trivia), field('value', $._expression)),
+  annotation: $ => seq(choice(alias($._annotation_start, '@'), alias($._module_annotation_start, '@!')),
+    field('value', $.dict)),
+  _value: $ => choice($.string, $.boolean, $.number, $.negative_number, $.path,
+    $.unit, $.array, $.dict, $.group),
+  number: _ => /[0-9]+(?:\.[0-9]+)?/,
+  negative_number: $ => prec(9, seq('-', $.number)),
+  unit: $ => seq('(', repeat($._trivia), ')'),
+  group: $ => seq('(', repeat($._trivia), $._value, repeat($._trivia), ')'),
+  array: $ => seq('(', repeat($._trivia), choice(',', seq(
+    $._value, repeat($._trivia), ',', repeat($._trivia),
+    optional(seq($._value, repeat(seq(repeat($._trivia), ',', repeat($._trivia),
+      $._value)), repeat($._trivia), optional(','))))), repeat($._trivia), ')'),
+  dict: $ => seq('(', repeat($._trivia), choice(':', seq($.dict_entry,
+    repeat(seq(repeat($._trivia), ',', repeat($._trivia), $.dict_entry)),
+    repeat($._trivia), optional(','))), repeat($._trivia), ')'),
+  dict_entry: $ => seq(field('key', choice($.identifier, $.string)), ':',
+    repeat($._trivia), field('value', $._value)),
+};

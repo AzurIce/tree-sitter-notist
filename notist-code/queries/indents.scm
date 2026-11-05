@@ -1,0 +1,8 @@
+(parameters "(" @indent ")" @end)
+(array "(" @indent ")" @end)
+(dict "(" @indent ")" @end)
+(children_declaration "[" @indent "]" @end)
+(comptime_parameters "<" @indent ">" @end)
+(block_expression "{" @indent "}" @end)
+(match_expression "{" @indent "}" @end)
+(content_block "[" @indent "]" @end)

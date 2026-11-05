@@ -1,0 +1,390 @@
+==================
+Headings and literal equals
+==================
+= One
+== *Two*
+=x
+
+---
+
+(source_file
+  (heading
+    (heading_marker)
+    (title
+      (text)))
+  (heading
+    (heading_marker)
+    (title
+      (strong
+        (text))))
+  (text)
+  (text))
+
+==================
+Nested styles and soft newline
+==================
+*strong _inner_ ~strike~*
+*soft
+break*
+
+---
+
+(source_file
+  (strong
+    (text)
+    (emphasis
+      (text))
+    (text)
+    (strike
+      (text)))
+  (strong
+    (text)
+    (text)))
+
+==================
+Unmatched punctuation is text
+==================
+#bare #foo. [ordinary] [[unfinished *unmatched `unmatched $unmatched
+
+---
+
+(source_file
+  (reference
+    (path
+      (identifier)))
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text))
+
+==================
+Calls and explicit node children
+==================
+#pkg.foo-bar(title: "Demo", amount: -0.5)[*body*] #node[group]
+
+---
+
+(source_file
+  (call
+    (path
+      (identifier)
+      (identifier))
+    (arguments
+      (named_argument
+        (identifier)
+        (string))
+      (named_argument
+        (identifier)
+        (negative_number
+          (number))))
+    (content_block
+      (strong
+        (text))))
+  (text)
+  (call
+    (path
+      (identifier))
+    (content_block
+      (text))))
+
+==================
+Call adjacency
+==================
+#foo (1) #foo(1) [text] #pkg. name(1)
+
+---
+
+(source_file
+  (reference
+    (path
+      (identifier)))
+  (text)
+  (call
+    (path
+      (identifier))
+    (arguments
+      (number)))
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text))
+
+==================
+Collections
+==================
+#f((), (,), (:), (42), (1,), (1, 2,), (key: true, "quoted": (false,)))
+
+---
+
+(source_file
+  (call
+    (path
+      (identifier))
+    (arguments
+      (unit)
+      (array)
+      (dict)
+      (group
+        (number))
+      (array
+        (number))
+      (array
+        (number)
+        (number))
+      (dict
+        (dict_entry
+          (identifier)
+          (boolean))
+        (dict_entry
+          (string)
+          (array
+            (boolean)))))))
+
+==================
+Annotations
+==================
+@!(title: "Demo")
+@(id: "intro", tags: ("a", "b"))
+= Heading
+@(:)#strong[hi]
+
+---
+
+(source_file
+  (annotation
+    (dict
+      (dict_entry
+        (identifier)
+        (string))))
+  (annotation
+    (dict
+      (dict_entry
+        (identifier)
+        (string))
+      (dict_entry
+        (identifier)
+        (array
+          (string)
+          (string)))))
+  (heading
+    (heading_marker)
+    (title
+      (text)))
+  (annotation
+    (dict))
+  (call
+    (path
+      (identifier))
+    (content_block
+      (text))))
+
+==================
+Four string forms
+==================
+#f("a\n", r##"a "# b"##, """
+multi
+""", r#"""
+raw\n
+"""#)
+
+---
+
+(source_file
+  (call
+    (path
+      (identifier))
+    (arguments
+      (string)
+      (string)
+      (string)
+      (string))))
+
+==================
+Links with titles and embeds
+==================
+[*label*](https://example.com/a_(b) "title") ![alt](img.png)
+
+---
+
+(source_file
+  (link
+    (strong
+      (text))
+    (link_destination))
+  (text)
+  (embed
+    (text)
+    (link_destination)))
+
+==================
+Wikilinks with labels
+==================
+[[page.not]] [[dir/page.not#id|_label_]]
+
+---
+
+(source_file
+  (wikilink
+    (link_target))
+  (text)
+  (wikilink
+    (link_target)
+    (emphasis
+      (text))))
+
+==================
+Raw and math are opaque
+==================
+`#bad() @(:) _` ``contains ` ticks`` $x^2$ $ x^2 $
+
+---
+
+(source_file
+  (raw_inline)
+  (text)
+  (raw_inline)
+  (text)
+  (math)
+  (text)
+  (math))
+
+==================
+Raw fences close with longer runs
+==================
+```rust
+fn main() {}
+```` trailing
+After
+
+---
+
+(source_file
+  (raw_block
+    (raw_fence_start)
+    (raw_content)
+    (raw_fence_end))
+  (text)
+  (text))
+
+==================
+Nested comments and URL exemption
+==================
+https://example.com // line
+/* a /* b */ c */
+
+---
+
+(source_file
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (comment)
+  (comment))
+
+==================
+List markers and divider
+==================
+- A
+  + B
+word - inline
+---
+
+---
+
+(source_file
+  (list_marker)
+  (text)
+  (text)
+  (list_marker)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (divider))
+
+==================
+Table delimiter and rows
+==================
+| A | B |
+| :--- | ---: |
+| x | y |
+
+After
+
+---
+
+(source_file
+  (table
+    (table_header
+      (table_row))
+    (table_delimiter)
+    (table_row))
+  (text)
+  (text))
+
+==================
+Unframed table
+==================
+A | B
+--- | ---
+x | y
+
+---
+
+(source_file
+  (table
+    (table_header
+      (table_row))
+    (table_delimiter)
+    (table_row)))
+
+==================
+Escapes and explicit break
+==================
+\*literal\* \a \
+next
+
+---
+
+(source_file
+  (escape)
+  (text)
+  (escape)
+  (text)
+  (text)
+  (text)
+  (explicit_break)
+  (text)
+  (text))
+
+==================
+Code declarations are prose
+==================
+fn foo()->Content; let x = 1;
+
+---
+
+(source_file
+  (text)
+  (text)
+  (text)
+  (text)
+  (text)
+  (text))

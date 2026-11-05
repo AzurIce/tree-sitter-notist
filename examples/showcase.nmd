@@ -1,0 +1,33 @@
+@!(title: "Markdown frontend")
+# Notist in Markdown
+
+**strong**, *emphasis* and ~~strike~~. `#bad()` stays code.
+[Link](guide.nmd) and <https://example.com>.
+
+> A quote with #badge(label: "Demo")[**Markdown children**].
+
+1. First
+2. Second with #badge(label: r#"tag"#)
+
+@(id: "panel")
+#panel(title: "Demo")[
+## Nested Markdown
+
+- **One**
+- Two with #badge(label: "Nested")[*inline*]
+
+```not
+#not-a-call("inside code")
+```
+]
+
+#code(text: """
+# not a heading
+#bad()
+""")
+
+| A | B |
+| --- | --- |
+| #badge(label: "x") | **value** |
+
+$inline$ and $ block $.

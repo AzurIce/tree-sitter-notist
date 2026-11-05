@@ -1,0 +1,9 @@
+/* declarations with nested /* comments */ */
+fn diagram(source: String, theme: String = "default") -> BlockContent;
+fn panel(title?: String)[children: BlockContent] -> BlockContent;
+fn badges(labels: Array<String>)[children: InlineContent] -> InlineContent;
+fn math<C: Type = InlineContent>(text: String) -> C;
+fn foo-bar(value: Array<Array<Int>> = ((1, 2), (-3,))) -> BlockContent;
+fn scalar(unit: Unit = (), flag: Bool = true, n: Float = -0.5,
+          dict: Dict = ("a": (1,), enabled: false), empty: Array = (,)) -> InlineContent;
+fn 中文(值: String = r##"raw # text"##)->InlineContent;

@@ -1,0 +1,15 @@
+{
+  "name": "tree-sitter-notist",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tree-sitter grammars for Notist native, code and Markdown frontends",
+  "license": "MIT OR Apache-2.0",
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "test": "node scripts/test.mjs",
+    "build:wasm": "tree-sitter build --wasm . && tree-sitter build --wasm notist-code && tree-sitter build --wasm notist-markdown && tree-sitter build --wasm notist-markdown-inline"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "0.26.11"
+  }
+}

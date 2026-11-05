@@ -1,0 +1,83 @@
+{
+  "grammars": [
+    {
+      "name": "notist",
+      "camelcase": "Notist",
+      "scope": "source.notist",
+      "path": ".",
+      "file-types": [
+        "not"
+      ],
+      "injection-regex": "^(not|notist)$",
+      "external-files": [
+        "src/unicode.h"
+      ],
+      "highlights": "queries/highlights.scm"
+    },
+    {
+      "name": "notist_code",
+      "camelcase": "NotistCode",
+      "scope": "source.notist_code",
+      "path": "notist-code",
+      "file-types": [
+        "notc"
+      ],
+      "injection-regex": "^(notc|notist_code)$",
+      "external-files": [
+        "src/scanner.c",
+        "src/unicode.h"
+      ],
+      "highlights": "notist-code/queries/highlights.scm"
+    },
+    {
+      "name": "notist_markdown",
+      "camelcase": "NotistMarkdown",
+      "scope": "text.notist_markdown",
+      "path": "notist-markdown",
+      "file-types": [
+        "nmd",
+        "notmd"
+      ],
+      "injection-regex": "^(nmd|notmd|notist_markdown)$",
+      "highlights": "notist-markdown/queries/highlights.scm",
+      "injections": "notist-markdown/queries/injections.scm",
+      "external-files": [
+        "src/scanner.c",
+        "src/unicode.h",
+        "common/markdown-scanner.h",
+        "vendor/tree-sitter-markdown/tree-sitter-markdown/src/scanner.c"
+      ]
+    },
+    {
+      "name": "notist_markdown_inline",
+      "camelcase": "NotistMarkdownInline",
+      "scope": "text.notist_markdown_inline",
+      "path": "notist-markdown-inline",
+      "injection-regex": "^notist_markdown_inline$",
+      "highlights": "notist-markdown-inline/queries/highlights.scm",
+      "injections": "notist-markdown-inline/queries/injections.scm",
+      "external-files": [
+        "src/scanner.c",
+        "src/unicode.h",
+        "common/markdown-scanner.h",
+        "vendor/tree-sitter-markdown/tree-sitter-markdown-inline/src/scanner.c"
+      ]
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT OR Apache-2.0",
+    "description": "Tree-sitter grammars for Notist native, code and Markdown frontends",
+    "authors": [
+      {
+        "name": "Notist contributors"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/AzurIce/tree-sitter-notist"
+    }
+  },
+  "bindings": {
+    "rust": true
+  }
+}

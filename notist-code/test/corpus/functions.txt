@@ -1,0 +1,124 @@
+==================
+Imports and implemented generic functions
+==================
+import "lib.notc" as lib;
+fn mark<C: Type = InlineContent>[children: C] -> C {
+  if C == InlineContent { [#lib.emph[#children]] } else { [ #children ] }
+}
+
+---
+
+(source_file
+  (module
+    (code_import
+      (string)
+      (identifier))
+    (function_declaration
+      (fn_keyword)
+      (identifier)
+      (comptime_parameters
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))
+          (default_value
+            (path
+              (identifier)))))
+      (children_declaration
+        (type
+          (path
+            (identifier))))
+      (type
+        (path
+          (identifier)))
+      (block_expression
+        (if_expression
+          (binary_expression
+            (path
+              (identifier))
+            (operator)
+            (path
+              (identifier)))
+          (block_expression
+            (content_block
+              (call
+                (path
+                  (identifier)
+                  (identifier))
+                (content_block
+                  (reference
+                    (path
+                      (identifier)))))))
+          (block_expression
+            (content_block
+              (text)
+              (reference
+                (path
+                  (identifier)))
+              (text))))))))
+
+==================
+Bindings, precedence and match
+==================
+fn value(n: Int) -> Int {
+  let x = comptime lib.count<mode: (2 > 1)>(1 + 2 * 3);
+  match n { 0 => x, _ => -n + 2, }
+}
+
+---
+
+(source_file
+  (module
+    (function_declaration
+      (fn_keyword)
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))))
+      (type
+        (path
+          (identifier)))
+      (block_expression
+        (let_binding
+          (identifier)
+          (comptime_expression
+            (invoke_expression
+              (path
+                (identifier)
+                (identifier))
+              (comptime_arguments
+                (named_argument
+                  (identifier)
+                  (group
+                    (binary_expression
+                      (number)
+                      (operator)
+                      (number)))))
+              (arguments
+                (binary_expression
+                  (number)
+                  (operator)
+                  (binary_expression
+                    (number)
+                    (operator)
+                    (number)))))))
+        (match_expression
+          (path
+            (identifier))
+          (match_arm
+            (number)
+            (path
+              (identifier)))
+          (match_arm
+            (path
+              (identifier))
+            (binary_expression
+              (unary_expression
+                (path
+                  (identifier)))
+              (operator)
+              (number))))))))

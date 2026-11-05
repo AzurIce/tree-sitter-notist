@@ -1,0 +1,19 @@
+* text=auto eol=lf
+src/parser.c linguist-generated
+src/grammar.json linguist-generated
+src/node-types.json linguist-generated
+src/tree_sitter/* linguist-generated
+notist-code/src/parser.c linguist-generated
+notist-code/src/grammar.json linguist-generated
+notist-code/src/node-types.json linguist-generated
+notist-code/src/tree_sitter/* linguist-generated
+src/unicode.h linguist-generated
+notist-markdown/src/parser.c linguist-generated
+notist-markdown/src/grammar.json linguist-generated
+notist-markdown/src/node-types.json linguist-generated
+notist-markdown/src/tree_sitter/* linguist-generated
+notist-markdown-inline/src/parser.c linguist-generated
+notist-markdown-inline/src/grammar.json linguist-generated
+notist-markdown-inline/src/node-types.json linguist-generated
+notist-markdown-inline/src/tree_sitter/* linguist-generated
+vendor/** linguist-vendored whitespace=-blank-at-eof

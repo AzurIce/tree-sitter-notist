@@ -1,0 +1,25 @@
+@!(title: "Notist")
+@(id: "intro", tags: ("grammar", "editor"))
+= Notist
+
+*Strong _emphasis_*, ~strike~, `raw`, $x^2$ and $ x^2 $.
+See [the guide](guide.not "Guide") and [[guide.not#syntax|*syntax*]].
+![picture](image.png)
+
+#panel(title: "Demo")[
+== Content
+- First
+  + Nested
+- Second
+#widgets.badge(label: r#"raw"#, count: -1, ratio: 0.5)[hello]
+]
+
+#[anonymous body] #bare remains text. #fn() is a markup call.
+---
+| Name | Value |
+| :--- | ---: |
+| Flag | true |
+
+```rust
+fn main() {}
+```

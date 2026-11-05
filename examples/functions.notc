@@ -1,0 +1,12 @@
+import "lib.notc" as lib;
+
+fn math<C: Type = InlineContent>(text: String) -> C;
+fn mark<C: Type>[children: C] -> C {
+    let n = comptime lib.count(1 + 2 * 3);
+    if C == InlineContent { [#emph[#children]] }
+    else { [ #children ] }
+}
+fn classify(n: Int) -> Int {
+    match n { 0 => 1, _ => -n + 2, }
+}
+fn compare(n: Int) -> Bool { n < 2 && n >= 0 || !false }

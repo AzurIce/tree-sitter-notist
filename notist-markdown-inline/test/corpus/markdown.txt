@@ -1,0 +1,157 @@
+================================================================================
+Calls in emphasis and links
+================================================================================
+
+**#bold()[*inner*]** and [#link()](url)
+--------------------------------------------------------------------------------
+
+(inline
+  (strong_emphasis
+    (emphasis_delimiter)
+    (emphasis_delimiter)
+    (call
+      (path
+        (identifier))
+      (arguments)
+      (content_block
+        (markdown_inline_content)))
+    (emphasis_delimiter)
+    (emphasis_delimiter))
+  (inline_link
+    (link_text
+      (call
+        (path
+          (identifier))
+        (arguments)))
+    (link_destination)))
+
+================================================================================
+Shared literals
+================================================================================
+
+@!(id: "demo") #namespace.call(a: -2, b: (true, (), (:),), c: r#"raw"#)
+--------------------------------------------------------------------------------
+
+(inline
+  (annotation
+    (dict
+      (dict_entry
+        (identifier)
+        (string))))
+  (call
+    (path
+      (identifier)
+      (identifier))
+    (arguments
+      (named_argument
+        (identifier)
+        (negative_number
+          (number)))
+      (named_argument
+        (identifier)
+        (array
+          (boolean)
+          (unit)
+          (dict)))
+      (named_argument
+        (identifier)
+        (string)))))
+
+================================================================================
+Body flanks and explicit node
+================================================================================
+
+#inline()[**bold**] #block()[ *emphasis* ] #node[nested #child()]
+--------------------------------------------------------------------------------
+
+(inline
+  (call
+    (path
+      (identifier))
+    (arguments)
+    (content_block
+      (markdown_inline_content)))
+  (call
+    (path
+      (identifier))
+    (arguments)
+    (content_block
+      (markdown_block_content)))
+  (call
+    (path
+      (identifier))
+    (content_block
+      (markdown_inline_content))))
+
+================================================================================
+Balanced code and math
+================================================================================
+
+#body()[`a ] b` $]$ #nested()]
+--------------------------------------------------------------------------------
+
+(inline
+  (call
+    (path
+      (identifier))
+    (arguments)
+    (content_block
+      (markdown_inline_content))))
+
+================================================================================
+Opaque code spans and math
+================================================================================
+
+`#hidden()` $#hidden()$ $ block $ #visible()
+--------------------------------------------------------------------------------
+
+(inline
+  (code_span
+    (code_span_delimiter)
+    (code_span_delimiter))
+  (math)
+  (math)
+  (call
+    (path
+      (identifier))
+    (arguments)))
+
+================================================================================
+Adjacency and prose fallback
+================================================================================
+
+#name #name (1) #name() [body] #(::) @word
+--------------------------------------------------------------------------------
+
+(inline
+  (reference
+    (path
+      (identifier)))
+  (reference
+    (path
+      (identifier)))
+  (call
+    (path
+      (identifier))
+    (arguments))
+  (shortcut_link
+    (link_text)))
+
+================================================================================
+Multiline header
+================================================================================
+
+#code(text: """
+# fake heading
+#bad()
+""")
+--------------------------------------------------------------------------------
+
+(inline
+  (call
+    (path
+      (identifier))
+    (arguments
+      (named_argument
+        (identifier)
+        (string)))))

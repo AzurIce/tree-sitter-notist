@@ -1,0 +1,11 @@
+# Markdown 调用
+
+@(id: "intro")
+#panel()[
+## Nested heading
+
+- 一个 **Markdown** 项目
+- #badge(text: "Notist")[*inline children*]
+]
+
+`#hidden()` stays code.

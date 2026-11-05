@@ -1,0 +1,33 @@
+==================
+Imports and expression headers
+==================
+#import "lib.notc" as lib;
+#lib.math<InlineContent>(text: lib.label(1 + 2))[#children]
+
+---
+
+(inline
+  (import_declaration
+    (string)
+    (identifier))
+  (call
+    (path
+      (identifier)
+      (identifier))
+    (comptime_arguments
+      (path
+        (identifier)))
+    (arguments
+      (named_argument
+        (identifier)
+        (invoke_expression
+          (path
+            (identifier)
+            (identifier))
+          (arguments
+            (binary_expression
+              (number)
+              (operator)
+              (number))))))
+    (content_block
+      (markdown_inline_content))))

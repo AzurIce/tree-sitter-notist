@@ -1,0 +1,260 @@
+==================
+Empty module
+==================
+
+---
+
+(source_file)
+
+==================
+Simple declaration
+==================
+fn diagram(source: String) -> Content;
+
+---
+
+(source_file
+  (module
+    (function_declaration
+      (fn_keyword)
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))))
+      (type
+        (path
+          (identifier))))))
+
+==================
+Optional and default parameters
+==================
+fn panel(title?: String, level: Int = 2,)[children: Content] -> Content;
+
+---
+
+(source_file
+  (module
+    (function_declaration
+      (fn_keyword)
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier))))
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))
+          (default_value
+            (number))))
+      (children_declaration
+        (type
+          (path
+            (identifier))))
+      (type
+        (path
+          (identifier))))))
+
+==================
+Recursive types
+==================
+fn badges(values: Array<Array<crate.Value,>>, block?: Bool) -> Content<block>;
+
+---
+
+(source_file
+  (module
+    (function_declaration
+      (fn_keyword)
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier))
+            (type
+              (path
+                (identifier))
+              (type
+                (path
+                  (identifier)
+                  (identifier))))))
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))))
+      (type
+        (path
+          (identifier))
+        (type
+          (path
+            (identifier)))))))
+
+==================
+Unicode and hyphenated identifiers
+==================
+fn 中文-name(值: String)->Content;
+fn trailing-()->InlineContent;
+
+---
+
+(source_file
+  (module
+    (function_declaration
+      (fn_keyword)
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))))
+      (type
+        (path
+          (identifier))))
+    (function_declaration
+      (fn_keyword)
+      (identifier)
+      (parameters)
+      (type
+        (path
+          (identifier))))))
+
+==================
+Collection defaults
+==================
+fn demo(unit: Unit = (), array: Array = (,), dict: Dict = (:), nested: Dict = (key: (1, -2),), flag: Bool = true)->Content;
+
+---
+
+(source_file
+  (module
+    (function_declaration
+      (fn_keyword)
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))
+          (default_value
+            (unit)))
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))
+          (default_value
+            (array)))
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))
+          (default_value
+            (dict)))
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))
+          (default_value
+            (dict
+              (dict_entry
+                (identifier)
+                (array
+                  (number)
+                  (negative_number
+                    (number)))))))
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))
+          (default_value
+            (boolean))))
+      (type
+        (path
+          (identifier))))))
+
+==================
+Multiline and raw strings
+==================
+fn text(a: String = """
+multi
+""", b: String = r##"raw"##, c: String = r#"""
+raw\n
+"""#)->Content;
+
+---
+
+(source_file
+  (module
+    (function_declaration
+      (fn_keyword)
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))
+          (default_value
+            (string)))
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))
+          (default_value
+            (string)))
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))
+          (default_value
+            (string))))
+      (type
+        (path
+          (identifier))))))
+
+==================
+Comments in declarations
+==================
+/* a /* b */ c */
+fn /* comment */ f( // line
+ x: /* type */ Int = -1) -> Content;
+
+---
+
+(source_file
+  (comment)
+  (module
+    (function_declaration
+      (fn_keyword)
+      (comment)
+      (identifier)
+      (parameters
+        (comment)
+        (parameter
+          (identifier)
+          (comment)
+          (type
+            (path
+              (identifier)))
+          (default_value
+            (negative_number
+              (number)))))
+      (type
+        (path
+          (identifier))))))

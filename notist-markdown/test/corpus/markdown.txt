@@ -1,0 +1,146 @@
+================================================================================
+Markdown sections and tables
+================================================================================
+
+# Heading
+
+| A | B |
+| --- | --- |
+| #badge() | **text** |
+
+--------------------------------------------------------------------------------
+
+(document
+  (section)
+  (section
+    (atx_heading
+      (atx_h1_marker)
+      (inline))
+    (pipe_table
+      (pipe_table_header
+        (pipe_table_cell)
+        (pipe_table_cell))
+      (pipe_table_delimiter_row
+        (pipe_table_delimiter_cell)
+        (pipe_table_delimiter_cell))
+      (pipe_table_row
+        (pipe_table_cell)
+        (pipe_table_cell)))))
+
+================================================================================
+Standalone multiline body
+================================================================================
+
+#panel()[
+## Inner
+
+- Item
+]
+
+--------------------------------------------------------------------------------
+
+(document
+  (section
+    (notist_block)))
+
+================================================================================
+Annotations and literal shielding
+================================================================================
+
+@!(title: "Demo")
+
+#code(text: """
+# fake heading
+#bad()
+""")
+
+--------------------------------------------------------------------------------
+
+(document
+  (section
+    (notist_block)
+    (notist_block)))
+
+================================================================================
+Container calls
+================================================================================
+
+> #quote()[text]
+> continued
+
+- #item()[text]
+
+--------------------------------------------------------------------------------
+
+(document
+  (section
+    (block_quote
+      (block_quote_marker)
+      (notist_block)
+      (block_continuation)
+      (paragraph
+        (inline)))
+    (list
+      (list_item
+        (list_marker_minus)
+        (notist_block)))))
+
+================================================================================
+Prose is not a heading
+================================================================================
+
+#name (1)
+#bare
+#name() [body]
+
+--------------------------------------------------------------------------------
+
+(document
+  (section
+    (paragraph
+      (inline))))
+
+================================================================================
+Code remains opaque
+================================================================================
+
+```not
+#hidden()
+```
+
+`#hidden()`
+
+--------------------------------------------------------------------------------
+
+(document
+  (section
+    (fenced_code_block
+      (fenced_code_block_delimiter)
+      (info_string
+        (language))
+      (block_continuation)
+      (code_fence_content
+        (block_continuation))
+      (fenced_code_block_delimiter))
+    (paragraph
+      (inline))))
+
+================================================================================
+Paragraph interruption
+================================================================================
+
+paragraph
+#block()[
+**body**
+]
+next
+
+--------------------------------------------------------------------------------
+
+(document
+  (section
+    (paragraph
+      (inline))
+    (notist_block)
+    (paragraph
+      (inline))))
