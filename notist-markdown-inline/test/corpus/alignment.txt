@@ -1,0 +1,31 @@
+==================
+Member imports and paths in Markdown headers
+==================
+#import "lib.notc": panel as box, label,;
+#link(p"./guide.not")[**guide**]
+#for x in ("a", "b") [**#text(text: x)**]
+
+---
+
+(inline
+  (import_declaration
+    (string)
+    (import_member
+      (identifier)
+      (identifier))
+    (import_member
+      (identifier)))
+  (call
+    (path
+      (identifier))
+    (arguments
+      (path_literal))
+    (content_block
+      (markdown_inline_content)))
+  (markup_for_expression
+    (identifier)
+    (array
+      (string)
+      (string))
+    (content_block
+      (markdown_inline_content))))

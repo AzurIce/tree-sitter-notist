@@ -1,0 +1,194 @@
+==================
+Member imports, paths and where constraints
+==================
+import "lib.notc": panel as box, label,;
+import "common.notc": *;
+fn link<T: Type>(target: T) -> InlineContent where T == Path || T == String;
+fn asset(directory: Path = p".") -> Path { directory.join("img").join("chart.svg") }
+
+---
+
+(source_file
+  (module
+    (code_import
+      (string)
+      (import_member
+        (identifier)
+        (identifier))
+      (import_member
+        (identifier)))
+    (code_import
+      (string))
+    (function_declaration
+      (fn_keyword)
+      (identifier)
+      (comptime_parameters
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))))
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))))
+      (type
+        (path
+          (identifier)))
+      (where_clause
+        (binary_expression
+          (binary_expression
+            (path
+              (identifier))
+            (operator)
+            (path
+              (identifier)))
+          (operator)
+          (binary_expression
+            (path
+              (identifier))
+            (operator)
+            (path
+              (identifier))))))
+    (function_declaration
+      (fn_keyword)
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier)))
+          (default_value
+            (path_literal))))
+      (type
+        (path
+          (identifier)))
+      (block_expression
+        (invoke_expression
+          (member_expression
+            (invoke_expression
+              (path
+                (identifier)
+                (identifier))
+              (arguments
+                (string)))
+            (identifier))
+          (arguments
+            (string)))))))
+
+==================
+Receiver methods and finite loops
+==================
+fn count(xs: Array<Int>) -> Int { make_array().len() + (1, 2).len() }
+fn labels(xs: Array<String>) -> InlineContent { for label in xs [#text(text: label)] }
+fn blocks(xs: Array<Int>) -> BlockContent { for n in xs { let display = str(n); [ #text(text: display) ] } }
+
+---
+
+(source_file
+  (module
+    (function_declaration
+      (fn_keyword)
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier))
+            (type
+              (path
+                (identifier))))))
+      (type
+        (path
+          (identifier)))
+      (block_expression
+        (binary_expression
+          (invoke_expression
+            (member_expression
+              (invoke_expression
+                (path
+                  (identifier))
+                (arguments))
+              (identifier))
+            (arguments))
+          (operator)
+          (invoke_expression
+            (member_expression
+              (array
+                (number)
+                (number))
+              (identifier))
+            (arguments)))))
+    (function_declaration
+      (fn_keyword)
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier))
+            (type
+              (path
+                (identifier))))))
+      (type
+        (path
+          (identifier)))
+      (block_expression
+        (for_expression
+          (identifier)
+          (path
+            (identifier))
+          (content_block
+            (call
+              (path
+                (identifier))
+              (arguments
+                (named_argument
+                  (identifier)
+                  (path
+                    (identifier)))))))))
+    (function_declaration
+      (fn_keyword)
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (path
+              (identifier))
+            (type
+              (path
+                (identifier))))))
+      (type
+        (path
+          (identifier)))
+      (block_expression
+        (for_expression
+          (identifier)
+          (path
+            (identifier))
+          (block_expression
+            (let_binding
+              (identifier)
+              (invoke_expression
+                (path
+                  (identifier))
+                (arguments
+                  (path
+                    (identifier)))))
+            (content_block
+              (text)
+              (call
+                (path
+                  (identifier))
+                (arguments
+                  (named_argument
+                    (identifier)
+                    (path
+                      (identifier)))))
+              (text))))))))

@@ -4806,6 +4806,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "markup_for_expression"
+        },
+        {
+          "type": "SYMBOL",
           "name": "annotation"
         },
         {
@@ -4950,6 +4954,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "markup_for_expression"
+        },
+        {
+          "type": "SYMBOL",
           "name": "annotation"
         },
         {
@@ -5090,6 +5098,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "markup_for_expression"
+        },
+        {
+          "type": "SYMBOL",
           "name": "annotation"
         },
         {
@@ -5227,6 +5239,10 @@
         {
           "type": "SYMBOL",
           "name": "import_declaration"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "markup_for_expression"
         },
         {
           "type": "SYMBOL",
@@ -5561,6 +5577,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "markup_for_expression"
+        },
+        {
+          "type": "SYMBOL",
           "name": "annotation"
         },
         {
@@ -5659,6 +5679,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "markup_for_expression"
+        },
+        {
+          "type": "SYMBOL",
           "name": "annotation"
         },
         {
@@ -5753,6 +5777,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "markup_for_expression"
+        },
+        {
+          "type": "SYMBOL",
           "name": "annotation"
         },
         {
@@ -5844,6 +5872,10 @@
         {
           "type": "SYMBOL",
           "name": "import_declaration"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "markup_for_expression"
         },
         {
           "type": "SYMBOL",
@@ -6304,23 +6336,8 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "STRING",
-                  "value": "as"
-                },
-                {
-                  "type": "REPEAT1",
-                  "content": {
-                    "type": "SYMBOL",
-                    "name": "_trivia"
-                  }
-                },
-                {
-                  "type": "FIELD",
-                  "name": "alias",
-                  "content": {
-                    "type": "SYMBOL",
-                    "name": "identifier"
-                  }
+                  "type": "SYMBOL",
+                  "name": "_import_selection"
                 },
                 {
                   "type": "REPEAT",
@@ -6339,6 +6356,175 @@
         {
           "type": "STRING",
           "value": ";"
+        }
+      ]
+    },
+    "_import_selection": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "as"
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_trivia"
+              }
+            },
+            {
+              "type": "FIELD",
+              "name": "alias",
+              "content": {
+                "type": "SYMBOL",
+                "name": "identifier"
+              }
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": ":"
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_trivia"
+              }
+            },
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "*"
+                },
+                {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "import_member"
+                    },
+                    {
+                      "type": "REPEAT",
+                      "content": {
+                        "type": "SEQ",
+                        "members": [
+                          {
+                            "type": "REPEAT",
+                            "content": {
+                              "type": "SYMBOL",
+                              "name": "_trivia"
+                            }
+                          },
+                          {
+                            "type": "STRING",
+                            "value": ","
+                          },
+                          {
+                            "type": "REPEAT",
+                            "content": {
+                              "type": "SYMBOL",
+                              "name": "_trivia"
+                            }
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "import_member"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "SEQ",
+                          "members": [
+                            {
+                              "type": "REPEAT",
+                              "content": {
+                                "type": "SYMBOL",
+                                "name": "_trivia"
+                              }
+                            },
+                            {
+                              "type": "STRING",
+                              "value": ","
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BLANK"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "import_member": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_trivia"
+                  }
+                },
+                {
+                  "type": "STRING",
+                  "value": "as"
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_trivia"
+                  }
+                },
+                {
+                  "type": "FIELD",
+                  "name": "alias",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "identifier"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         }
       ]
     },
@@ -6619,6 +6805,10 @@
         {
           "type": "SYMBOL",
           "name": "string"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "path_literal"
         },
         {
           "type": "SYMBOL",
@@ -7130,6 +7320,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "for_expression"
+        },
+        {
+          "type": "SYMBOL",
           "name": "comptime_expression"
         }
       ]
@@ -7556,6 +7750,40 @@
         {
           "type": "SYMBOL",
           "name": "invoke_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "member_expression"
+        }
+      ]
+    },
+    "member_expression": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "object",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_postfix"
+          }
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_path_dot"
+          },
+          "named": false,
+          "value": "."
+        },
+        {
+          "type": "FIELD",
+          "name": "member",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
         }
       ]
     },
@@ -8079,6 +8307,114 @@
           }
         ]
       }
+    },
+    "for_expression": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "for"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_trivia"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_for_tail"
+        }
+      ]
+    },
+    "markup_for_expression": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_for_start"
+          },
+          "named": false,
+          "value": "#for"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_trivia"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_for_tail"
+        }
+      ]
+    },
+    "_for_tail": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "binding",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_trivia"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "in"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_trivia"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "subject",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_expression"
+          }
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_trivia"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "body",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "content_block"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "block_expression"
+              }
+            ]
+          }
+        }
+      ]
     }
   },
   "extras": [
@@ -8343,6 +8679,16 @@
     ],
     [
       "match_expression"
+    ],
+    [
+      "_prefix",
+      "invoke_expression"
+    ],
+    [
+      "import_member"
+    ],
+    [
+      "_import_selection"
     ]
   ],
   "precedences": [
@@ -8539,6 +8885,14 @@
     {
       "type": "SYMBOL",
       "name": "_product_operator"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "path_literal"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_for_start"
     }
   ],
   "inline": [],

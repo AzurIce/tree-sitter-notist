@@ -2,7 +2,7 @@
 const list = ($, item) => seq(item, repeat(seq(repeat($._trivia), ',', repeat($._trivia), item)), optional(seq(repeat($._trivia), ',')));
 module.exports = {
   comptime_arguments: $ => seq(alias($._comptime_open, '<'), repeat($._trivia), list($, choice($.named_argument, $._expression)), repeat($._trivia), alias($._comptime_close, '>')),
-  _expression: $ => choice($._or, $.if_expression, $.match_expression, $.comptime_expression),
+  _expression: $ => choice($._or, $.if_expression, $.match_expression, $.for_expression, $.comptime_expression),
   ...Object.fromEntries([
     ['or', 'and'], ['and', 'equality'], ['equality', 'compare'],
     ['compare', 'sum'], ['sum', 'product'], ['product', 'prefix'],
@@ -13,7 +13,8 @@ module.exports = {
   ])),
   _prefix: $ => choice($._postfix, $.unary_expression),
   unary_expression: $ => seq(field('operator', choice('!', '-')), repeat($._trivia), field('operand', $._prefix)),
-  _postfix: $ => choice($._value, $.content_block, $.block_expression, $.invoke_expression),
+  _postfix: $ => choice($._value, $.content_block, $.block_expression, $.invoke_expression, $.member_expression),
+  member_expression: $ => seq(field('object', $._postfix), alias($._path_dot, '.'), field('member', $.identifier)),
   invoke_expression: $ => seq(field('function', $._postfix), choice(
     seq(field('comptime', $.comptime_arguments), optional(seq(repeat($._trivia), field('arguments', $.arguments))),
       optional(seq(repeat($._trivia), field('body', $.content_block)))),
@@ -27,6 +28,10 @@ module.exports = {
     optional(list($, $.match_arm)), repeat($._trivia), '}'),
   match_arm: $ => seq(field('pattern', $._expression), repeat($._trivia), '=>', repeat($._trivia), field('value', $._expression)),
   comptime_expression: $ => prec.right(seq('comptime', repeat($._trivia), $._expression)),
+  for_expression: $ => seq('for', repeat($._trivia), $._for_tail),
+  markup_for_expression: $ => seq(alias($._for_start, '#for'), repeat($._trivia), $._for_tail),
+  _for_tail: $ => seq(field('binding', $.identifier), repeat($._trivia), 'in', repeat($._trivia),
+    field('subject', $._expression), repeat($._trivia), field('body', choice($.content_block, $.block_expression))),
   // Collection elements in expression positions may themselves be expressions.
   group: $ => seq('(', repeat($._trivia), $._expression, repeat($._trivia), ')'),
   array: $ => seq('(', repeat($._trivia), choice(',', seq($._expression, repeat($._trivia), ',', repeat($._trivia),

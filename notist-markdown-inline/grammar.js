@@ -7,7 +7,7 @@ const contexts = {};
 for (const link of ['', '_no_link']) {
   for (const delimiter of ['', '_no_star', '_no_underscore', '_no_tilde']) {
     contexts[`_inline_element${delimiter}${link}`] = ($, previous) =>
-      choice($.call, $.reference, $.import_declaration, $.annotation, $.math, previous);
+      choice($.call, $.reference, $.import_declaration, $.markup_for_expression, $.annotation, $.math, previous);
   }
 }
 module.exports = grammar(markdown, {
@@ -21,6 +21,7 @@ module.exports = grammar(markdown, {
     $._import_start, $._path_dot, $._arguments_open, $._comptime_open,
     $._comptime_close, $._or_operator, $._and_operator, $._equality_operator,
     $._compare_operator, $._sum_operator, $._product_operator,
+    $.path_literal, $._for_start,
   ],
   conflicts: ($, previous) => [...previous, [$.dict], [$.array], [$.arguments], ...require('../common/code-conflicts')($)],
   rules: {

@@ -1,0 +1,24 @@
+import "lib.notc": panel as box, label,;
+import "common.notc": *;
+
+fn link<T: Type>(target: T) -> InlineContent
+where T == Path || T == String;
+
+fn positive<n: Int>() -> Int where n > 0 { n }
+
+fn asset(directory: Path = p".") -> Path {
+  directory.join("images").join("chart.svg")
+}
+
+fn count(xs: Array<Int>) -> Int { make_array().len() + xs.len() }
+
+fn labels(xs: Array<String>) -> InlineContent {
+  for label in xs [#text(text: label)]
+}
+
+fn blocks(xs: Array<Int>) -> BlockContent {
+  for n in xs {
+    let display = str(n);
+    [ #text(text: display) ]
+  }
+}

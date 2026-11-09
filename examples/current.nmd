@@ -1,0 +1,13 @@
+#import "lib.notc": panel as box, label,;
+
+#import "common.notc": *;
+
+#link(p"./guide.not")[**Guide**]
+
+#for x in ("a", "b") [
+## Heading
+
+#text(text: x)
+]
+
+#for x in make_array() { [#text(text: x)] }

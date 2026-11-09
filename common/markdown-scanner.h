@@ -103,8 +103,8 @@ static inline bool notist_md_construct_tail(TSLexer *l, int32_t marker) {
   }
   bool args = false;
   {
-    bool is_import = false;
-    if (!call_path_info(l, &is_import)) return false;
+    bool is_import = false, is_for = false;
+    if (!call_path_info(l, &is_import, &is_for)) return false;
     if (is_import && space(l->lookahead)) {
       while (l->lookahead == ' ' || l->lookahead == '\t') advance_notist(l);
       if (l->lookahead != '"' || !string_tail(l, 0)) return false;
@@ -118,9 +118,27 @@ static inline bool notist_md_construct_tail(TSLexer *l, int32_t marker) {
         if (!call_path(l)) return false;
         while (l->lookahead == ' ' || l->lookahead == '\t') advance_notist(l);
       }
+      if (l->lookahead == ':') {
+        // Imports occupy a physical line; header parsing validates members.
+        while (!l->eof(l) && !newline(l->lookahead) && l->lookahead != ';') {
+          if (l->lookahead == '/') { advance_notist(l); scan_comment(l); }
+          else advance_notist(l);
+        }
+      }
       if (l->lookahead != ';') return false;
       advance_notist(l);
       return true;
+    }
+    if (is_for && space(l->lookahead)) {
+      // The inline grammar parses the Code subject and body. Shield strings,
+      // comments and argument groups while finding a multiline content body.
+      while (!l->eof(l) && l->lookahead != '[' && l->lookahead != '{') {
+        if (l->lookahead == '"') string_tail(l, 0);
+        else if (l->lookahead == '(') { if (!balanced(l, '(', ')', true)) return false; }
+        else if (l->lookahead == '/') { advance_notist(l); scan_comment(l); }
+        else advance_notist(l);
+      }
+      if (l->lookahead == '{') return balanced(l, '{', '}', true);
     }
     if (l->lookahead == '<') {
       if (!balanced(l, '<', '>', true)) return false;

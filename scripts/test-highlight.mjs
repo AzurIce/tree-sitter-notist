@@ -20,6 +20,19 @@ try {
       calls, `${file}: calls must highlight through block, inline and recursive body injections`);
     assert.doesNotMatch(result.stdout, /class='function[^']*'>(?:hidden|bad|not-a-call)<\/span>/);
   }
+  for (const [file, expected] of [
+    ['current.notc', ["where", "for", "join"]],
+    ['current.nmd', ["#for", "text"]],
+  ]) {
+    const result = spawnSync('tree-sitter', ['highlight', '--config-path', config,
+      '--html', '--css-classes', `examples/${file}`], { cwd: root, encoding: 'utf8' });
+    if (result.error) throw result.error;
+    assert.equal(result.status, 0, result.stderr);
+    assert.doesNotMatch(result.stderr, /No language found|Failed to/);
+    for (const text of expected) {
+      assert.match(result.stdout, new RegExp(`class='(?:keyword|function)[^']*'>${text}</span>`), file);
+    }
+  }
   console.log('Markdown extension discovery and recursive highlighting passed.');
 } finally {
   rmSync(temporary, { recursive: true, force: true });

@@ -113,6 +113,16 @@ fn injected(source: &str) -> Vec<Tree> {
 }
 
 #[test]
+fn markdown_current_imports_paths_and_loops() {
+    let source = "#import \"lib.notc\": panel as box, label,;\n\n#import \"common.notc\": *;\n\n#link(p\"./guide.not\")[**Guide**]\n\n#for x in (\"a\", \"b\") [\n## Heading\n\n#text(text: x)\n]\n\n#for x in make_array() { [#text(text: x)] }\n";
+    let trees = injected(source);
+    assert_eq!(texts(&trees, source, "import_declaration").len(), 2);
+    assert_eq!(texts(&trees, source, "import_member").len(), 2);
+    assert_eq!(texts(&trees, source, "path_literal"), ["p\"./guide.not\""]);
+    assert_eq!(texts(&trees, source, "markup_for_expression").len(), 2);
+    assert_eq!(texts(&trees, source, "atx_heading").len(), 1);
+}
+#[test]
 fn current_imports_and_header_expressions() {
     let source = "#import \"lib.notc\" as lib;\n\n#lib.math<InlineContent>(text: lib.label(1 + 2))[#children]\n\n#[removed]\n";
     let trees = injected(source);
@@ -125,6 +135,7 @@ fn current_imports_and_header_expressions() {
 #[test]
 fn recursive_markdown_example() {
     injected(include_str!("../examples/guide.notmd"));
+    injected(include_str!("../examples/current.nmd"));
     let source = include_str!("../examples/showcase.nmd");
     let trees = injected(source);
     assert_eq!(texts(&trees, source, "call").len(), 6);
@@ -236,6 +247,7 @@ fn incremental_markdown_scanners_match_fresh_trees() {
         for original in [
             include_str!("../examples/showcase.nmd"),
             include_str!("../examples/guide.notmd"),
+            include_str!("../examples/current.nmd"),
         ] {
             for (offset, ch) in original.char_indices() {
                 let mut p = parser(inline);

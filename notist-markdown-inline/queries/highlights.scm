@@ -39,12 +39,20 @@
 (strikethrough) @text.strike
 (comment) @comment
 (string) @string
+(path_literal) @string.special.path
 (number) @number
 (boolean) @constant.builtin
 (math) @string.special
 (call name: (path) @function.call)
 (reference name: (path) @variable)
 ["#import" "as" "let" "if" "else" "match" "comptime"] @keyword
+["for" "in" "#for"] @keyword
+(for_expression binding: (identifier) @variable.parameter)
+(markup_for_expression binding: (identifier) @variable.parameter)
+(member_expression member: (identifier) @property)
+(invoke_expression function: (member_expression member: (identifier) @function.call))
+(import_member name: (identifier) @variable)
+(import_member alias: (identifier) @variable)
 (invoke_expression function: (path) @function.call)
 (binary_expression operator: _ @operator)
 (unary_expression operator: _ @operator)

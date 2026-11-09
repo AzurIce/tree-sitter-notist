@@ -52,6 +52,10 @@
           "named": true
         },
         {
+          "type": "for_expression",
+          "named": true
+        },
+        {
           "type": "group",
           "named": true
         },
@@ -68,6 +72,10 @@
           "named": true
         },
         {
+          "type": "member_expression",
+          "named": true
+        },
+        {
           "type": "named_argument",
           "named": true
         },
@@ -81,6 +89,10 @@
         },
         {
           "type": "path",
+          "named": true
+        },
+        {
+          "type": "path_literal",
           "named": true
         },
         {
@@ -135,6 +147,10 @@
           "named": true
         },
         {
+          "type": "for_expression",
+          "named": true
+        },
+        {
           "type": "group",
           "named": true
         },
@@ -151,6 +167,10 @@
           "named": true
         },
         {
+          "type": "member_expression",
+          "named": true
+        },
+        {
           "type": "negative_number",
           "named": true
         },
@@ -160,6 +180,10 @@
         },
         {
           "type": "path",
+          "named": true
+        },
+        {
+          "type": "path_literal",
           "named": true
         },
         {
@@ -223,6 +247,10 @@
             "named": true
           },
           {
+            "type": "member_expression",
+            "named": true
+          },
+          {
             "type": "negative_number",
             "named": true
           },
@@ -232,6 +260,10 @@
           },
           {
             "type": "path",
+            "named": true
+          },
+          {
+            "type": "path_literal",
             "named": true
           },
           {
@@ -295,6 +327,10 @@
             "named": true
           },
           {
+            "type": "member_expression",
+            "named": true
+          },
+          {
             "type": "negative_number",
             "named": true
           },
@@ -304,6 +340,10 @@
           },
           {
             "type": "path",
+            "named": true
+          },
+          {
+            "type": "path_literal",
             "named": true
           },
           {
@@ -359,6 +399,10 @@
           "named": true
         },
         {
+          "type": "for_expression",
+          "named": true
+        },
+        {
           "type": "group",
           "named": true
         },
@@ -379,6 +423,10 @@
           "named": true
         },
         {
+          "type": "member_expression",
+          "named": true
+        },
+        {
           "type": "negative_number",
           "named": true
         },
@@ -388,6 +436,10 @@
         },
         {
           "type": "path",
+          "named": true
+        },
+        {
+          "type": "path_literal",
           "named": true
         },
         {
@@ -518,6 +570,10 @@
           "named": true
         },
         {
+          "type": "for_expression",
+          "named": true
+        },
+        {
           "type": "group",
           "named": true
         },
@@ -534,6 +590,10 @@
           "named": true
         },
         {
+          "type": "member_expression",
+          "named": true
+        },
+        {
           "type": "named_argument",
           "named": true
         },
@@ -547,6 +607,10 @@
         },
         {
           "type": "path",
+          "named": true
+        },
+        {
+          "type": "path_literal",
           "named": true
         },
         {
@@ -601,6 +665,10 @@
           "named": true
         },
         {
+          "type": "for_expression",
+          "named": true
+        },
+        {
           "type": "group",
           "named": true
         },
@@ -617,6 +685,10 @@
           "named": true
         },
         {
+          "type": "member_expression",
+          "named": true
+        },
+        {
           "type": "negative_number",
           "named": true
         },
@@ -626,6 +698,10 @@
         },
         {
           "type": "path",
+          "named": true
+        },
+        {
+          "type": "path_literal",
           "named": true
         },
         {
@@ -728,6 +804,10 @@
             "named": true
           },
           {
+            "type": "for_expression",
+            "named": true
+          },
+          {
             "type": "group",
             "named": true
           },
@@ -744,6 +824,10 @@
             "named": true
           },
           {
+            "type": "member_expression",
+            "named": true
+          },
+          {
             "type": "negative_number",
             "named": true
           },
@@ -753,6 +837,10 @@
           },
           {
             "type": "path",
+            "named": true
+          },
+          {
+            "type": "path_literal",
             "named": true
           },
           {
@@ -840,6 +928,10 @@
           "named": true
         },
         {
+          "type": "markup_for_expression",
+          "named": true
+        },
+        {
           "type": "math",
           "named": true
         },
@@ -868,6 +960,122 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "for_expression",
+    "named": true,
+    "fields": {
+      "binding": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block_expression",
+            "named": true
+          },
+          {
+            "type": "content_block",
+            "named": true
+          }
+        ]
+      },
+      "subject": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "array",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "block_expression",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "comptime_expression",
+            "named": true
+          },
+          {
+            "type": "content_block",
+            "named": true
+          },
+          {
+            "type": "dict",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "group",
+            "named": true
+          },
+          {
+            "type": "if_expression",
+            "named": true
+          },
+          {
+            "type": "invoke_expression",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "member_expression",
+            "named": true
+          },
+          {
+            "type": "negative_number",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "path",
+            "named": true
+          },
+          {
+            "type": "path_literal",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "unit",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -926,6 +1134,10 @@
           "named": true
         },
         {
+          "type": "for_expression",
+          "named": true
+        },
+        {
           "type": "group",
           "named": true
         },
@@ -942,6 +1154,10 @@
           "named": true
         },
         {
+          "type": "member_expression",
+          "named": true
+        },
+        {
           "type": "negative_number",
           "named": true
         },
@@ -951,6 +1167,10 @@
         },
         {
           "type": "path",
+          "named": true
+        },
+        {
+          "type": "path_literal",
           "named": true
         },
         {
@@ -1029,6 +1249,10 @@
             "named": true
           },
           {
+            "type": "for_expression",
+            "named": true
+          },
+          {
             "type": "group",
             "named": true
           },
@@ -1045,6 +1269,10 @@
             "named": true
           },
           {
+            "type": "member_expression",
+            "named": true
+          },
+          {
             "type": "negative_number",
             "named": true
           },
@@ -1054,6 +1282,10 @@
           },
           {
             "type": "path",
+            "named": true
+          },
+          {
+            "type": "path_literal",
             "named": true
           },
           {
@@ -1174,6 +1406,10 @@
           "named": true
         },
         {
+          "type": "markup_for_expression",
+          "named": true
+        },
+        {
           "type": "math",
           "named": true
         },
@@ -1224,6 +1460,42 @@
         "types": [
           {
             "type": "string",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "import_member",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "import_member",
+    "named": true,
+    "fields": {
+      "alias": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
             "named": true
           }
         ]
@@ -1293,6 +1565,10 @@
         },
         {
           "type": "inline_link",
+          "named": true
+        },
+        {
+          "type": "markup_for_expression",
           "named": true
         },
         {
@@ -1416,6 +1692,10 @@
             "named": true
           },
           {
+            "type": "member_expression",
+            "named": true
+          },
+          {
             "type": "negative_number",
             "named": true
           },
@@ -1425,6 +1705,10 @@
           },
           {
             "type": "path",
+            "named": true
+          },
+          {
+            "type": "path_literal",
             "named": true
           },
           {
@@ -1486,6 +1770,10 @@
             "named": true
           },
           {
+            "type": "for_expression",
+            "named": true
+          },
+          {
             "type": "group",
             "named": true
           },
@@ -1502,6 +1790,10 @@
             "named": true
           },
           {
+            "type": "member_expression",
+            "named": true
+          },
+          {
             "type": "negative_number",
             "named": true
           },
@@ -1511,6 +1803,10 @@
           },
           {
             "type": "path",
+            "named": true
+          },
+          {
+            "type": "path_literal",
             "named": true
           },
           {
@@ -1628,6 +1924,10 @@
           "named": true
         },
         {
+          "type": "markup_for_expression",
+          "named": true
+        },
+        {
           "type": "math",
           "named": true
         },
@@ -1678,6 +1978,122 @@
     }
   },
   {
+    "type": "markup_for_expression",
+    "named": true,
+    "fields": {
+      "binding": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block_expression",
+            "named": true
+          },
+          {
+            "type": "content_block",
+            "named": true
+          }
+        ]
+      },
+      "subject": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "array",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "block_expression",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "comptime_expression",
+            "named": true
+          },
+          {
+            "type": "content_block",
+            "named": true
+          },
+          {
+            "type": "dict",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "group",
+            "named": true
+          },
+          {
+            "type": "if_expression",
+            "named": true
+          },
+          {
+            "type": "invoke_expression",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "member_expression",
+            "named": true
+          },
+          {
+            "type": "negative_number",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "path",
+            "named": true
+          },
+          {
+            "type": "path_literal",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "unit",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "match_arm",
     "named": true,
     "fields": {
@@ -1714,6 +2130,10 @@
             "named": true
           },
           {
+            "type": "for_expression",
+            "named": true
+          },
+          {
             "type": "group",
             "named": true
           },
@@ -1730,6 +2150,10 @@
             "named": true
           },
           {
+            "type": "member_expression",
+            "named": true
+          },
+          {
             "type": "negative_number",
             "named": true
           },
@@ -1739,6 +2163,10 @@
           },
           {
             "type": "path",
+            "named": true
+          },
+          {
+            "type": "path_literal",
             "named": true
           },
           {
@@ -1788,6 +2216,10 @@
             "named": true
           },
           {
+            "type": "for_expression",
+            "named": true
+          },
+          {
             "type": "group",
             "named": true
           },
@@ -1804,6 +2236,10 @@
             "named": true
           },
           {
+            "type": "member_expression",
+            "named": true
+          },
+          {
             "type": "negative_number",
             "named": true
           },
@@ -1813,6 +2249,10 @@
           },
           {
             "type": "path",
+            "named": true
+          },
+          {
+            "type": "path_literal",
             "named": true
           },
           {
@@ -1868,6 +2308,10 @@
             "named": true
           },
           {
+            "type": "for_expression",
+            "named": true
+          },
+          {
             "type": "group",
             "named": true
           },
@@ -1884,6 +2328,10 @@
             "named": true
           },
           {
+            "type": "member_expression",
+            "named": true
+          },
+          {
             "type": "negative_number",
             "named": true
           },
@@ -1893,6 +2341,10 @@
           },
           {
             "type": "path",
+            "named": true
+          },
+          {
+            "type": "path_literal",
             "named": true
           },
           {
@@ -1919,6 +2371,84 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "member_expression",
+    "named": true,
+    "fields": {
+      "member": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "object": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "array",
+            "named": true
+          },
+          {
+            "type": "block_expression",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "content_block",
+            "named": true
+          },
+          {
+            "type": "dict",
+            "named": true
+          },
+          {
+            "type": "group",
+            "named": true
+          },
+          {
+            "type": "invoke_expression",
+            "named": true
+          },
+          {
+            "type": "member_expression",
+            "named": true
+          },
+          {
+            "type": "negative_number",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "path",
+            "named": true
+          },
+          {
+            "type": "path_literal",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "unit",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -1972,6 +2502,10 @@
             "named": true
           },
           {
+            "type": "for_expression",
+            "named": true
+          },
+          {
             "type": "group",
             "named": true
           },
@@ -1988,6 +2522,10 @@
             "named": true
           },
           {
+            "type": "member_expression",
+            "named": true
+          },
+          {
             "type": "negative_number",
             "named": true
           },
@@ -1997,6 +2535,10 @@
           },
           {
             "type": "path",
+            "named": true
+          },
+          {
+            "type": "path_literal",
             "named": true
           },
           {
@@ -2145,6 +2687,10 @@
           "named": true
         },
         {
+          "type": "markup_for_expression",
+          "named": true
+        },
+        {
           "type": "math",
           "named": true
         },
@@ -2244,6 +2790,10 @@
           "named": true
         },
         {
+          "type": "markup_for_expression",
+          "named": true
+        },
+        {
           "type": "math",
           "named": true
         },
@@ -2311,6 +2861,10 @@
             "named": true
           },
           {
+            "type": "member_expression",
+            "named": true
+          },
+          {
             "type": "negative_number",
             "named": true
           },
@@ -2320,6 +2874,10 @@
           },
           {
             "type": "path",
+            "named": true
+          },
+          {
+            "type": "path_literal",
             "named": true
           },
           {
@@ -2367,6 +2925,10 @@
   },
   {
     "type": "#",
+    "named": false
+  },
+  {
+    "type": "#for",
     "named": false
   },
   {
@@ -2543,11 +3105,19 @@
     "named": true
   },
   {
+    "type": "for",
+    "named": false
+  },
+  {
     "type": "identifier",
     "named": true
   },
   {
     "type": "if",
+    "named": false
+  },
+  {
+    "type": "in",
     "named": false
   },
   {
@@ -2580,6 +3150,10 @@
   },
   {
     "type": "operator",
+    "named": true
+  },
+  {
+    "type": "path_literal",
     "named": true
   },
   {

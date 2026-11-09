@@ -1,0 +1,63 @@
+==================
+Member imports, path literals and markup loops
+==================
+#import "lib.notc": panel as box, label,;
+#import "common.notc": *;
+@(asset: p"./img.svg")#link(p"./guide.not")[guide]
+#for x in ("a", "b") [#text(text: x)]
+#for x in make_array() { [#text(text: x)] }
+
+---
+
+(source_file
+  (import_declaration
+    (string)
+    (import_member
+      (identifier)
+      (identifier))
+    (import_member
+      (identifier)))
+  (import_declaration
+    (string))
+  (annotation
+    (dict
+      (dict_entry
+        (identifier)
+        (path_literal))))
+  (call
+    (path
+      (identifier))
+    (arguments
+      (path_literal))
+    (content_block
+      (text)))
+  (markup_for_expression
+    (identifier)
+    (array
+      (string)
+      (string))
+    (content_block
+      (call
+        (path
+          (identifier))
+        (arguments
+          (named_argument
+            (identifier)
+            (path
+              (identifier)))))))
+  (markup_for_expression
+    (identifier)
+    (invoke_expression
+      (path
+        (identifier))
+      (arguments))
+    (block_expression
+      (content_block
+        (call
+          (path
+            (identifier))
+          (arguments
+            (named_argument
+              (identifier)
+              (path
+                (identifier)))))))))

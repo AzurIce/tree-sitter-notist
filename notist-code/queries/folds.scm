@@ -6,3 +6,5 @@
 (block_expression) @fold
 (match_expression) @fold
 (content_block) @fold
+(for_expression) @fold
+(markup_for_expression) @fold

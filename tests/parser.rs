@@ -57,6 +57,7 @@ fn snapshot(node: Node<'_>, result: &mut Vec<(String, usize, usize, Point, Point
 fn examples_and_fixed_entry_points() {
     parse(include_str!("../examples/showcase.not"), false);
     parse(include_str!("../examples/signatures.notc"), true);
+    parse(include_str!("../examples/current.notc"), true);
     let prose = "fn panel(title?: String) -> Content; let x = 1;";
     assert!(text_of(&parse(prose, false), prose, "identifier").is_empty());
     assert!(
@@ -102,6 +103,100 @@ fn queries_compile_for_both_languages() {
         }
     }
 }
+#[test]
+fn current_imports_paths_methods_loops_and_constraints() {
+    let source = r#"import "lib.notc": panel as box, label,;
+import "common.notc": *;
+fn link<T: Type>(target: T) -> InlineContent where T == Path || T == String;
+fn positive<n: Int>() -> Int where n > 0 { n }
+fn asset(directory: Path = p".") -> Path { directory.join("img").join("chart.svg") }
+fn size(xs: Array<Int>) -> Int { make_array().len() + (1, 2).len() + xs.len() }
+fn labels(xs: Array<String>) -> InlineContent {
+    for label in xs [#text(text: label)]
+}
+fn blocks(xs: Array<Int>) -> BlockContent {
+    for n in xs { let text = str(n); [ #text(text: text) ] }
+}
+"#;
+    let tree = parse(source, true);
+    assert_eq!(text_of(&tree, source, "code_import").len(), 2);
+    assert_eq!(
+        text_of(&tree, source, "import_member"),
+        ["panel as box", "label"]
+    );
+    assert_eq!(
+        text_of(&tree, source, "where_clause"),
+        ["where T == Path || T == String", "where n > 0"]
+    );
+    assert_eq!(text_of(&tree, source, "path_literal"), [r#"p".""#]);
+    assert_eq!(text_of(&tree, source, "for_expression").len(), 2);
+    let mut loops = Vec::new();
+    nodes(tree.root_node(), "for_expression", &mut loops);
+    for node in loops {
+        let subject = node.child_by_field_name("subject").unwrap();
+        assert_eq!(&source[subject.byte_range()], "xs");
+    }
+    assert!(text_of(&tree, source, "member_expression").contains(&"make_array().len"));
+    assert!(text_of(&tree, source, "member_expression").contains(&"(1, 2).len"));
+}
+
+#[test]
+fn markup_paths_member_imports_and_for() {
+    let source = "#import \"lib.notc\": panel as box, label,;\n#import \"common.notc\": *;\n@(asset: p\"./img.svg\")#link(p\"./guide.not\")[guide]\n#for x in (\"a\", \"b\") [#text(text: x)]\n#for x in make_array() { [#text(text: x)] }\n";
+    let tree = parse(source, false);
+    assert_eq!(text_of(&tree, source, "import_declaration").len(), 2);
+    assert_eq!(text_of(&tree, source, "markup_for_expression").len(), 2);
+    assert_eq!(
+        text_of(&tree, source, "path_literal"),
+        ["p\"./img.svg\"", "p\"./guide.not\""]
+    );
+}
+
+#[test]
+fn constraints_and_paths_recover_at_the_next_declaration() {
+    for condition in ["", "T ==", "T ||", "("] {
+        let source =
+            format!("fn broken<T: Type>() -> Int where {condition};\nfn healthy() -> Int {{ 1 }}");
+        let tree = parser(true).parse(&source, None).unwrap();
+        assert!(tree.root_node().has_error(), "{source}");
+        assert!(
+            text_of(&tree, &source, "function_declaration").contains(&"fn healthy() -> Int { 1 }")
+        );
+    }
+    let source = "fn path() -> Path { p\"unfinished\n}\nfn healthy() -> Int { 1 }";
+    let tree = parse(source, true);
+    assert_eq!(text_of(&tree, source, "path_literal"), ["p\"unfinished"]);
+    assert_eq!(text_of(&tree, source, "function_declaration").len(), 2);
+    for keyword in ["where", "for", "in"] {
+        let source = format!("fn {keyword}() -> Int {{ 1 }}");
+        assert!(
+            parser(true)
+                .parse(&source, None)
+                .unwrap()
+                .root_node()
+                .has_error()
+        );
+    }
+}
+
+#[test]
+fn loop_subjects_leave_content_bodies_to_the_loop() {
+    for subject in [
+        "xs",
+        "make_array()",
+        "make_array().values()",
+        "(choose()[input])",
+    ] {
+        let source = format!("fn f() -> InlineContent {{ for x in {subject} [#text(text: x)] }}");
+        let tree = parse(&source, true);
+        let mut loops = Vec::new();
+        nodes(tree.root_node(), "for_expression", &mut loops);
+        assert_eq!(loops.len(), 1);
+        let node = loops[0].child_by_field_name("subject").unwrap();
+        assert_eq!(&source[node.byte_range()], subject);
+    }
+}
+
 #[test]
 fn expression_precedence_and_trivia() {
     let source = "fn f(n: Int) -> Int { let iffoo = 1; -n + 2 * 3 - 4 / 2 }";
@@ -348,6 +443,11 @@ fn incremental_edits_match_fresh_trees_and_ranges() {
         (false, include_str!("../examples/showcase.not")),
         (true, include_str!("../examples/signatures.notc")),
         (true, include_str!("../examples/functions.notc")),
+        (true, include_str!("../examples/current.notc")),
+        (
+            false,
+            "#for x in (1, 2) [#text(text: str(x))]\n#link(p\"./guide.not\")[guide]\n",
+        ),
         (false, "= CRLF\r\n*text*\r\n```\r\nopaque\r\n```\r\n"),
         (true, "fn 空(值: String = \"\"\"\n多行\n\"\"\")->Content;\n"),
     ] {

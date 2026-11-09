@@ -26,15 +26,23 @@ The file type selects a fixed entry point. `fn demo()->Content;` is prose in
   `@(dict)` / `@!(dict)` annotations. Call parts and path segments are adjacent;
   `#(...)` and the removed anonymous `#[body]` form remain prose. Use explicit
   `#node[body]` for transparent content. Reference legality is checked by Notist.
-- File-level `#import "relative.notc" as name;` and Code `import` declarations.
+- File-level `#import "relative.notc" as name;` and Code `import` declarations,
+  including member selection (`: name as alias, other`) and wildcard selection (`: *`).
 - Shared literals: Unit `()`, Bool, integer/decimal numbers, adjacent negative
   numbers, grouping `(x)`, arrays `(,)` / `(x,)`, dicts `(:)` / `(key: value)`,
   and all four ordinary/raw inline/multiline string forms.
+- Adjacent single-line Path literals (`p"./guide.not"`) in shared values, defaults,
+  annotations and expressions. Path validation and source-relative binding belong
+  to Notist, not the editor grammar.
 - `.notc` `fn` declarations with optional compile-time and ordinary parameter
   lists, required/optional/defaulted parameters, a `[children: Type]` mount,
   recursive qualified types, literal defaults, and trailing commas.
   Code keywords are reserved throughout Code. Hyphenated and Unicode
   identifiers work; adjacent `Content->Content` keeps `->` separate.
+- `where` expression constraints between a function's return type and its body
+  or semicolon, receiver methods such as `make_array().len()`, and finite
+  `for element in array [content]` / `for element in array { code }` expressions.
+  Both content frontends support the corresponding `#for` entry point.
 
 ```not
 @(id: "intro")
@@ -52,7 +60,7 @@ fn double(n: Int) -> Int { n * 2 }
 
 Function bodies and call arguments support name/member references, calls,
 immutable `let`, arithmetic/comparison/Bool operators, `if` / `else`, `match`,
-`comptime`, collections and content literals. An attached `<` starts compile-time
+`for`, `comptime`, collections and content literals. An attached `<` starts compile-time
 arguments; comparison `<` must be separated from its left operand by trivia.
 Parenthesize comparisons inside compile-time arguments. `use`, mutable state,
 lambdas and closures are not part of current Code.
@@ -106,6 +114,7 @@ flat nodes; lists expose individual markers; all call children use a
 `content_block` node. Bare URLs remain prose.
 Import placement, literal-default validity and other semantic restrictions remain
 Notist's responsibility; the editor grammar does not load imported modules.
+`where` constraints and loop element types are parsed but not evaluated or checked.
 
 Tables validate the header/delimiter width and alignment cells, and expose
 opaque logical row nodes. Cell contents do not receive nested syntax captures.

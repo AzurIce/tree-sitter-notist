@@ -21,6 +21,7 @@ enum MarkdownToken {
   MD_PATH_DOT, MD_ARGUMENTS_OPEN, MD_COMPTIME_OPEN,
   MD_COMPTIME_CLOSE, MD_OR_OPERATOR, MD_AND_OPERATOR, MD_EQUALITY_OPERATOR,
   MD_COMPARE_OPERATOR, MD_SUM_OPERATOR, MD_PRODUCT_OPERATOR,
+  MD_PATH_LITERAL, MD_FOR_START,
 };
 typedef struct { void *markdown; void *notist; } CombinedScanner;
 void *tree_sitter_notist_markdown_inline_external_scanner_create(void) {
@@ -72,7 +73,9 @@ bool tree_sitter_notist_markdown_inline_external_scanner_scan(void *p, TSLexer *
   symbols[ARGUMENTS_OPEN] = valid[MD_ARGUMENTS_OPEN];
   symbols[COMPTIME_OPEN] = valid[MD_COMPTIME_OPEN];
   for (unsigned i = 0; i < 7; i++) symbols[COMPTIME_CLOSE + i] = valid[MD_COMPTIME_CLOSE + i];
-  bool literal = (valid[MD_IDENTIFIER] || valid[MD_STRING] || valid[MD_BOOLEAN]) && ident_start(l->lookahead);
+  symbols[PATH_LITERAL] = valid[MD_PATH_LITERAL];
+  symbols[FOR_START] = valid[MD_FOR_START];
+  bool literal = (valid[MD_IDENTIFIER] || valid[MD_STRING] || valid[MD_BOOLEAN] || valid[MD_PATH_LITERAL]) && ident_start(l->lookahead);
    bool custom = literal || (valid[MD_STRING] && l->lookahead == '"') ||
      valid[MD_OR_OPERATOR] || valid[MD_AND_OPERATOR] || valid[MD_EQUALITY_OPERATOR] ||
      valid[MD_COMPARE_OPERATOR] || valid[MD_SUM_OPERATOR] || valid[MD_PRODUCT_OPERATOR] ||
@@ -80,7 +83,7 @@ bool tree_sitter_notist_markdown_inline_external_scanner_scan(void *p, TSLexer *
      (valid[MD_PATH_DOT] && l->lookahead == '.') ||
      (valid[MD_ARGUMENTS_OPEN] && l->lookahead == '(') ||
      (valid[MD_COMPTIME_OPEN] && l->lookahead == '<') ||
-    (valid[MD_CALL_START] && l->lookahead == '#') ||
+    ((valid[MD_CALL_START] || valid[MD_FOR_START]) && l->lookahead == '#') ||
     ((valid[MD_ANNOTATION_START] || valid[MD_MODULE_ANNOTATION_START]) && l->lookahead == '@') ||
     (valid[MD_BODY_OPEN] && l->lookahead == '[') ||
     (valid[MD_BODY_CLOSE] && l->lookahead == ']') ||
@@ -93,6 +96,8 @@ bool tree_sitter_notist_markdown_inline_external_scanner_scan(void *p, TSLexer *
     else if (l->result_symbol == PATH_DOT) l->result_symbol = MD_PATH_DOT;
     else if (l->result_symbol == ARGUMENTS_OPEN) l->result_symbol = MD_ARGUMENTS_OPEN;
     else if (l->result_symbol == COMPTIME_OPEN) l->result_symbol = MD_COMPTIME_OPEN;
+    else if (l->result_symbol == PATH_LITERAL) l->result_symbol = MD_PATH_LITERAL;
+    else if (l->result_symbol == FOR_START) l->result_symbol = MD_FOR_START;
     else if (l->result_symbol >= COMPTIME_CLOSE && l->result_symbol <= PRODUCT_OPERATOR)
       l->result_symbol = MD_COMPTIME_CLOSE + l->result_symbol - COMPTIME_CLOSE;
     else for (unsigned i = 0; i < sizeof(original) / sizeof(original[0]); i++) {

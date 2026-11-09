@@ -20,6 +20,7 @@ enum Token {
   COMMENT, TABLE_START, TABLE_ROW, TABLE_DELIMITER,
   ANNOTATION_START, MODULE_ANNOTATION_START, IMPORT_START, PATH_DOT, ARGUMENTS_OPEN, COMPTIME_OPEN,
   COMPTIME_CLOSE, OR_OPERATOR, AND_OPERATOR, EQUALITY_OPERATOR, COMPARE_OPERATOR, SUM_OPERATOR, PRODUCT_OPERATOR,
+  PATH_LITERAL, FOR_START,
   TOKEN_COUNT,
 };
 
@@ -122,6 +123,30 @@ static bool string_tail(TSLexer *l, unsigned hashes) {
   return true;
 }
 
+// Path tokens share ordinary string escapes but never cross a physical line.
+// Even malformed triple-quoted paths remain bounded to that line for recovery.
+static bool path_tail(TSLexer *l) {
+  if (l->lookahead != '"') return false;
+  advance_notist(l);
+  unsigned quotes = 1;
+  if (l->lookahead == '"') {
+    advance_notist(l);
+    if (l->lookahead != '"') return true;
+    advance_notist(l); quotes = 3;
+  }
+  while (!l->eof(l) && !newline(l->lookahead)) {
+    if (l->lookahead == '\\') {
+      advance_notist(l);
+      if (!l->eof(l) && !newline(l->lookahead)) advance_notist(l);
+    } else if (l->lookahead == '"') {
+      unsigned count = 0;
+      while (count < quotes && l->lookahead == '"') { advance_notist(l); count++; }
+      if (count == quotes) return true;
+    } else advance_notist(l);
+  }
+  return true;
+}
+
 static bool scan_comment(TSLexer *l) {
   // Caller has consumed the first slash.
   if (l->lookahead == '/') {
@@ -182,7 +207,7 @@ static bool balanced(TSLexer *l, int32_t open, int32_t close, bool blocks) {
   return false;
 }
 
-static bool call_path_info(TSLexer *l, bool *is_import) {
+static bool call_path_info(TSLexer *l, bool *is_import, bool *is_for) {
   if (!ident_start(l->lookahead)) return false;
   char name[8] = {0}; unsigned count = 0;
   bool first = true;
@@ -193,6 +218,7 @@ static bool call_path_info(TSLexer *l, bool *is_import) {
     } while (ident_continue(l->lookahead));
     if (l->lookahead != '.') {
       if (is_import) *is_import = first && count == 6 && !strcmp(name, "import");
+      if (is_for) *is_for = first && count == 3 && !strcmp(name, "for");
       return true;
     }
     first = false;
@@ -200,7 +226,7 @@ static bool call_path_info(TSLexer *l, bool *is_import) {
     if (!ident_start(l->lookahead)) return false;
   }
 }
-static bool call_path(TSLexer *l) { return call_path_info(l, NULL); }
+static bool call_path(TSLexer *l) { return call_path_info(l, NULL, NULL); }
 
 static bool style_mate(TSLexer *l, int32_t marker) {
   if (space(l->lookahead) || l->eof(l) || l->lookahead == marker) return false;
@@ -375,7 +401,7 @@ NOTIST_SCANNER_STORAGE bool tree_sitter_notist_external_scanner_scan(void *paylo
   if (valid[FN_KEYWORD] && valid[TEXT]) {
 #ifdef NOTIST_CODE
     recovery[NEWLINE] = recovery[IDENTIFIER] = recovery[FN_KEYWORD] = true;
-    recovery[STRING] = recovery[BOOLEAN] = recovery[COMMENT] = true;
+    recovery[STRING] = recovery[PATH_LITERAL] = recovery[BOOLEAN] = recovery[COMMENT] = true;
     valid = recovery;
 #else
     (void)recovery;
@@ -443,7 +469,7 @@ NOTIST_SCANNER_STORAGE bool tree_sitter_notist_external_scanner_scan(void *paylo
     if (table_line(l, false, &cells, &pipe, c) && pipe) return finish(s, l, TABLE_ROW, false);
     return valid[TEXT] && emit(s, l, TEXT, space(c));
   }
-  if ((valid[IDENTIFIER] || valid[BOOLEAN] || valid[STRING]) && ident_start(c)) {
+  if ((valid[IDENTIFIER] || valid[BOOLEAN] || valid[STRING] || valid[PATH_LITERAL]) && ident_start(c)) {
     char name[16] = {0}; unsigned count = 0;
     do {
       c = l->lookahead;
@@ -465,9 +491,14 @@ NOTIST_SCANNER_STORAGE bool tree_sitter_notist_external_scanner_scan(void *paylo
       }
 #endif
     } while (ident_continue(l->lookahead));
+    if (count == 1 && name[0] == 'p' && l->lookahead == '"' && valid[PATH_LITERAL]) {
+      path_tail(l);
+      return finish(s, l, PATH_LITERAL, false);
+    }
     if (!valid[TEXT] && count < 15 &&
         (!strcmp(name, "import") || !strcmp(name, "as") || !strcmp(name, "let") ||
-         !strcmp(name, "if") || !strcmp(name, "else") || !strcmp(name, "match") || !strcmp(name, "comptime"))) return false;
+         !strcmp(name, "if") || !strcmp(name, "else") || !strcmp(name, "match") || !strcmp(name, "comptime") ||
+         !strcmp(name, "for") || !strcmp(name, "in") || !strcmp(name, "where"))) return false;
     if (count == 1 && name[0] == 'r' && l->lookahead == '#' && valid[STRING]) {
       unsigned hashes = 0;
       while (l->lookahead == '#') { advance_notist(l); hashes++; }
@@ -524,9 +555,10 @@ NOTIST_SCANNER_STORAGE bool tree_sitter_notist_external_scanner_scan(void *paylo
   if (c == ']' && valid[LINK_LABEL_CLOSE]) return emit(s, l, LINK_LABEL_CLOSE, false);
   if (c == '|' && valid[WIKI_PIPE]) return emit(s, l, WIKI_PIPE, false);
   if (c == '#') {
-    bool is_import = false;
-    if ((valid[CALL_START] || valid[IMPORT_START]) && call_path_info(l, &is_import)) {
+    bool is_import = false, is_for = false;
+    if ((valid[CALL_START] || valid[IMPORT_START] || valid[FOR_START]) && call_path_info(l, &is_import, &is_for)) {
       if (valid[IMPORT_START] && column == 0 && is_import && space(l->lookahead)) return finish(s, l, IMPORT_START, false);
+      if (valid[FOR_START] && is_for && space(l->lookahead)) return finish(s, l, FOR_START, false);
       if (l->lookahead == '(' && !balanced(l, '(', ')', false)) return valid[TEXT] && emit(s, l, TEXT, false);
       return valid[CALL_START] && emit(s, l, CALL_START, false);
     }
